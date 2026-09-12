@@ -12,8 +12,12 @@ This is a modified ViaForge client for Minecraft Forge 1.8.9.
   under Vibe's GPLv3 license. The Windows builder is adapted from Vibe too.
   The complete GPLv3 text is in the project root's `LICENSE`.
 
-Changes to the Vibe files: Java package names, ViaForge initialization and menu
-integration, account directory, fixed account theme and vanilla background in
+The account manager and screens are development-only (`src/development`) and
+are not included in the release mod JAR. They are available when using `run.bat`
+or Gradle `runClient` and remain included in the project source archive.
+
+Changes to the Vibe files: Java package names, development-only Forge initialization
+and menu event integration, account directory, fixed account theme and vanilla background in
 place of Vibe's shader/language/theme infrastructure. Account screen clicks are
 dispatched once to prevent a newly displayed button receiving the same click.
 The encrypted file format

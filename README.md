@@ -2,12 +2,12 @@
 
 ViaForge from the [ver/1.8-1.12](https://github.com/ViaVersion/ViaForge/tree/ver/1.8-1.12) branch,
 adapted to target **Minecraft 1.8.9 / Forge 11.15.1.2318** only.
-Includes account management adapted from [Vibe](https://codeberg.org/SkidderClub/Vibe).
+Developer launches include account management adapted from [Vibe](https://codeberg.org/SkidderClub/Vibe).
 
 ## Running and building (Windows)
 
-- **`run.bat`** launches Minecraft with ViaForge and the account manager.
-- **`build.bat`** runs checks and builds the mod JAR.
+- **`run.bat`** launches Minecraft with ViaForge and the developer account manager.
+- **`build.bat`** runs checks and builds the mod JAR without the account manager.
 - Output: **`build/libs/ViaForge-1.8.9-4.4.0-client.1.jar`**.
 - For a standard Forge 1.8.9 installation, place the JAR in the `mods` folder.
   It is a Forge mod and cannot be launched directly by double-clicking it.
@@ -32,9 +32,11 @@ The scripts return Gradle's exit code.
 On Windows, an available drive letter is temporarily mapped to the project
 so the legacy Forge tools can work with short paths.
 
-## Accounts
+## Developer accounts
 
-Open **Accounts** in the top-right corner of the main menu.
+When starting through **`run.bat`** (Gradle `runClient`), open **Accounts** in the
+top-right corner of the main menu. Account login support and this button are
+included only in the development JAR; the release mod uses the launcher account.
 
 - **Microsoft login**: sign in through your browser and enter the displayed code.
   As in Vibe, Microsoft identifies the application as **In-Game Account Switcher**.
@@ -65,7 +67,8 @@ This is a single Gradle project for Minecraft 1.8.9:
 
 | Path | Contents |
 | --- | --- |
-| `src/main/` | ViaForge, Forge integration, account manager and resources |
+| `src/main/` | ViaForge, Forge integration and release resources |
+| `src/development/` | Developer account manager, screens and menu integration |
 | `src/test/` | Account tests |
 | `docs/` | Development notes and source attribution |
 | `gradle/` | Gradle wrapper for reproducible builds |
@@ -78,8 +81,9 @@ once the game and Gradle have stopped; both are recreated on the next build.
 `run/` contains your personal game data.
 
 The build compiles with JDK 21 and converts the bundled modern libraries to
-Java 8. `runClient` uses a separate JAR with development names; the release
-mod JAR uses Forge SRG names.
+Java 8. `runClient` uses a separate JAR with development names and account login
+support in `build/development/`; the release mod JAR uses Forge SRG names and
+contains no account manager classes. Both JARs are verified during `build`.
 
 The adapted account tests cover OAuth flows with simulated responses, token
 refresh, cookie validation and encrypted storage, among other checks.

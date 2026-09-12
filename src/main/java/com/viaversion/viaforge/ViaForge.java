@@ -19,7 +19,6 @@
 package com.viaversion.viaforge;
 
 import com.viaversion.viaforge.common.ViaForgeCommon;
-import com.viaversion.viaforge.account.AccountManager;
 import com.viaversion.viaforge.common.platform.ViaForgePlatform;
 import com.viaversion.viaforge.common.platform.ViaForgeProtocolBase;
 import com.viaversion.viaforge.platform.ViaForgeGameProfileFetcher;
@@ -35,17 +34,9 @@ import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.provider.GameProfi
 @Mod(modid = "viaforge", name = "ViaForge", acceptableRemoteVersions = "*", clientSideOnly = true, useMetadata = true)
 public class ViaForge implements ViaForgePlatform {
 
-    private static AccountManager accounts;
-
-    public static AccountManager getAccounts() {
-        return accounts;
-    }
-
     @Mod.EventHandler
     public void onInit(FMLInitializationEvent event) {
         ViaForgeCommon.init(this);
-        final Minecraft minecraft = Minecraft.getMinecraft();
-        accounts = new AccountManager(minecraft, minecraft.mcDataDir.toPath().resolve("ViaForge/accounts"));
     }
 
     @Override

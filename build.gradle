@@ -12,7 +12,7 @@ plugins {
 group = 'com.viaversion'
 version = '4.4.0-client.1'
 
-description = 'ViaForge for Minecraft Forge 1.8.9 with Vibe account management'
+description = 'ViaForge for Minecraft Forge 1.8.9'
 base { archivesName = 'ViaForge-1.8.9' }
 java { toolchain.languageVersion = JavaLanguageVersion.of(21) }
 tasks.withType(JavaCompile).configureEach {
@@ -85,6 +85,13 @@ unimined.minecraft {
     }
 }
 
+// Login support is compiled separately and never enters the release pipeline.
+sourceSets {
+    development {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+    }
+}
+
 processResources {
     inputs.property 'version', project.version
     inputs.property 'description', project.description
@@ -126,8 +133,18 @@ shadeDowngradedApi {
     archiveFileName = "ViaForge-1.8.9-${project.version}.jar"
     logLevel = 'FATAL'
 }
+tasks.register('developmentJar', Jar) {
+    destinationDirectory = layout.buildDirectory.dir('intermediates/development')
+    archiveClassifier = 'dev'
+    manifest.from tasks.jar.manifest
+    from(tasks.named('shadowJar').flatMap { it.archiveFile }.map { zipTree(it) }) {
+        exclude 'META-INF/MANIFEST.MF'
+    }
+    from sourceSets.development.output
+}
+
 tasks.register('downgradeDevelopmentJar', DowngradeJar) {
-    inputFile = tasks.shadowJar.archiveFile
+    inputFile = tasks.named('developmentJar').flatMap { it.archiveFile }
     destinationDirectory = layout.buildDirectory.dir('intermediates/dev-downgrade')
     archiveClassifier = 'dev-downgraded'
     downgradeTo = JavaVersion.VERSION_1_8
@@ -147,7 +164,7 @@ tasks.register('installDevelopmentJar', Copy) {
 tasks.named('remapJar') { enabled = false }
 tasks.named('assemble') { dependsOn tasks.named('shadeDowngradedApi') }
 tasks.named('compileTestJava') {
-    classpath = files(sourceSets.main.output, configurations.accountTestLibraries)
+    classpath = files(sourceSets.development.output, configurations.accountTestLibraries)
     sourceCompatibility = '8'
     targetCompatibility = '8'
     options.release = 8
@@ -155,14 +172,14 @@ tasks.named('compileTestJava') {
 tasks.named('test') {
     useJUnit()
     javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(8) }
-    dependsOn tasks.named('shadeDowngradedApi')
-    // Exercise the packaged, downgraded account implementation on the game's JVM.
-    classpath = files(sourceSets.test.output, tasks.named('shadeDowngradedApi'), configurations.accountTestLibraries)
+    dependsOn tasks.named('shadeDevelopmentApi')
+    // Exercise the development-only account implementation on the game's JVM.
+    classpath = files(sourceSets.test.output, tasks.named('shadeDevelopmentApi'), configurations.accountTestLibraries)
 }
 
 tasks.register('verifyReleaseJar') {
     group = 'verification'
-    description = 'Checks Forge metadata, mixin mappings and Java 8 bytecode in the release JAR.'
+    description = 'Checks Forge metadata, mixin mappings, Java 8 bytecode and absence of development accounts in the release JAR.'
     dependsOn tasks.named('shadeDowngradedApi')
     def artifact = tasks.named('shadeDowngradedApi').flatMap { it.archiveFile }
     inputs.file(artifact)
@@ -175,13 +192,16 @@ tasks.register('verifyReleaseJar') {
             }
             for (String path : ['mcmod.info', 'mixins.viaforge.json', 'mixins.viaforge.refmap.json',
                     'com/viaversion/viaforge/ViaForge.class',
-                    'com/viaversion/viaforge/account/AccountManager.class',
-                    'com/viaversion/viaforge/gui/account/AccountManagerGui.class',
                     'com/viaversion/viaversion/ViaManagerImpl.class', 'META-INF/viaforge/LICENSE']) {
                 if (jarFile.getEntry(path) == null) throw new GradleException("Missing packaged file: ${path}")
             }
             int count = 0
             jarFile.entries().each { entry ->
+                if (entry.name.startsWith('com/viaversion/viaforge/account/')
+                        || entry.name.startsWith('com/viaversion/viaforge/gui/account/')
+                        || entry.name.startsWith('com/viaversion/viaforge/development/')) {
+                    throw new GradleException("Development-only account code packaged in release: ${entry.name}")
+                }
                 if (entry.name.endsWith('.class')) {
                     jarFile.getInputStream(entry).withCloseable { stream ->
                         def data = new DataInputStream(stream)
@@ -193,11 +213,40 @@ tasks.register('verifyReleaseJar') {
                     }
                 }
             }
-            logger.lifecycle("Release verified: ${count} Java 8-compatible classes, Forge registration and mixin mappings present.")
+            logger.lifecycle("Release verified: ${count} Java 8-compatible classes, Forge registration and mixin mappings present, no development accounts.")
         }
     }
 }
-tasks.named('check') { dependsOn tasks.named('verifyReleaseJar') }
+tasks.register('verifyDevelopmentJar') {
+    group = 'verification'
+    description = 'Checks that the development JAR contains account login support and Java 8 bytecode.'
+    dependsOn tasks.named('shadeDevelopmentApi')
+    def artifact = tasks.named('shadeDevelopmentApi').flatMap { it.archiveFile }
+    inputs.file(artifact)
+    doLast {
+        new java.util.jar.JarFile(artifact.get().asFile).withCloseable { jarFile ->
+            for (String path : ['com/viaversion/viaforge/development/DevelopmentAccounts.class',
+                    'com/viaversion/viaforge/account/AccountManager.class',
+                    'com/viaversion/viaforge/gui/account/AccountManagerGui.class']) {
+                if (jarFile.getEntry(path) == null) throw new GradleException("Missing development file: ${path}")
+            }
+            jarFile.entries().each { entry ->
+                if (entry.name.endsWith('.class')) {
+                    jarFile.getInputStream(entry).withCloseable { stream ->
+                        def data = new DataInputStream(stream)
+                        data.readInt()
+                        data.readUnsignedShort()
+                        int major = data.readUnsignedShort()
+                        if (major > 52) throw new GradleException("Forge cannot scan Java ${major - 44} class ${entry.name}")
+                    }
+                }
+            }
+            logger.lifecycle('Development JAR verified: account login support present, all classes Java 8-compatible.')
+        }
+    }
+}
+
+tasks.named('check') { dependsOn tasks.named('verifyReleaseJar'), tasks.named('verifyDevelopmentJar') }
 
 tasks.register('sourceArchive', Zip) {
     archiveFileName = "ViaForge-1.8.9-${project.version}-sources.zip"

@@ -22,8 +22,6 @@ import com.viaversion.viaversion.util.Pair;
 import com.viaversion.viaforge.common.ViaForgeCommon;
 import com.viaversion.viaforge.common.platform.ViaForgeConfig;
 import com.viaversion.viaforge.gui.GuiProtocolSelector;
-import com.viaversion.viaforge.ViaForge;
-import com.viaversion.viaforge.gui.account.AccountManagerGui;
 import net.minecraft.client.gui.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -35,7 +33,6 @@ public class MixinGuiMainMenu extends GuiScreen {
 
     @Inject(method = "initGui", at = @At("RETURN"))
     public void hookViaForgeButton(CallbackInfo ci) {
-        buttonList.add(new GuiButton(1_000_000_001, this.width - 105, 5, 100, 20, "Accounts"));
         final ViaForgeConfig config = ViaForgeCommon.getManager().getConfig();
         if (config.isShowMainMenuButton()) {
             final Pair<Integer, Integer> pos = config.getViaForgeButtonPosition().getPosition(this.width, this.height);
@@ -46,9 +43,6 @@ public class MixinGuiMainMenu extends GuiScreen {
 
     @Inject(method = "actionPerformed", at = @At("RETURN"))
     public void handleViaForgeButtonClicking(GuiButton p_actionPerformed_1_, CallbackInfo ci) {
-        if (p_actionPerformed_1_.id == 1_000_000_001) {
-            mc.displayGuiScreen(new AccountManagerGui(this, ViaForge.getAccounts()));
-        }
         if (ViaForgeCommon.getManager().getConfig().isShowMainMenuButton()) {
             if (p_actionPerformed_1_.id == 1_000_000_000) {
                 mc.displayGuiScreen(new GuiProtocolSelector(this));

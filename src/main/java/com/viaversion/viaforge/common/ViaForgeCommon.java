@@ -47,8 +47,8 @@ import net.raphimc.vialegacy.netty.PreNettyLengthPrepender;
 import net.raphimc.vialegacy.netty.PreNettyLengthRemover;
 
 /**
- * This class is used to manage the common code between the different ViaForge versions.
- * It is used to inject the ViaVersion pipeline into the netty pipeline. It also manages the target version.
+ * Initializes protocol translation, injects ViaVersion into the Netty pipeline
+ * and manages the target server version.
  */
 public class ViaForgeCommon {
 

@@ -1,82 +1,90 @@
-# This project has been archived!
+# ViaForge 1.8.9 Client
 
-Forge and NeoForge ViaVersion have seen almost no use in recent months, aside from some very old client versions.
-Keeping the project updated and working has become increasingly time-consuming, and it’s no longer worth the effort.
+ViaForge from the [ver/1.8-1.12](https://github.com/ViaVersion/ViaForge/tree/ver/1.8-1.12) branch,
+adapted to target **Minecraft 1.8.9 / Forge 11.15.1.2318** only.
+Includes account management adapted from [Vibe](https://codeberg.org/SkidderClub/Vibe).
 
-Please consider switching to the [FabricMC mod loader](https://fabricmc.net/)
-with [one of our Fabric platforms](https://viaversion.com/), or use [ViaProxy](https://github.com/ViaVersion/ViaProxy).
+## Running and building (Windows)
 
-<!--suppress HtmlDeprecatedAttribute -->
-<div align="center">
-  <img src="https://raw.githubusercontent.com/ViaVersion/ViaForge/master/src/main/resources/icon.png" width="150" alt="ViaForge logo">
-  <h1>ViaForge</h1>
-  <a href="https://files.minecraftforge.net/net/minecraftforge/forge"><img src="https://img.shields.io/badge/Mod%20Loader-Forge-lightyellow?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAYCAYAAACbU/80AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAALySURBVEhLtZZPaBNBFMbzz42NtoII0aCiRQURVGIFEak3URFEEHqUCkVsPZSKoHjQiwjiQb1UFOlBUXoS0XjowYte1JutF6kKUtYIUQpN1k3zz9+bndos3TabNPng4817b+Z7Mzs7sxtoFKVSaV25XO6BD4vF4nodbi4QD+nmfxDbWqlUnsFfUIHYNZ12gUluI32R/Ed4Uof9g0EGPKVdBUS7nLIumMTbdT7BmLNwjHjOSSuklIAfMLhDN6V9Hx7XrvhrEJtyNOdBfBjzBP5RATcKcDSbzQa1zNJA7A7slTYrGmTwd/Z5tUoCcq+V7NL4DVP07Udjh23b/ooLGHSMwVPY/UJRw97V6QDuJYl54Af9RuBpijb2YqbT6RCr3YTIIQTHEEpiTVEndlj6ENuDW5RYNcj3KZHlAqGD8CrsolgHthv9HPYz+2hIH/y3qqobD5RAM0CxPgTfY3drfx/+NPaG9s+oklUgNm6a5oKj2zAQvI6uje0Xn/Yu2hNsUbJQKBj4k1JYI0/uOfGVavBykM/nIxSRfb7taKvVjUrOsqw425CQNrFeUu+wA7BTYvXC82jkcrlEKBTqjkajbcFg0JIQBfIcpQ+xWEy9AyBMcbEV+vzFrtAUTZXQmKsxrfu54DkBisXpLIVKTkT1s3kqVyKRiGyHraLzhTx1qtAGL6D5yHFrgAmcU8+d/YdWFUuwUQxpeRc8Z05neZPvwQEVqB+zcAKdT9ivLEhOz5hhGF9U1i8YdBS+QOgnnIW1ICfmFnfHzkwmU2tb/APRtbCTI/ZYF/KCfPmO6CGtAadgC0Xki+eFYd2tteDxtlMs7dR04bzuUhcauTblsxx1mi5s17Y14PYLs/q9rDTlLHgBLN6TIfps0EOaB4Tl0zwO/dwDM3CES0tuxZrwdVQQvIm57HgKb4i9ZGLfaK8Kh8MHsD0wLkkgN+RGbj7TcReH3wkkMfIzQrMyyXfilUpUgUe/mfgJmrLyGSb3lInNXdmLIBD4Bw72x5r0eQ99AAAAAElFTkSuQmCC" alt="Mod Loader: Forge"></a>
-  <img src="https://img.shields.io/badge/Enviroment-Client-purple" alt="Environment: Client">
-  <a href="https://discord.gg/viaversion"><img src="https://img.shields.io/discord/316206679014244363?color=0098DB&label=Discord&logo=discord&logoColor=0098DB" alt="Discord"></a> <br />
-  <a href="https://modrinth.com/mod/viaforge"><img src="https://img.shields.io/badge/dynamic/json?color=158000&label=downloads&prefix=+%20&query=downloads&url=https://api.modrinth.com/v2/project/Z6se2s8f&logo=modrinth" alt="Modrinth Downloads"></a>
-  <a href="https://curseforge.com/minecraft/mc-mods/viaforge"><img src="https://cf.way2muchnoise.eu/full_418933_downloads.svg" alt="CurseForge Downloads"></a>
-  <a href="https://github.com/ViaVersion/ViaForge/actions/workflows/build.yml"><img src="https://github.com/ViaVersion/ViaForge/actions/workflows/build.yml/badge.svg?branch=master" alt="Build Status"></a>  
+- **`run.bat`** launches Minecraft with ViaForge and the account manager.
+- **`build.bat`** runs checks and builds the mod JAR.
+- Output: **`build/libs/ViaForge-1.8.9-4.4.0-client.1.jar`**.
+- For a standard Forge 1.8.9 installation, place the JAR in the `mods` folder.
+  It is a Forge mod and cannot be launched directly by double-clicking it.
+- The matching project sources are saved alongside it as `*-sources.zip`.
 
-  <p>Client-side ViaVersion implementation for MinecraftForge and NeoForge</p>
-</div>
+The build script automatically searches for **JDK 21**, including in `%USERPROFILE%/.jdks`.
+The game runs on **Java 8**, which Gradle selects as a toolchain and downloads
+if needed. The first launch also downloads Minecraft, Forge and the required
+libraries. This requires an internet connection and may take a few minutes.
+The scripts also work when a different Java version is set as the system default.
 
-## How to (Users)
+`run/` contains the game data. You can pass additional Gradle arguments:
 
-If you are using the latest Minecraft version and care about the gameplay being more enjoyable/functional, you may want
-to
-check [ViaFabricPlus](https://modrinth.com/mod/viafabricplus) out.
+```bat
+build.bat clean build
+build.bat test
+run.bat --info
+```
 
-### Supported Client versions
+For automated runs, use `set VIAFORGE_NO_PAUSE=1` to skip the final keypress prompt.
+The scripts return Gradle's exit code.
+On Windows, an available drive letter is temporarily mapped to the project
+so the legacy Forge tools can work with short paths.
 
-- Minecraft 26.x+ versions
-- 1.16.5 – 1.21.11
-- 1.8.9 / 1.12.2
-  using the Forge or NeoForge (1.20.1+) Loader.
+## Accounts
 
-For each year, there is a versioned branch named after that year (for example, `ver/26.x`). Each yearly branch contains
-all `26.x` releases published during that year.
+Open **Accounts** in the top-right corner of the main menu.
 
-Additional version branches
+- **Microsoft login**: sign in through your browser and enter the displayed code.
+  As in Vibe, Microsoft identifies the application as **In-Game Account Switcher**.
+- **Cookie login**: select your own Microsoft cookie file in Netscape format.
+- **More → Offline profile**: create a profile for singleplayer and offline servers.
+- **Use account**: sign in with a saved account; **Auto Login** enables automatic
+  sign-in with that account on the next launch.
+- **More** provides backup import/export, access to the cookie folder and an option
+  to restore the original launcher session.
 
-- `ver/1.16-1.21`
-- `ver/1.8-1.12`
+Saved credentials are encrypted and stored in `run/ViaForge/accounts/`.
+`accounts.vault` and `accounts.key` belong together; keep both private.
+The key is stored locally alongside the vault, so encryption does not replace
+the need to secure your Windows user account. Vibe backups require their matching
+key and cannot be decrypted independently.
+Automatic cookie import watches only `run/ViaForge/cookies/`.
+Accounts can only be switched when no world is running.
 
-## Supported Server versions
+## Server version
 
-- Release (1.0.0 - 26.1)
-- Beta (b1.0 - b1.8.1)
-- Alpha (a1.0.15 - a1.2.6)
-- Classic (c0.0.15 - c0.30 including [CPE](https://wiki.vg/Classic_Protocol_Extension))
-- April Fools (3D Shareware, 20w14infinite, 25w14craftmine)
-- Combat Snapshots (Combat Test 8c)
+The **ViaForge** button opens the protocol selector. ViaForge's existing protocol
+translation through ViaVersion, ViaBackwards, ViaRewind, ViaLegacy and ViaAprilFools
+is included. The Minecraft client itself always remains on version 1.8.9.
 
-Dev builds: https://ci.viaversion.com/view/Platforms/job/ViaForge/
+## Development and attribution
 
-If you encounter any issues, please report them on either:
+This is a single Gradle project for Minecraft 1.8.9:
 
-- [the issue tracker](https://github.com/ViaVersion/ViaForge/issues)
-- [the ViaVersion Discord](https://discord.gg/viaversion)
+| Path | Contents |
+| --- | --- |
+| `src/main/` | ViaForge, Forge integration, account manager and resources |
+| `src/test/` | Account tests |
+| `docs/` | Development notes and source attribution |
+| `gradle/` | Gradle wrapper for reproducible builds |
+| `build/` | Generated JARs, intermediate files and verification reports |
+| `run/` | Game data, settings and accounts |
+| `.gradle/` | Automatically generated build cache |
 
-## How to (Developers)
+`gradle/` and `.gradle/` serve different purposes. You can delete `build/` and `.gradle/`
+once the game and Gradle have stopped; both are recreated on the next build.
+`run/` contains your personal game data.
 
-### How to build
+The build compiles with JDK 21 and converts the bundled modern libraries to
+Java 8. `runClient` uses a separate JAR with development names; the release
+mod JAR uses Forge SRG names.
 
-1. Clone the repository with `git clone`.
-2. Run `./gradlew build` in the root directory of the repository.
-3. The compiled jar files can be found in `viaforge-mc<version>/build/libs`.
+The adapted account tests cover OAuth flows with simulated responses, token
+refresh, cookie validation and encrypted storage, among other checks.
+A real Microsoft sign-in requires confirmation by the account owner.
 
-Note: Build scripts are made to be run using Java 21.
-
-### Anti cheat integration
-
-ViaForge supports sending a custom payload to transmit player protocol version data to the server. This allows servers
-to retrieve a player's protocol version via plugin messages, which can be useful for anti-cheat checks and
-version-dependent logic.
-For more details on how to use this feature, see
-the [Server and Player Details Protocol wiki](https://github.com/ViaVersion/ViaVersion/wiki/Server-and-Player-Details-Protocol).
-
-## Disclaimer
-
-It cannot be guaranteed that this mod is allowed on specific servers as it can possibly cause problems with anti-cheat
-plugins.\
-***(USE ONLY WITH CAUTION!)***
+Development: [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
+Sources, revisions and adaptations: [docs/THIRD_PARTY_NOTICES.md](docs/THIRD_PARTY_NOTICES.md).
+License: [GPLv3](LICENSE).

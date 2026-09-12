@@ -13,8 +13,6 @@ classes/
 # Idea
 
 .idea/
-!.idea/copyright/*
-!.idea/scopes/*
 *.iml
 *.ipr
 *.iws
@@ -34,5 +32,10 @@ DS_Store
 # Misc
 
 run/
-viaforge-mc189/publishMods/*
 forge*changelog.txt
+*.log
+*.vibeaccounts
+accounts.key
+accounts.vault
+ViaForge/accounts/
+ViaForge/cookies/

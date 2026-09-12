@@ -1,328 +1,212 @@
-import me.modmuss50.mpp.ReleaseType
+import xyz.wagyourtail.jvmdg.gradle.task.DowngradeJar
+import xyz.wagyourtail.jvmdg.gradle.task.ShadeJar
 
-String runGitCommand(Project project, List<String> args) {
-    try {
-        def output = new ByteArrayOutputStream()
-        project.exec {
-            commandLine(["git"] + args)
-            standardOutput = output
-            ignoreExitValue = true
+plugins {
+    id 'java-library'
+    id 'net.raphimc.class-token-replacer' version '1.1.7'
+    id 'xyz.wagyourtail.unimined' version '1.4.1'
+    id 'com.gradleup.shadow' version '9.4.1'
+    id 'xyz.wagyourtail.jvmdowngrader' version '1.3.6'
+}
+
+group = 'com.viaversion'
+version = '4.4.0-client.1'
+
+description = 'ViaForge for Minecraft Forge 1.8.9 with Vibe account management'
+base { archivesName = 'ViaForge-1.8.9' }
+java { toolchain.languageVersion = JavaLanguageVersion.of(21) }
+tasks.withType(JavaCompile).configureEach {
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
+    options.encoding = 'UTF-8'
+}
+repositories {
+    mavenCentral()
+    maven { url = 'https://maven.minecraftforge.net/' }
+    maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+    maven {
+        url = 'https://repo.viaversion.com'
+        // Modern Via libraries are converted to Java 8 during packaging.
+        metadataSources { mavenPom(); artifact() }
+    }
+}
+configurations {
+    library
+    implementation.extendsFrom(library)
+    accountTestLibraries {
+        canBeConsumed = false
+        canBeResolved = true
+    }
+}
+dependencies {
+    library "com.viaversion:viaversion-common:${vv_version}"
+    library "com.viaversion:viabackwards-common:${vb_version}"
+    library "com.viaversion:viarewind-common:${vr_version}"
+    library "com.viaversion:viaaprilfools-common:${vaf_version}"
+    library("net.raphimc:ViaLegacy:${vl_version}") {
+        exclude group: 'com.google.code.gson', module: 'gson'
+    }
+    compileOnly 'io.netty:netty-all:4.2.2.Final'
+    library('org.spongepowered:mixin:0.7.10-SNAPSHOT') { exclude module: 'launchwrapper' }
+    library 'org.slf4j:slf4j-api:2.0.17'
+    accountTestLibraries 'junit:junit:4.13.2'
+    accountTestLibraries 'com.google.code.gson:gson:2.2.4'
+    accountTestLibraries 'org.apache.httpcomponents:httpclient:4.3.3'
+}
+
+sourceSets.main.classTokenReplacer { property('\${version}', project.version) }
+
+unimined.minecraft {
+    version '1.8.9'
+    minecraftForge {
+        loader '11.15.1.2318-1.8.9'
+        mixinConfig('mixins.viaforge.json')
+    }
+    mappings {
+        searge()
+        mcp('stable', '22-1.8.9')
+    }
+    remap(tasks.shadowJar) {
+        prodNamespace('searge')
+        mixinRemap { }
+    }
+    runs {
+        config('client') {
+            javaVersion = JavaVersion.VERSION_1_8
+            workingDir file('run')
+            // Forge 1.8.9 cannot read the original Java 17+ classes.
+            // Run the complete downgraded development JAR with only game libraries.
+            classpath = classpath - sourceSets.main.output - configurations.library + configurations.minecraftLibraries
+            classpath = classpath.filter { !it.name.startsWith('annotations-') }
+            // Coremods are skipped during classpath mod discovery. Install the
+            // development JAR in mods so Forge also discovers its @Mod entry.
+            dependsOn tasks.named('installDevelopmentJar')
         }
-
-        def result = output.toString("UTF-8").trim()
-        return result ? result : "unknown"
-    } catch (Exception ignored) {
-        return "unknown"
     }
 }
 
-String latestCommitHash(Project project) {
-    return runGitCommand(project, ["rev-parse", "--short", "HEAD"])
+processResources {
+    inputs.property 'version', project.version
+    inputs.property 'description', project.description
+    filesMatching('mcmod.info') { expand version: project.version, description: project.description }
+    from(file('LICENSE')) { into 'META-INF/viaforge' }
+    from(file('docs/THIRD_PARTY_NOTICES.md')) { into 'META-INF/viaforge' }
 }
 
-String latestCommitMessage(Project project) {
-    return runGitCommand(project, ["log", "-1", "--pretty=%B"])
+jar {
+    enabled = false
+    manifest.attributes(
+        'Implementation-Title': 'ViaForge 1.8.9 Client',
+        'Implementation-Version': project.version,
+        'FMLCorePlugin': 'com.viaversion.viaforge.mixin.MixinLoader',
+        'FMLCorePluginContainsFMLMod': 'true',
+        'ForceLoadAsMod': 'true',
+        'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
+        'TweakOrder': '0',
+        'MixinConfigs': 'mixins.viaforge.json'
+    )
+}
+shadowJar {
+    destinationDirectory = layout.buildDirectory.dir('intermediates/shadow')
+    configurations = [project.configurations.library]
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    exclude 'META-INF/maven/**', 'META-INF/*.SF', 'META-INF/*.RSA', 'META-INF/*.DSA', 'META-INF/*.EC'
+    // Forge's ASM 5 scanner reads every class, including Java 9+ module descriptors.
+    exclude 'META-INF/versions/**', 'module-info.class'
+    relocate 'org.slf4j', 'com.viaversion.viaforge.libs.slf4j'
+}
+downgradeJar {
+    inputFile = tasks.named('remapShadowJar').flatMap { it.archiveFile }
+    destinationDirectory = layout.buildDirectory.dir('intermediates/downgrade')
+    downgradeTo = JavaVersion.VERSION_1_8
+    logLevel = 'FATAL'
+}
+shadeDowngradedApi {
+    destinationDirectory = layout.buildDirectory.dir('libs')
+    archiveFileName = "ViaForge-1.8.9-${project.version}.jar"
+    logLevel = 'FATAL'
+}
+tasks.register('downgradeDevelopmentJar', DowngradeJar) {
+    inputFile = tasks.shadowJar.archiveFile
+    destinationDirectory = layout.buildDirectory.dir('intermediates/dev-downgrade')
+    archiveClassifier = 'dev-downgraded'
+    downgradeTo = JavaVersion.VERSION_1_8
+    logLevel = 'FATAL'
+}
+tasks.register('shadeDevelopmentApi', ShadeJar) {
+    inputFile = tasks.named('downgradeDevelopmentJar').flatMap { it.archiveFile }
+    destinationDirectory = layout.buildDirectory.dir('development')
+    archiveClassifier = 'dev-java8'
+    logLevel = 'FATAL'
+}
+tasks.register('installDevelopmentJar', Copy) {
+    from tasks.named('shadeDevelopmentApi').flatMap { it.archiveFile }
+    into layout.projectDirectory.dir('run/mods')
+    rename { 'ViaForge-development.jar' }
+}
+tasks.named('remapJar') { enabled = false }
+tasks.named('assemble') { dependsOn tasks.named('shadeDowngradedApi') }
+tasks.named('compileTestJava') {
+    classpath = files(sourceSets.main.output, configurations.accountTestLibraries)
+    sourceCompatibility = '8'
+    targetCompatibility = '8'
+    options.release = 8
+}
+tasks.named('test') {
+    useJUnit()
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(8) }
+    dependsOn tasks.named('shadeDowngradedApi')
+    // Exercise the packaged, downgraded account implementation on the game's JVM.
+    classpath = files(sourceSets.test.output, tasks.named('shadeDowngradedApi'), configurations.accountTestLibraries)
 }
 
-buildscript {
-    // Unify build logic of all submodules in here, ugly but easier since we have to deal with a lot random stuff
-    repositories {
-        gradlePluginPortal()
-
-        maven {
-            url = "https://maven.minecraftforge.net/"
-        }
-        maven {
-            url = "https://repo.spongepowered.org/repository/maven-public/"
-        }
-    }
-
-    dependencies {
-        classpath "com.gradleup.shadow:shadow-gradle-plugin:9.4.1"
-        classpath "net.minecraftforge.gradle:ForgeGradle:[6.0.36,6.2)"
-        classpath "org.spongepowered:mixingradle:0.7-SNAPSHOT"
-        classpath "xyz.wagyourtail.jvmdowngrader:gradle-plugin:1.3.6"
-        classpath "me.modmuss50.mod-publish-plugin:me.modmuss50.mod-publish-plugin.gradle.plugin:1.1.0"
-        classpath "net.raphimc.class-token-replacer:net.raphimc.class-token-replacer.gradle.plugin:1.1.7"
-    }
-}
-
-allprojects {
-    apply plugin: "java-library"
-    apply plugin: "com.gradleup.shadow"
-    apply plugin: "xyz.wagyourtail.jvmdowngrader"
-
-    java {
-        // Minecraft 1.17+ required Java 17 to compile,
-        // Minecraft 1.20.5+ required Java 21 to compile
-        toolchain.languageVersion = JavaLanguageVersion.of(21)
-    }
-
-    // Always set min java version to 17, for java 8 versions the jar is manually downgraded so it doesn't matter.
-    compileJava.setSourceCompatibility("17")
-    compileJava.setTargetCompatibility("17")
-
-    // Configuration used to include dependencies to the final jars
-    configurations {
-        library
-        implementation.extendsFrom(library)
-    }
-
-    repositories {
-        maven {
-            url = "https://maven.minecraftforge.net/"
-        }
-        maven {
-            url = "https://repo.spongepowered.org/repository/maven-public"
-        }
-        maven {
-            url = "https://maven.neoforged.net/releases"
-        }
-        maven {
-            url = "https://repo.viaversion.com"
-            metadataSources {
-                // Prevent Gradle from checking against correct Java version, needed since we downgrade libraries
-                // on include
-                mavenPom()
-                artifact()
+tasks.register('verifyReleaseJar') {
+    group = 'verification'
+    description = 'Checks Forge metadata, mixin mappings and Java 8 bytecode in the release JAR.'
+    dependsOn tasks.named('shadeDowngradedApi')
+    def artifact = tasks.named('shadeDowngradedApi').flatMap { it.archiveFile }
+    inputs.file(artifact)
+    doLast {
+        new java.util.jar.JarFile(artifact.get().asFile).withCloseable { jarFile ->
+            def attributes = jarFile.manifest.mainAttributes
+            if (attributes.getValue('FMLCorePlugin') != 'com.viaversion.viaforge.mixin.MixinLoader'
+                    || attributes.getValue('FMLCorePluginContainsFMLMod') != 'true') {
+                throw new GradleException('Missing Forge coremod/mod registration')
             }
-        }
-    }
-
-    dependencies {
-        library "com.viaversion:viaversion-common:${vv_version}"
-        library "com.viaversion:viabackwards-common:${vb_version}"
-        library "com.viaversion:viarewind-common:${vr_version}"
-        library "com.viaversion:viaaprilfools-common:${vaf_version}"
-        library("net.raphimc:ViaLegacy:${vl_version}") {
-            exclude group: "com.google.code.gson", module: "gson"
-        }
-    }
-}
-
-subprojects {
-    def applyFg = project.hasProperty("applyFg") ? Boolean.parseBoolean(project.applyFg) : true
-    if (applyFg) {
-        apply plugin: "net.minecraftforge.gradle"
-        apply plugin: "org.spongepowered.mixin"
-    }
-    apply plugin: "me.modmuss50.mod-publish-plugin"
-
-    // Define the jar output attributes for all platforms
-    base {
-        group = "com.viaversion"
-        archivesName = project.name
-        version = "4.4.0+" + (System.getenv("GITHUB_RUN_NUMBER") ?: "unknown")
-        description = "Client-side ViaVersion implementation for MinecraftForge and NeoForge"
-    }
-
-    // Get the game version (1.16.5) from the forge version
-    // Kinda ugly but easier than having multiple constants
-    def mcVersion = project.hasProperty("mcVersion") ? project.mcVersion : project.forge_version.split("-")[0]
-
-    // Used to execute code only for specific submodules
-    def versionId = Integer.parseInt(mcVersion.replace(".", ""))
-
-    compileJava.options.encoding = "UTF-8"
-
-    dependencies {
-        library project(":") // Include the base project
-    }
-
-    if (applyFg) {
-        minecraft {
-            runs {
-                client {
-                    workingDirectory project.file("run")
-
-                    property "forge.logging.markers", "REGISTRIES"
-                    property "forge.logging.console.level", "debug"
-
-                    // mixin
-                    property "mixin.debug.export", "true"
-                    property "mixin.hotSwap", "true"
-                    property "fml.coreMods.load", "com.viaversion.viaforge.mixin.MixinLoader"
-                    // Only required for MC 1.12, but modern Forges skips this anyway
-                    args "-mixin.config=" + "mixins.viaforge.json"
-
-                    // source set
-                    mods {
-                        "${project.name}" {
-                            source sourceSets.main
-                        }
+            for (String path : ['mcmod.info', 'mixins.viaforge.json', 'mixins.viaforge.refmap.json',
+                    'com/viaversion/viaforge/ViaForge.class',
+                    'com/viaversion/viaforge/account/AccountManager.class',
+                    'com/viaversion/viaforge/gui/account/AccountManagerGui.class',
+                    'com/viaversion/viaversion/ViaManagerImpl.class', 'META-INF/viaforge/LICENSE']) {
+                if (jarFile.getEntry(path) == null) throw new GradleException("Missing packaged file: ${path}")
+            }
+            int count = 0
+            jarFile.entries().each { entry ->
+                if (entry.name.endsWith('.class')) {
+                    jarFile.getInputStream(entry).withCloseable { stream ->
+                        def data = new DataInputStream(stream)
+                        data.readInt()
+                        data.readUnsignedShort()
+                        int major = data.readUnsignedShort()
+                        if (major > 52) throw new GradleException("Forge cannot scan Java ${major - 44} class ${entry.name}")
+                        count++
                     }
                 }
             }
-        }
-
-        sourceSets.main.resources {
-            srcDir "src/generated/resources"
-        }
-
-        dependencies {
-            minecraft "net.minecraftforge:forge:${forge_version}"
-
-            if (versionId > 1_8_9) {
-                library "org.slf4j:slf4j-api:2.0.17"
-                library "org.spongepowered:mixin:${mixin_version}"
-                annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
-            }
-        }
-
-        mixin {
-            add sourceSets.main, "mixins.viaforge.refmap.json"
-        }
-
-        reobf {
-            shadowJar {}
-        }
-    }
-
-    // Replace the version in the mod files with the project version
-    // Since this depends on the platform version, we can't define it in the global scope :(
-    tasks {
-        processResources {
-            for (final def file in ["mcmod.info", "META-INF/mods.toml", "META-INF/neoforge.mods.toml"]) {
-                filesMatching(file) {
-                    expand(
-                        "version": project.version,
-                        "description": project.description
-                    )
-                }
-            }
-        }
-    }
-
-    // 1. jar
-    // 2. shadowJar
-    // 3. downgradeJar and shadeDowngradedApi
-    // 4. re-obfuscate the shadowJar
-
-    jar {
-        manifest.attributes(
-            "Specification-Title": project.name,
-            "Specification-Vendor": "EnZaXD",
-            "Specification-Version": project.version,
-            "Implementation-Title": project.name,
-            "Implementation-Vendor": "EnZaXD",
-            "Implementation-Version": project.version,
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd" - "HH:mm:ssZ"),
-            "Implementation-Contact": "git@florianreuth.de",
-            "TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
-            "TweakOrder": "0",
-            "FMLCorePluginContainsFMLMod": "true", // Only required for MC 1.12, but modern Forges skips this anyway
-            "FMLCorePlugin": "com.viaversion.viaforge.mixin.MixinLoader", // Counterpart to the above
-            "MixinConfigs": "mixins.viaforge.json",
-            "ForceLoadAsMod": "true"
-        )
-        enabled = false
-    }
-
-    shadowJar {
-        destinationDirectory = temporaryDir
-        configurations = [project.configurations.library] // Include the dependencies from the include configuration
-        duplicatesStrategy DuplicatesStrategy.EXCLUDE
-
-        // Prevent conflicts with Forge's weird service loading
-        exclude("META-INF/maven/**")
-
-        // Workaround GH-94
-        relocate("org.slf4j", "com.viaversion.viaforge.libs.slf4j")
-    }
-
-    downgradeJar {
-        inputFile = shadowJar.archiveFile
-        destinationDirectory = temporaryDir
-        logLevel = "FATAL"
-    }
-
-    if (!applyFg) {
-        afterEvaluate {
-            // Unimined creates remap tasks later; pick the remapped archive task dynamically.
-            def remapArchiveTask = tasks.findAll {
-                it.name.toLowerCase().contains("remap") && it.hasProperty("archiveFile")
-            }.sort { it.name }.find { it.name.toLowerCase().contains("shadow") } ?: tasks.findAll {
-                it.name.toLowerCase().contains("remap") && it.hasProperty("archiveFile")
-            }.sort { it.name }.find()
-
-            if (remapArchiveTask == null) {
-                throw new GradleException("No remap archive task found for ${project.path}")
-            }
-
-            tasks.named("downgradeJar") {
-                dependsOn(remapArchiveTask)
-                inputFile = remapArchiveTask.archiveFile
-            }
-
-            // remapJar (from the dev jar) can overwrite the release artifact path in build/libs.
-            def remapDevJarTask = tasks.findByName("remapJar")
-            if (remapDevJarTask != null) {
-                remapDevJarTask.enabled = false
-            }
-
-            tasks.matching { it.name == "publishCurseforge" || it.name == "publishModrinth" || it.name == "publishMods" }.configureEach {
-                dependsOn(remapArchiveTask)
-                dependsOn(tasks.named("shadeDowngradedApi"))
-            }
-        }
-    }
-
-    shadeDowngradedApi {
-        // Keep publish artifact stable across toolchains; Unimined jar names can carry a -dev classifier.
-        archiveFileName = "${project.name}-${project.version}.jar"
-        logLevel = "FATAL"
-    }
-
-    jar.dependsOn("shadowJar")
-    // Downgrade the jar to Java 8 for Minecraft 1.16.5 and below
-    jar.dependsOn("shadeDowngradedApi")
-
-    publishMods {
-        file = tasks.shadeDowngradedApi.archiveFile
-        def commitHash = latestCommitHash(rootProject)
-        def commitMessage = latestCommitMessage(rootProject).replaceAll("\\s+", " ").trim()
-        if (commitHash == "unknown" || commitMessage == "unknown") {
-            changelog = "A changelog can be found at https://github.com/ViaVersion/ViaForge/commits"
-        } else {
-            changelog = "[${commitHash}](https://github.com/ViaVersion/ViaForge/commit/${commitHash}) ${commitMessage}"
-        }
-        version = project.version.toString() + "+" + mcVersion
-        displayName = version
-        modLoaders.add("forge")
-        type = ReleaseType.ALPHA
-
-        curseforge {
-            accessToken = System.getenv("CURSEFORGE_TOKEN")
-            projectId = "418933"
-
-            javaVersions.add(JavaVersion.VERSION_1_8)
-            minecraftVersions.add(mcVersion.toString())
-
-            clientRequired = true
-        }
-        modrinth {
-            accessToken = System.getenv("MODRINTH_TOKEN")
-            projectId = "Z6se2s8f"
-
-            minecraftVersions.add(mcVersion.toString())
-        }
-    }
-
-    // Make sure to have the re-obfuscated jar for publishing
-    tasks.publishMods.dependsOn tasks.build
-}
-
-dependencies {
-    compileOnly "io.netty:netty-all:4.2.2.Final"
-    compileOnly "org.slf4j:slf4j-api:2.0.17"
-}
-
-apply plugin: "net.raphimc.class-token-replacer"
-
-sourceSets {
-    main {
-        classTokenReplacer {
-            property("\${version}", project.version)
+            logger.lifecycle("Release verified: ${count} Java 8-compatible classes, Forge registration and mixin mappings present.")
         }
     }
 }
+tasks.named('check') { dependsOn tasks.named('verifyReleaseJar') }
+
+tasks.register('sourceArchive', Zip) {
+    archiveFileName = "ViaForge-1.8.9-${project.version}-sources.zip"
+    destinationDirectory = layout.buildDirectory.dir('libs')
+    includeEmptyDirs = false
+    from(projectDir) {
+        include 'src/**', 'gradle/**', 'docs/**'
+        include '*.gradle', '*.properties', '*.bat', 'gradlew', 'README.md', 'LICENSE'
+        include '.editorconfig', '.gitignore', '.github/workflows/build.yml'
+    }
+}
+tasks.named('build') { dependsOn tasks.named('sourceArchive') }

@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.util.DumpUtil;
 import com.viaversion.viaforge.common.ViaForgeCommon;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import net.minecraft.client.Minecraft;
@@ -35,11 +36,14 @@ import org.lwjgl.opengl.GL11;
 
 public class GuiProtocolSelector extends GuiScreen {
 
+    private static final String ORIGINAL_MOD_CREDIT = "Original ViaForge by Florian Reuth (EnZaXD) and contributors";
+
     private final GuiScreen parent;
     private final boolean simple;
     private final FinishedCallback finishedCallback;
 
     private SlotList list;
+    private List<String> creditLines;
 
     private String status;
     private long time;
@@ -66,7 +70,10 @@ public class GuiProtocolSelector extends GuiScreen {
             buttonList.add(new GuiButton(3, width - 105, height - 25, 100, 20, "Reload configs"));
         }
 
-        list = new SlotList(mc, width, height, 3 + 3 /* start offset */ + (fontRendererObj.FONT_HEIGHT + 2) * 3 /* title is 2 */, height - 30, fontRendererObj.FONT_HEIGHT + 2);
+        final int lineHeight = fontRendererObj.FONT_HEIGHT + 2;
+        creditLines = fontRendererObj.listFormattedStringToWidth(ORIGINAL_MOD_CREDIT, Math.max(1, width - 10));
+        final int listTop = 6 + lineHeight * (3 + creditLines.size());
+        list = new SlotList(mc, width, height, listTop, height - 30, lineHeight);
     }
 
     public void setStatus(final String status) {
@@ -119,6 +126,9 @@ public class GuiProtocolSelector extends GuiScreen {
         GL11.glPopMatrix();
 
         drawCenteredString(fontRendererObj, "https://github.com/ViaVersion/ViaForge", width / 2, (fontRendererObj.FONT_HEIGHT + 2) * 2 + 3, -1);
+        for (int i = 0; i < creditLines.size(); i++) {
+            drawCenteredString(fontRendererObj, creditLines.get(i), width / 2, (fontRendererObj.FONT_HEIGHT + 2) * (3 + i) + 3, 0xAAAAAA);
+        }
         drawString(fontRendererObj, status != null ? status : "Discord: http://discord.gg/viaversion", 3, 3, -1);
 
         super.drawScreen(mouseX, mouseY, partialTicks);

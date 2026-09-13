@@ -45,3 +45,19 @@ inside the mod JAR or its source ZIP. The block implementation uses the existing
 ViaVersion chunk codecs, reversible ViaBackwards/ViaRewind item mappings and Forge
 block/rendering APIs. The locally read assets now include block-item models and
 the specific entity/icon textures used by shulker boxes, colored beds, gateways and block seeds.
+The standalone item extension also reads the vanilla item models/textures and the
+shield, elytra and dragon textures from those same verified archives. Item IDs,
+potion types and durations, spawn-egg colors, and shield/dragon geometry and UV
+layouts were checked against the 1.9-1.12.2 client registries and rendering code.
+The shield grip, slim-arm offsets, version-dependent skull inventory orientation,
+creative categories and area-effect-cloud particle behavior were also checked
+against those local vanilla references.
+Potion impact event formats, arrow metadata/particle cadence and Totem activation
+movement and particles were checked against the same original clients. Projectile
+textures and the particle atlas are read locally from the verified archives. Mojang's
+1.11 and 1.12 asset indexes identify the Totem sound as
+`e7f0337931cdb05c4234d2a9bc1f38ead675db26` (35,952 bytes); it is downloaded from
+`resources.download.minecraft.net` and verified locally, without redistribution.
+The mod supplies its own compatibility implementation; no downloaded client
+classes are loaded or included in the release. Item names and effect names use
+the corresponding vanilla terminology.

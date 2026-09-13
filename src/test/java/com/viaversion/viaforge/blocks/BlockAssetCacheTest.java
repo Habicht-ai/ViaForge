@@ -27,10 +27,10 @@ public class BlockAssetCacheTest {
                 add(zip, "../../outside.txt", new byte[]{7});
             }
             Map<String, byte[]> assets = BlockAssetCache.readAssets(jar);
-            assertEquals(6, assets.size());
+            assertEquals(7, assets.size());
             assertArrayEquals(new byte[]{11}, assets.get("textures/entity/bed/blue.png"));
             assertArrayEquals(new byte[]{1, 2, 3}, assets.get("textures/blocks/stone.png"));
-            assertFalse(assets.containsKey("textures/items/apple.png"));
+            assertArrayEquals(new byte[]{5}, assets.get("textures/items/apple.png"));
         } finally {
             Files.deleteIfExists(jar);
         }

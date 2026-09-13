@@ -37,7 +37,7 @@ public final class ClientBlocks {
         for (Definition definition : LegacyBlockCatalog.BLOCKS) {
             Block block = LegacyClientBlockTypes.create(definition);
             block.setUnlocalizedName("viaforge." + definition.name);
-            block.setCreativeTab(CreativeTabs.tabBlock);
+            block.setCreativeTab(com.viaversion.viaforge.items.ServerCreativeTabs.block(definition));
             DEFINITIONS.put(block, definition);
             GameRegistry.registerBlock(block, definition.itemId() >= 0 && definition.kind != Kind.CROP && definition.kind != Kind.BED ? ServerItemBlock.class : null, definition.name);
             for (int meta = 0; meta < 16; meta++) {
@@ -127,6 +127,7 @@ public final class ClientBlocks {
     private static final class ServerSeeds extends ItemSeeds {
         private final Block crop;
         ServerSeeds(Block crop) { super(crop, Blocks.farmland); this.crop = crop; setUnlocalizedName("viaforge.beetroot_seeds"); }
+        @Override public CreativeTabs getCreativeTab() { return com.viaversion.viaforge.items.ServerCreativeTabs.materials(); }
         @Override public String getItemStackDisplayName(ItemStack stack) { return "Beetroot Seeds"; }
         @Override public void getSubItems(Item item, CreativeTabs tab, java.util.List<ItemStack> items) {
             if (ServerBlockSession.supports(definition(crop))) items.add(new ItemStack(item));

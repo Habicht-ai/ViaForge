@@ -1,0 +1,137 @@
+package com.viaversion.viaforge.items;
+
+import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.common.blocks.LegacyItemDefinition;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
+import com.viaversion.viaversion.api.type.Types;
+import io.netty.buffer.*;
+import java.util.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
+
+/** Main-thread, world-scoped visuals. Effects and inventory authority stay on the server. */
+public final class ServerEntityViews {
+    public static final class View {
+        public final int type;
+        public ItemStack potion, offhand;
+        public int handState;
+        public boolean leftHanded;
+        View(int type) { this.type = type; }
+    }
+    private static WorldClient world;
+    private static final Map<Integer, View> VIEWS = new HashMap<>();
+    public static void clear() { VIEWS.clear(); world = null; ServerTotemAnimation.clear(); }
+    public static View get(int id) { return world == Minecraft.getMinecraft().theWorld ? VIEWS.get(id) : null; }
+    public static boolean blocking(EntityLivingBase entity, boolean offhand, ItemStack stack) {
+        if (!ClientItems.is(stack, com.viaversion.viaforge.common.blocks.LegacyItemCatalog.Kind.SHIELD)) return false;
+        if (entity == Minecraft.getMinecraft().thePlayer) return !offhand && ((EntityPlayer)entity).getItemInUse() == stack;
+        View view = get(entity.getEntityId());
+        return view != null && (view.handState & 1) != 0 && ((view.handState & 2) != 0) == offhand;
+    }
+    public static void accept(ByteBuf input) throws Exception {
+        int protocol = input.readUnsignedShort(), operation = input.readUnsignedByte();
+        if (!ServerBlockSession.supportsProtocol(107)) return;
+        WorldClient current = Minecraft.getMinecraft().theWorld;
+        if (world != current || operation == 0) { clear(); world = current; }
+        // A same-dimension respawn retains the native world and its tracked entities.
+        if (world == null || operation == 0 || operation == 6) return;
+        if (operation == 7) {
+            int event = input.readInt();
+            net.minecraft.util.BlockPos pos = net.minecraft.util.BlockPos.fromLong(input.readLong());
+            ServerPotionImpact.play(world, protocol, event, pos, input.readInt());
+            return;
+        }
+        if (operation == 8) {
+            net.minecraft.entity.Entity entity = world.getEntityByID(input.readInt());
+            if (input.readByte() == 35 && protocol >= 315 && entity != null) ServerTotemAnimation.activate(entity);
+            return;
+        }
+        if (operation == 9) { ServerTotemAnimation.particlePacket(world, input); return; }
+        int entityId = operation == 4 ? -1 : Types.VAR_INT.readPrimitive(input);
+        int first = protocol >= 210 ? 6 : 5;
+        switch (operation) {
+            case 1: {
+                input.skipBytes(16); int type = input.readUnsignedByte();
+                double x = input.readDouble(), y = input.readDouble(), z = input.readDouble();
+                if (type != 3 && type != 73 && type != 60 && type != 91) return;
+                View view = new View(type); VIEWS.put(entityId, view);
+                if (type == 3) {
+                    ServerAreaEffectCloud cloud = new ServerAreaEffectCloud(world);
+                    cloud.setPosition(x, y, z);
+                    cloud.serverPosX = (int)Math.floor(x * 32); cloud.serverPosY = (int)Math.floor(y * 32); cloud.serverPosZ = (int)Math.floor(z * 32);
+                    world.addEntityToWorld(entityId, cloud);
+                } else if (type == 60 || type == 91) {
+                    float pitch = input.readByte() * 360F / 256F, yaw = input.readByte() * 360F / 256F;
+                    int owner = input.readInt() - 1;
+                    ServerArrow arrow = new ServerArrow(world, type == 91);
+                    arrow.setPositionAndRotation(x, y, z, yaw, pitch);
+                    arrow.prevRotationYaw = yaw; arrow.prevRotationPitch = pitch;
+                    arrow.serverPosX = (int)Math.floor(x * 32); arrow.serverPosY = (int)Math.floor(y * 32); arrow.serverPosZ = (int)Math.floor(z * 32);
+                    arrow.setVelocity(input.readShort() / 8000D, input.readShort() / 8000D, input.readShort() / 8000D);
+                    if (world.getEntityByID(owner) instanceof EntityLivingBase) arrow.shootingEntity = (EntityLivingBase)world.getEntityByID(owner);
+                    world.addEntityToWorld(entityId, arrow);
+                } else view.potion = item(new com.viaversion.viaversion.api.minecraft.item.DataItem(438, (byte)1, (short)0, null));
+                break;
+            }
+            case 5:
+                input.skipBytes(42); // UUID, position and rotation
+                VIEWS.put(entityId, new View(-1));
+                metadata(entityId, first, (protocol >= 335 ? Types.ENTITY_DATA_LIST1_12 : Types.ENTITY_DATA_LIST1_9).read(input));
+                break;
+            case 2: metadata(entityId, first, (protocol >= 335 ? Types.ENTITY_DATA_LIST1_12 : Types.ENTITY_DATA_LIST1_9).read(input)); break;
+            case 3: {
+                int slot = Types.VAR_INT.readPrimitive(input);
+                if (slot != 1) break;
+                View view = VIEWS.get(entityId);
+                if (view == null && world.getEntityByID(entityId) instanceof EntityPlayer) { view = new View(-1); VIEWS.put(entityId, view); }
+                if (view != null && view.type == -1) view.offhand = item(Types.ITEM1_8.read(input));
+                break;
+            }
+            case 4:
+                int count = Types.VAR_INT.readPrimitive(input);
+                for (int i = 0; i < count; i++) VIEWS.remove(Types.VAR_INT.readPrimitive(input));
+                break;
+            default: break;
+        }
+    }
+    private static void metadata(int id, int first, List<EntityData> entries) throws Exception {
+        View view = VIEWS.get(id);
+        if (view == null && world.getEntityByID(id) instanceof EntityPlayer) { view = new View(-1); VIEWS.put(id, view); }
+        if (view == null) return;
+        for (EntityData data : entries) {
+            Object value = data.getValue();
+            if (view.type == 73 && data.id() == first && data.dataType().type() == Types.ITEM1_8) {
+                ItemStack stack = item((com.viaversion.viaversion.api.minecraft.item.Item)value);
+                if (ClientItems.is(stack, com.viaversion.viaforge.common.blocks.LegacyItemCatalog.Kind.LINGERING)
+                        || ClientItems.is(stack, com.viaversion.viaforge.common.blocks.LegacyItemCatalog.Kind.SPLASH)) view.potion = stack;
+            } else if (view.type == 3 && world.getEntityByID(id) instanceof ServerAreaEffectCloud) {
+                ((ServerAreaEffectCloud)world.getEntityByID(id)).metadata(data.id() - first, value);
+            } else if ((view.type == 60 || view.type == 91) && world.getEntityByID(id) instanceof ServerArrow) {
+                ServerArrow arrow = (ServerArrow)world.getEntityByID(id);
+                if (data.id() == first && value instanceof Byte) arrow.setIsCritical(((Byte)value & 1) != 0);
+                if (view.type == 60 && data.id() == first + 1 && value instanceof Integer) arrow.color = (Integer)value;
+            } else if (view.type == -1 && value instanceof Byte) {
+                if (data.id() == first) view.handState = (Byte)value;
+                if (data.id() == first + 8) view.leftHanded = (Byte)value == 0;
+            }
+        }
+    }
+    public static ItemStack item(com.viaversion.viaversion.api.minecraft.item.Item source) throws Exception {
+        if (source == null) return null;
+        int local = ClientItems.localItem(source.identifier(), source.data());
+        com.viaversion.viaversion.api.minecraft.item.Item copy = source.copy();
+        if (local >= 0) {
+            LegacyItemDefinition definition = ClientItems.serverItem(local);
+            if (!ServerBlockSession.supportsItem(definition)) return null;
+            copy.setIdentifier(local); if (!definition.preservesDamage()) copy.setData((short)0);
+        } else if (source.identifier() >= 198 && source.identifier() < 256 || source.identifier() > 425) return null;
+        PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
+        try { Types.ITEM1_8.write(buffer, copy); return buffer.readItemStackFromBuffer(); }
+        finally { buffer.release(); }
+    }
+    private ServerEntityViews() { }
+}

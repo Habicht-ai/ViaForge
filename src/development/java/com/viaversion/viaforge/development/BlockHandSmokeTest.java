@@ -47,9 +47,16 @@ final class BlockHandSmokeTest {
         mc.theWorld = world; mc.thePlayer = player;
         GlStateManager.matrixMode(GL11.GL_MODELVIEW); GlStateManager.pushMatrix();
         try {
+            java.util.List<ItemStack> held = new java.util.ArrayList<>();
             for (LegacyBlockCatalog.Definition definition : LegacyBlockCatalog.BLOCKS) {
                 if (definition.itemId() < 0 || definition.itemProtocol() > profile.protocol()) continue;
-                ItemStack stack = stack(definition.itemId(), definition.itemData());
+                held.add(stack(definition.itemId(), definition.itemData()));
+            }
+            for (com.viaversion.viaforge.common.blocks.LegacyItemCatalog.Definition definition : com.viaversion.viaforge.common.blocks.LegacyItemCatalog.ITEMS) {
+                java.util.List<ItemStack> variants = ServerItemSmokeTest.variants(definition);
+                if (!variants.isEmpty()) held.add(variants.get(0));
+            }
+            for (ItemStack stack : held) {
                 IBakedModel model = mc.getRenderItem().getItemModelMesher().getItemModel(stack);
                 GlStateManager.loadIdentity();
                 // Forge-generated flat icons expose their camera through perspective
@@ -64,7 +71,7 @@ final class BlockHandSmokeTest {
                     GlStateManager.loadIdentity();
                     render(hand, recorder, player, stack);
                     float[] actual = recorder.matrix;
-                    require(actual != null, "Missing first-person draw " + definition.name);
+                    require(actual != null, "Missing first-person draw " + stack.getDisplayName());
                     // renderItem's final .5 geometry scale is applied after this capture.
                     for (int axis = 0; axis < 3; axis++) {
                         double length = 0;
@@ -72,16 +79,16 @@ final class BlockHandSmokeTest {
                         double expected = 0;
                         for (int row = 0; row < 3; row++) expected += display[axis * 4 + row] * display[axis * 4 + row];
                         require(Math.abs(Math.sqrt(length) * .5 - Math.sqrt(expected)) < .0001,
-                                "First-person scale " + definition.name + ", swing " + swing + ": " + Math.sqrt(length) * .5 + " != " + Math.sqrt(expected));
+                                "First-person scale " + stack.getDisplayName() + ", swing " + swing + ": " + Math.sqrt(length) * .5 + " != " + Math.sqrt(expected));
                     }
                     if (swing == 0) {
                         require(Math.abs(actual[12] - (.56F + display[12])) < .0001
                                 && Math.abs(actual[13] - (-.52F + display[13])) < .0001
                                 && Math.abs(actual[14] - (-.72F + display[14])) < .0001,
-                                "First-person position " + definition.name);
+                                "First-person position " + stack.getDisplayName());
                         for (int column = 0; column < 3; column++) for (int row = 0; row < 3; row++) {
                             require(Math.abs(actual[column * 4 + row] * .5F - display[column * 4 + row]) < .0001,
-                                    "First-person orientation " + definition.name);
+                                    "First-person orientation " + stack.getDisplayName());
                         }
                     }
                 }
@@ -92,9 +99,15 @@ final class BlockHandSmokeTest {
                     + recorder.matrix[2] * recorder.matrix[2]) * .5;
             require(Math.abs(stoneScale - .4) < .0001, "Native 1.8 stone hand size unchanged");
             verifyBonemeal(mc, world, player);
+            ServerItemSmokeTest.interactions(profile, world, player);
+            EntityRenderSmokeTest.verify(profile, world, directory);
+            CreativeOrderPreview.verify(profile, directory);
             // Restore the idle pose after the interaction test for the review image.
             player.isSwingInProgress = false; player.swingProgress = player.prevSwingProgress = 0;
-            if (profile == BlockVersionProfile.V1_12_2) capture(directory, hand, recorder, player);
+            if (profile == BlockVersionProfile.V1_12_2) {
+                capture(directory, hand, recorder, player, false);
+                capture(directory, hand, recorder, player, true);
+            }
         } finally {
             GlStateManager.popMatrix();
             mc.theWorld = previousWorld; mc.thePlayer = previousPlayer;
@@ -127,7 +140,7 @@ final class BlockHandSmokeTest {
         }
     }
 
-    private static void capture(Path directory, ItemRenderer hand, RecordingRenderer recorder, EntityPlayerSP player) throws Exception {
+    private static void capture(Path directory, ItemRenderer hand, RecordingRenderer recorder, EntityPlayerSP player, boolean items) throws Exception {
         Minecraft mc = Minecraft.getMinecraft();
         int width = 1440, height = 840, cellWidth = 360, cellHeight = 260;
         Framebuffer target = new Framebuffer(width, height, true);
@@ -136,6 +149,7 @@ final class BlockHandSmokeTest {
         recorder.draw = true;
         try {
             int[] ids = {1, 201, 203, 205, 198, 202, 206, 213, 229, 235, 251, 435};
+            if (items) ids = new int[]{1, 442, 443, 397, 426, 432, 434, 438, 440, 444, 449, 403};
             for (int index = 0; index < ids.length; index++) {
                 int x = index % 4 * cellWidth, y = 45 + index / 4 * cellHeight;
                 GlStateManager.viewport(x, height - y - cellHeight, cellWidth, cellHeight);
@@ -143,7 +157,8 @@ final class BlockHandSmokeTest {
                 GLU.gluPerspective(70, cellWidth / (float) cellHeight, .05F, 100F);
                 GlStateManager.matrixMode(GL11.GL_MODELVIEW); GlStateManager.loadIdentity();
                 GlStateManager.enableDepth(); GlStateManager.enableAlpha(); GlStateManager.enableTexture2D();
-                ItemStack item = ids[index] == 1 ? new ItemStack(Blocks.stone) : stack(ids[index], 0);
+                ItemStack item = ids[index] == 1 ? new ItemStack(Blocks.stone) : stack(ids[index], ids[index] == 397 ? 5 : 0);
+                if (ids[index] == 438 || ids[index] == 440) com.viaversion.viaforge.items.ItemVariants.potion(item, "healing");
                 render(hand, recorder, player, item);
                 GlStateManager.viewport(0, 0, width, height);
                 GlStateManager.matrixMode(GL11.GL_PROJECTION); GlStateManager.loadIdentity();
@@ -155,8 +170,9 @@ final class BlockHandSmokeTest {
             }
             mc.fontRendererObj.drawString("Forge 1.8.9 | 1.12.2 resources | actual first-person renderer | identical 70-degree FOV", 15, 15, 0xffffff);
             Files.createDirectories(directory);
-            ScreenShotHelper.saveScreenshot(directory.toFile(), "block-hand-preview-1.12.2.png", width, height, target);
-            require(Files.isRegularFile(directory.resolve("screenshots/block-hand-preview-1.12.2.png")), "Hand preview saved");
+            String file = items ? "items-hand-preview-1.12.2.png" : "block-hand-preview-1.12.2.png";
+            ScreenShotHelper.saveScreenshot(directory.toFile(), file, width, height, target);
+            require(Files.isRegularFile(directory.resolve("screenshots/" + file)), "Hand preview saved");
         } finally {
             recorder.draw = false;
             GlStateManager.matrixMode(GL11.GL_PROJECTION); GlStateManager.popMatrix(); GlStateManager.matrixMode(GL11.GL_MODELVIEW);
@@ -170,7 +186,7 @@ final class BlockHandSmokeTest {
         recorder.matrix = null;
         hand.renderItemInFirstPerson(1F);
     }
-    private static ItemStack stack(int id, int data) { return new ItemStack(Item.getItemById(ClientBlocks.localItem(id, data))); }
+    private static ItemStack stack(int id, int data) { return new ItemStack(Item.getItemById(com.viaversion.viaforge.items.ClientItems.localItem(id, data))); }
     private static void setField(Class<?> owner, Object target, String name, Object value) throws Exception {
         Field field = owner.getDeclaredField(name); field.setAccessible(true); field.set(target, value);
     }

@@ -124,6 +124,8 @@ final class BlockPipelineSmokeTest {
                 if (actual != expected) throw new AssertionError("Via -> Minecraft block update mismatch for " + profile);
             }
             BlockItemPipelineSmokeTest.verify(profile, channel, serverCompression, world);
+            ServerItemSmokeTest.pipeline(profile, channel, serverCompression);
+            ServerEntitySmokeTest.pipeline(profile, channel, serverCompression, world);
             BlockEditorSmokeTest.verify(profile, channel, serverCompression, world);
             BedPipelineSmokeTest.verify(profile, channel, serverCompression, world);
             if (profile.protocol() >= 335) {

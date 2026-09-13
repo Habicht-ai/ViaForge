@@ -2,8 +2,9 @@
 
 The implementation targets Forge 1.8.9 connecting to vanilla-protocol
 servers from 1.9 through 1.12.2. This is an incremental block backport, not complete
-client emulation. Block items are included; the longer-term design covers modern blocks, other items, then
-additional interaction mechanics.
+client emulation. Block items and the standalone items introduced through 1.12.2
+are included; see [item implementation and limits](ITEMS.md). The longer-term design
+covers modern blocks and additional interaction mechanics.
 
 ## Profiles and scope
 

@@ -30,6 +30,12 @@ public final class ServerBlockSession {
     private ServerBlockSession() { }
 
     public static String getLoadedResourceVersion() { return loadedResourceVersion; }
+    public static boolean supportsItem(com.viaversion.viaforge.common.blocks.LegacyItemDefinition item) {
+        return item != null && supportsProtocol(item.itemProtocol());
+    }
+    public static boolean supportsProtocol(int protocol) {
+        return activeProfile != null && activeProfile.protocol() >= protocol && !Minecraft.getMinecraft().isSingleplayer();
+    }
     public static boolean supports(com.viaversion.viaforge.common.blocks.LegacyBlockCatalog.Definition block) {
         return block != null && activeProfile != null && activeProfile.protocol() >= block.protocol
                 && !Minecraft.getMinecraft().isSingleplayer();
@@ -90,6 +96,7 @@ public final class ServerBlockSession {
 
     /** Called before loading any disconnected or integrated world, including fast server switches. */
     public static void unload() {
+        com.viaversion.viaforge.items.ServerEntityViews.clear();
         activeConnection = null;
         activeProfile = null;
         if (resourcesLoaded) resetResources(Minecraft.getMinecraft());
@@ -117,5 +124,9 @@ public final class ServerBlockSession {
         mc.getBlockRendererDispatcher().onResourceManagerReload(resources);
         mc.getRenderItem().onResourceManagerReload(resources);
         mc.renderGlobal.onResourceManagerReload(resources);
+        net.minecraft.util.ResourceLocation particles = new net.minecraft.util.ResourceLocation("textures/particle/particles.png");
+        mc.getTextureManager().deleteTexture(particles);
+        mc.getTextureManager().loadTexture(particles, new net.minecraft.client.renderer.texture.SimpleTexture(particles));
+        com.viaversion.viaforge.items.ServerTotemSound.reload();
     }
 }

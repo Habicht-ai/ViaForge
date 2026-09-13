@@ -192,7 +192,7 @@ final class BlockItemPipelineSmokeTest {
             while ((compressed = client.readOutbound()) != null) server.writeInbound(compressed);
         }
     }
-    private static Item sendItem(EmbeddedChannel client, EmbeddedChannel server, ByteBuf packet, int id, boolean creative) {
+    static Item sendItem(EmbeddedChannel client, EmbeddedChannel server, ByteBuf packet, int id, boolean creative) {
         client.writeOutbound(packet);
         ByteBuf compressed = (ByteBuf) client.readOutbound();
         require(compressed != null, "Missing outgoing inventory packet");
@@ -204,12 +204,12 @@ final class BlockItemPipelineSmokeTest {
             return Types.ITEM1_8.read(sent);
         } finally { sent.release(); }
     }
-    private static int clientbound(BlockVersionProfile profile, String name) {
+    static int clientbound(BlockVersionProfile profile, String name) {
         PacketType[] types = profile.protocol() >= 338 ? ClientboundPackets1_12_1.values() : profile.protocol() >= 335 ? ClientboundPackets1_12.values()
                 : profile.protocol() >= 110 ? ClientboundPackets1_9_3.values() : ClientboundPackets1_9.values();
         return find(types, name);
     }
-    private static int serverbound(BlockVersionProfile profile, String name) {
+    static int serverbound(BlockVersionProfile profile, String name) {
         PacketType[] types = profile.protocol() >= 338 ? ServerboundPackets1_12_1.values() : profile.protocol() >= 335 ? ServerboundPackets1_12.values()
                 : profile.protocol() >= 110 ? ServerboundPackets1_9_3.values() : ServerboundPackets1_9.values();
         return find(types, name);

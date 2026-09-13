@@ -1,0 +1,572 @@
+{
+    "potions":  [
+                    {
+                        "name":  "empty",
+                        "effect":  0,
+                        "duration":  0,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "water",
+                        "effect":  0,
+                        "duration":  0,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "mundane",
+                        "effect":  0,
+                        "duration":  0,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "thick",
+                        "effect":  0,
+                        "duration":  0,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "awkward",
+                        "effect":  0,
+                        "duration":  0,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "night_vision",
+                        "effect":  16,
+                        "duration":  3600,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "long_night_vision",
+                        "effect":  16,
+                        "duration":  9600,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "invisibility",
+                        "effect":  14,
+                        "duration":  3600,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "long_invisibility",
+                        "effect":  14,
+                        "duration":  9600,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "leaping",
+                        "effect":  8,
+                        "duration":  3600,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "long_leaping",
+                        "effect":  8,
+                        "duration":  9600,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "strong_leaping",
+                        "effect":  8,
+                        "duration":  1800,
+                        "amplifier":  1
+                    },
+                    {
+                        "name":  "fire_resistance",
+                        "effect":  12,
+                        "duration":  3600,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "long_fire_resistance",
+                        "effect":  12,
+                        "duration":  9600,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "swiftness",
+                        "effect":  1,
+                        "duration":  3600,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "long_swiftness",
+                        "effect":  1,
+                        "duration":  9600,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "strong_swiftness",
+                        "effect":  1,
+                        "duration":  1800,
+                        "amplifier":  1
+                    },
+                    {
+                        "name":  "slowness",
+                        "effect":  2,
+                        "duration":  1800,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "long_slowness",
+                        "effect":  2,
+                        "duration":  4800,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "water_breathing",
+                        "effect":  13,
+                        "duration":  3600,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "long_water_breathing",
+                        "effect":  13,
+                        "duration":  9600,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "healing",
+                        "effect":  6,
+                        "duration":  1,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "strong_healing",
+                        "effect":  6,
+                        "duration":  1,
+                        "amplifier":  1
+                    },
+                    {
+                        "name":  "harming",
+                        "effect":  7,
+                        "duration":  1,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "strong_harming",
+                        "effect":  7,
+                        "duration":  1,
+                        "amplifier":  1
+                    },
+                    {
+                        "name":  "poison",
+                        "effect":  19,
+                        "duration":  900,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "long_poison",
+                        "effect":  19,
+                        "duration":  1800,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "strong_poison",
+                        "effect":  19,
+                        "duration":  432,
+                        "amplifier":  1
+                    },
+                    {
+                        "name":  "regeneration",
+                        "effect":  10,
+                        "duration":  900,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "long_regeneration",
+                        "effect":  10,
+                        "duration":  1800,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "strong_regeneration",
+                        "effect":  10,
+                        "duration":  450,
+                        "amplifier":  1
+                    },
+                    {
+                        "name":  "strength",
+                        "effect":  5,
+                        "duration":  3600,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "long_strength",
+                        "effect":  5,
+                        "duration":  9600,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "strong_strength",
+                        "effect":  5,
+                        "duration":  1800,
+                        "amplifier":  1
+                    },
+                    {
+                        "name":  "weakness",
+                        "effect":  18,
+                        "duration":  1800,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "long_weakness",
+                        "effect":  18,
+                        "duration":  4800,
+                        "amplifier":  0
+                    },
+                    {
+                        "name":  "luck",
+                        "effect":  26,
+                        "duration":  6000,
+                        "amplifier":  0
+                    }
+                ],
+    "eggs":  [
+                 {
+                     "name":  "bat",
+                     "legacy":  "Bat",
+                     "number":  65,
+                     "protocol":  107,
+                     "base":  4996656,
+                     "overlay":  986895
+                 },
+                 {
+                     "name":  "blaze",
+                     "legacy":  "Blaze",
+                     "number":  61,
+                     "protocol":  107,
+                     "base":  16167425,
+                     "overlay":  16775294
+                 },
+                 {
+                     "name":  "cave_spider",
+                     "legacy":  "CaveSpider",
+                     "number":  59,
+                     "protocol":  107,
+                     "base":  803406,
+                     "overlay":  11013646
+                 },
+                 {
+                     "name":  "chicken",
+                     "legacy":  "Chicken",
+                     "number":  93,
+                     "protocol":  107,
+                     "base":  10592673,
+                     "overlay":  16711680
+                 },
+                 {
+                     "name":  "cow",
+                     "legacy":  "Cow",
+                     "number":  92,
+                     "protocol":  107,
+                     "base":  4470310,
+                     "overlay":  10592673
+                 },
+                 {
+                     "name":  "creeper",
+                     "legacy":  "Creeper",
+                     "number":  50,
+                     "protocol":  107,
+                     "base":  894731,
+                     "overlay":  0
+                 },
+                 {
+                     "name":  "donkey",
+                     "legacy":  "Donkey",
+                     "number":  31,
+                     "protocol":  315,
+                     "base":  5457209,
+                     "overlay":  8811878
+                 },
+                 {
+                     "name":  "elder_guardian",
+                     "legacy":  "ElderGuardian",
+                     "number":  4,
+                     "protocol":  315,
+                     "base":  13552826,
+                     "overlay":  7632531
+                 },
+                 {
+                     "name":  "enderman",
+                     "legacy":  "Enderman",
+                     "number":  58,
+                     "protocol":  107,
+                     "base":  1447446,
+                     "overlay":  0
+                 },
+                 {
+                     "name":  "endermite",
+                     "legacy":  "Endermite",
+                     "number":  67,
+                     "protocol":  107,
+                     "base":  1447446,
+                     "overlay":  7237230
+                 },
+                 {
+                     "name":  "evocation_illager",
+                     "legacy":  "EvocationIllager",
+                     "number":  34,
+                     "protocol":  315,
+                     "base":  9804699,
+                     "overlay":  1973274
+                 },
+                 {
+                     "name":  "ghast",
+                     "legacy":  "Ghast",
+                     "number":  56,
+                     "protocol":  107,
+                     "base":  16382457,
+                     "overlay":  12369084
+                 },
+                 {
+                     "name":  "guardian",
+                     "legacy":  "Guardian",
+                     "number":  68,
+                     "protocol":  107,
+                     "base":  5931634,
+                     "overlay":  15826224
+                 },
+                 {
+                     "name":  "horse",
+                     "legacy":  "Horse",
+                     "number":  100,
+                     "protocol":  107,
+                     "base":  12623485,
+                     "overlay":  15656192
+                 },
+                 {
+                     "name":  "husk",
+                     "legacy":  "Husk",
+                     "number":  23,
+                     "protocol":  315,
+                     "base":  7958625,
+                     "overlay":  15125652
+                 },
+                 {
+                     "name":  "llama",
+                     "legacy":  "Llama",
+                     "number":  103,
+                     "protocol":  315,
+                     "base":  12623485,
+                     "overlay":  10051392
+                 },
+                 {
+                     "name":  "magma_cube",
+                     "legacy":  "LavaSlime",
+                     "number":  62,
+                     "protocol":  107,
+                     "base":  3407872,
+                     "overlay":  16579584
+                 },
+                 {
+                     "name":  "mooshroom",
+                     "legacy":  "MushroomCow",
+                     "number":  96,
+                     "protocol":  107,
+                     "base":  10489616,
+                     "overlay":  12040119
+                 },
+                 {
+                     "name":  "mule",
+                     "legacy":  "Mule",
+                     "number":  32,
+                     "protocol":  315,
+                     "base":  1769984,
+                     "overlay":  5321501
+                 },
+                 {
+                     "name":  "ocelot",
+                     "legacy":  "Ozelot",
+                     "number":  98,
+                     "protocol":  107,
+                     "base":  15720061,
+                     "overlay":  5653556
+                 },
+                 {
+                     "name":  "parrot",
+                     "legacy":  "Parrot",
+                     "number":  105,
+                     "protocol":  335,
+                     "base":  894731,
+                     "overlay":  16711680
+                 },
+                 {
+                     "name":  "pig",
+                     "legacy":  "Pig",
+                     "number":  90,
+                     "protocol":  107,
+                     "base":  15771042,
+                     "overlay":  14377823
+                 },
+                 {
+                     "name":  "polar_bear",
+                     "legacy":  "PolarBear",
+                     "number":  102,
+                     "protocol":  210,
+                     "base":  15921906,
+                     "overlay":  9803152
+                 },
+                 {
+                     "name":  "rabbit",
+                     "legacy":  "Rabbit",
+                     "number":  101,
+                     "protocol":  107,
+                     "base":  10051392,
+                     "overlay":  7555121
+                 },
+                 {
+                     "name":  "sheep",
+                     "legacy":  "Sheep",
+                     "number":  91,
+                     "protocol":  107,
+                     "base":  15198183,
+                     "overlay":  16758197
+                 },
+                 {
+                     "name":  "shulker",
+                     "legacy":  "Shulker",
+                     "number":  69,
+                     "protocol":  107,
+                     "base":  9725844,
+                     "overlay":  5060690
+                 },
+                 {
+                     "name":  "silverfish",
+                     "legacy":  "Silverfish",
+                     "number":  60,
+                     "protocol":  107,
+                     "base":  7237230,
+                     "overlay":  3158064
+                 },
+                 {
+                     "name":  "skeleton",
+                     "legacy":  "Skeleton",
+                     "number":  51,
+                     "protocol":  107,
+                     "base":  12698049,
+                     "overlay":  4802889
+                 },
+                 {
+                     "name":  "skeleton_horse",
+                     "legacy":  "SkeletonHorse",
+                     "number":  28,
+                     "protocol":  315,
+                     "base":  6842447,
+                     "overlay":  15066584
+                 },
+                 {
+                     "name":  "slime",
+                     "legacy":  "Slime",
+                     "number":  55,
+                     "protocol":  107,
+                     "base":  5349438,
+                     "overlay":  8306542
+                 },
+                 {
+                     "name":  "spider",
+                     "legacy":  "Spider",
+                     "number":  52,
+                     "protocol":  107,
+                     "base":  3419431,
+                     "overlay":  11013646
+                 },
+                 {
+                     "name":  "squid",
+                     "legacy":  "Squid",
+                     "number":  94,
+                     "protocol":  107,
+                     "base":  2243405,
+                     "overlay":  7375001
+                 },
+                 {
+                     "name":  "stray",
+                     "legacy":  "Stray",
+                     "number":  6,
+                     "protocol":  315,
+                     "base":  6387319,
+                     "overlay":  14543594
+                 },
+                 {
+                     "name":  "vex",
+                     "legacy":  "Vex",
+                     "number":  35,
+                     "protocol":  315,
+                     "base":  8032420,
+                     "overlay":  15265265
+                 },
+                 {
+                     "name":  "villager",
+                     "legacy":  "Villager",
+                     "number":  120,
+                     "protocol":  107,
+                     "base":  5651507,
+                     "overlay":  12422002
+                 },
+                 {
+                     "name":  "vindication_illager",
+                     "legacy":  "VindicationIllager",
+                     "number":  36,
+                     "protocol":  315,
+                     "base":  9804699,
+                     "overlay":  2580065
+                 },
+                 {
+                     "name":  "witch",
+                     "legacy":  "Witch",
+                     "number":  66,
+                     "protocol":  107,
+                     "base":  3407872,
+                     "overlay":  5349438
+                 },
+                 {
+                     "name":  "wither_skeleton",
+                     "legacy":  "WitherSkeleton",
+                     "number":  5,
+                     "protocol":  315,
+                     "base":  1315860,
+                     "overlay":  4672845
+                 },
+                 {
+                     "name":  "wolf",
+                     "legacy":  "Wolf",
+                     "number":  95,
+                     "protocol":  107,
+                     "base":  14144467,
+                     "overlay":  13545366
+                 },
+                 {
+                     "name":  "zombie",
+                     "legacy":  "Zombie",
+                     "number":  54,
+                     "protocol":  107,
+                     "base":  44975,
+                     "overlay":  7969893
+                 },
+                 {
+                     "name":  "zombie_horse",
+                     "legacy":  "ZombieHorse",
+                     "number":  29,
+                     "protocol":  315,
+                     "base":  3232308,
+                     "overlay":  9945732
+                 },
+                 {
+                     "name":  "zombie_pigman",
+                     "legacy":  "PigZombie",
+                     "number":  57,
+                     "protocol":  107,
+                     "base":  15373203,
+                     "overlay":  5009705
+                 },
+                 {
+                     "name":  "zombie_villager",
+                     "legacy":  "ZombieVillager",
+                     "number":  27,
+                     "protocol":  315,
+                     "base":  5651507,
+                     "overlay":  7969893
+                 }
+             ]
+}

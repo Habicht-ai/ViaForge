@@ -52,7 +52,22 @@ public final class BlockAssetCache {
                 Files.deleteIfExists(temporary);
             }
         }
-        return readAssets(jar);
+        Map<String, byte[]> assets = new HashMap<>(readAssets(jar));
+        if (version.startsWith("1.11") || version.startsWith("1.12")) {
+            // The 1.11 and 1.12 Mojang asset indexes reference this identical recording.
+            String soundHash = "e7f0337931cdb05c4234d2a9bc1f38ead675db26";
+            Path sound = cache.resolve(soundHash + ".ogg");
+            if (!valid(sound, 35952, soundHash)) {
+                Path temporary = Files.createTempFile(cache, "totem-", ".part");
+                try {
+                    download("https://resources.download.minecraft.net/e7/" + soundHash, temporary, 35952);
+                    if (!valid(temporary, 35952, soundHash)) throw new IOException("Totem sound checksum mismatch");
+                    Files.move(temporary, sound, StandardCopyOption.REPLACE_EXISTING);
+                } finally { Files.deleteIfExists(temporary); }
+            }
+            assets.put("sounds/item/totem/use_totem.ogg", Files.readAllBytes(sound));
+        }
+        return Collections.unmodifiableMap(assets);
     }
 
     public static Map<String, byte[]> readAssets(Path jar) throws IOException {
@@ -68,7 +83,10 @@ public final class BlockAssetCache {
                 if (!(path.startsWith("textures/blocks/") || path.startsWith("models/block/") || path.startsWith("blockstates/")
                         || path.startsWith("models/item/") || path.startsWith("textures/entity/shulker/") || path.startsWith("textures/entity/bed/")
                         || path.equals("textures/entity/end_portal.png") || path.equals("textures/environment/end_sky.png")
-                        || path.equals("textures/items/beetroot_seeds.png") || path.equals("textures/items/structure_void.png"))) continue;
+                        || path.startsWith("textures/items/") || path.startsWith("textures/entity/shield/")
+                        || path.equals("textures/entity/shield_base.png") || path.equals("textures/entity/shield_base_nopattern.png")
+                        || path.equals("textures/entity/elytra.png") || path.equals("textures/entity/enderdragon/dragon.png")
+                        || path.startsWith("textures/entity/projectiles/") || path.equals("textures/particle/particles.png"))) continue;
                 try (InputStream input = zip.getInputStream(entry)) {
                     byte[] data = readBounded(input, 2 * 1024 * 1024);
                     total += data.length;
@@ -100,7 +118,7 @@ public final class BlockAssetCache {
 
     private static void download(String address, Path target, long expectedSize) throws IOException {
         URL url = new URL(address);
-        if (!"https".equals(url.getProtocol()) || !"piston-data.mojang.com".equals(url.getHost())) {
+        if (!"https".equals(url.getProtocol()) || !("piston-data.mojang.com".equals(url.getHost()) || "resources.download.minecraft.net".equals(url.getHost()))) {
             throw new IOException("Untrusted Minecraft resource address");
         }
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();

@@ -124,6 +124,8 @@ public final class BlockClientSmokeTest {
         world.doPreChunk(0, 0, true);
         LegacyShapeSmokeTest.verify(world);
         BlockHandSmokeTest.verify(profile, world, report.toAbsolutePath().getParent());
+        ServerItemSmokeTest.models(profile, world, report.toAbsolutePath().getParent());
+        CreativeCategorySmokeTest.verify(profile);
         if (profile.protocol() >= 335) BedModelSmokeTest.verify();
         BlockPos pos = new BlockPos(4, 64, 4);
         for (int meta = 0; meta < 8; meta++) {
@@ -157,12 +159,17 @@ public final class BlockClientSmokeTest {
         require(Minecraft.getMinecraft().getResourceManager().getResource(new net.minecraft.util.ResourceLocation("minecraft:textures/blocks/stone.png"))
                 .getResourcePackName().equals("ViaForge versioned blocks"), "Existing block texture overlay");
         checks.add(profile.resourceVersion() + ": compressed Via pipeline/repeated decoder reordering/native chunk+updates, " + states + " server states, all block/item models, first-person scale/position/swing, right-click/air-use packets, shulker container cycle where available, inventory/creative/click/NBT round trips, rod/slab/path/crop/64 chorus shapes, 24 stair collision shapes, vanilla texture overlay OK"
+                + "; all available standalone item/potion/egg/book variants, durability/NBT/creative/click round trips, target item models, hand transforms, eating/drinking/shield/bow/equip actions OK"
+                + "; original projectile/cloud/offhand packets, cloud RGB/radius/destroy/respawn, shield matrices for both hands/poses/skin widths, target creative categories/order/search OK"
+                + "; 37 potion impact types/custom RGB without duplicate fallback effects, tipped/spectral arrow spawn/velocity/metadata/flight/ground/expiration/destroy, version-gated Totem particles/40-tick animation/original sound OK"
                 + "; command editor activation/NBT/controls/cancel and target packets OK"
                 + (profile.protocol() >= 210 ? "; structure SAVE/LOAD/CORNER/DATA, save/load/detect/cancel, numeric limits and target packets OK" : "")
                 + (profile.protocol() >= 335 ? "; 16 bed colors: every world/item vertex, UV corner and face winding matches native ModelBed in all directions" : ""));
     }
 
     private static void checkFallbackModels() {
+        CreativeCategorySmokeTest.disconnected();
+        ServerItemSmokeTest.disconnected();
         for (int raw = 0; raw < com.viaversion.viaforge.common.blocks.LegacyBlockCatalog.STATE_LIMIT; raw++) {
             if (BlockVersionProfile.V1_12_2.supportsState(raw)) model(local(raw));
         }

@@ -66,7 +66,7 @@ public final class LegacyBlockCatalog {
     public static int bedState(int meta, int color) { return 4096 + (color << 4) + (meta & 15); }
     public static boolean isBedState(int state) { return (state >> 4) == 26 || state >= 4096 && state < STATE_LIMIT; }
 
-    public static final class Definition {
+    public static final class Definition implements LegacyItemDefinition {
         public final int id, protocol, color;
         public final String name;
         public final Kind kind;

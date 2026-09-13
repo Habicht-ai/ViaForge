@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 public final class BlockPreservingDecodeHandler extends ViaDecodeHandler {
     private static final Logger LOGGER = Logger.getLogger("ViaForge/Blocks");
     private final LegacyBlockPackets blocks;
+    private final LegacyEntityPackets entities;
     private final IntUnaryOperator mapper;
     private final Runnable onJoin;
     private final Runnable onClose;
@@ -23,6 +24,7 @@ public final class BlockPreservingDecodeHandler extends ViaDecodeHandler {
             IntUnaryOperator mapper, Runnable onJoin, Runnable onClose) {
         super(connection);
         this.blocks = new LegacyBlockPackets(profile);
+        this.entities = new LegacyEntityPackets(profile);
         this.mapper = mapper;
         this.onJoin = onJoin;
         this.onClose = onClose;
@@ -45,6 +47,12 @@ public final class BlockPreservingDecodeHandler extends ViaDecodeHandler {
         boolean joined = false;
         if (play) {
             try {
+                ByteBuf visualEvent = entities.replacement(input);
+                if (visualEvent != null) {
+                    if (connection.checkIncomingPacket(input.readableBytes())) output.add(visualEvent);
+                    else visualEvent.release();
+                    return;
+                }
                 ByteBuf editor = blocks.editorUpdate(input);
                 if (editor != null) {
                     if (connection.checkIncomingPacket()) output.add(editor);
@@ -69,7 +77,26 @@ public final class BlockPreservingDecodeHandler extends ViaDecodeHandler {
             }
         }
         int start = output.size();
-        super.decode(ctx, input, output);
+        ByteBuf visual = play && !disabled ? entities.capture(input) : null;
+        try {
+            if (visual == null) super.decode(ctx, input, output);
+            else {
+                // A cloud or off-hand update is intentionally cancelled by Via.
+                // Validate the incoming packet once, then retain its visual message
+                // even when the translation has no corresponding 1.8 packet.
+                if (!connection.checkIncomingPacket(input.readableBytes())) throw com.viaversion.viaversion.exception.CancelDecoderException.generate(null);
+                ByteBuf translated = ctx.alloc().buffer(input.readableBytes());
+                try {
+                    translated.writeBytes(input, input.readerIndex(), input.readableBytes());
+                    try {
+                        connection.transformIncoming(translated, com.viaversion.viaversion.exception.CancelDecoderException::generate);
+                        output.add(translated.retain());
+                    } catch (com.viaversion.viaversion.exception.CancelDecoderException expected) { }
+                } finally { translated.release(); }
+            }
+        }
+        catch (Exception failure) { if (visual != null) visual.release(); throw failure; }
+        if (visual != null) output.add(visual);
         if (!play || disabled) return;
         if (joined) onJoin.run();
         for (int i = start; i < output.size(); i++) {

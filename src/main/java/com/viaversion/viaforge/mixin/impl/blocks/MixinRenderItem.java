@@ -1,6 +1,6 @@
 package com.viaversion.viaforge.mixin.impl.blocks;
 
-import com.viaversion.viaforge.blocks.ClientBlocks;
+import com.viaversion.viaforge.items.ClientItems;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
@@ -15,6 +15,12 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 /** Imported GUI transforms already contain the rotation and scale hard-coded in 1.8. */
 @Mixin(RenderItem.class)
 public abstract class MixinRenderItem {
+    @org.spongepowered.asm.mixin.injection.Inject(method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/resources/model/IBakedModel;)V", at = @At("HEAD"), cancellable = true)
+    private void importedEntityItem(ItemStack stack, IBakedModel model, org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
+        if (com.viaversion.viaforge.items.ServerItemRenderer.special(stack)) {
+            com.viaversion.viaforge.items.ServerItemRenderer.render(stack); ci.cancel();
+        }
+    }
     @Shadow public float zLevel;
     @Shadow private void setupGuiTransform(int x, int y, boolean gui3d) { throw new AssertionError(); }
     @Shadow private void preTransform(ItemStack stack) { throw new AssertionError(); }
@@ -23,7 +29,7 @@ public abstract class MixinRenderItem {
             target = "Lnet/minecraft/client/renderer/entity/RenderItem;setupGuiTransform(IIZ)V"))
     private void versionedGuiTransform(RenderItem renderer, int x, int y, boolean gui3d,
             ItemStack stack, int slotX, int slotY) {
-        if (ClientBlocks.serverItem(Item.getIdFromItem(stack.getItem())) == null) {
+        if (ClientItems.serverItem(Item.getIdFromItem(stack.getItem())) == null) {
             setupGuiTransform(x, y, gui3d);
             return;
         }
@@ -38,7 +44,7 @@ public abstract class MixinRenderItem {
     private void versionedGuiGeometry(RenderItem renderer, ItemStack stack, IBakedModel model) {
         // Undo renderItem's legacy half-scale after the model's display transform,
         // keeping display translations at their original size as well.
-        if (ClientBlocks.serverItem(Item.getIdFromItem(stack.getItem())) != null) GlStateManager.scale(2F, 2F, 2F);
+        if (ClientItems.serverItem(Item.getIdFromItem(stack.getItem())) != null) GlStateManager.scale(2F, 2F, 2F);
         renderer.renderItem(stack, model);
     }
 
@@ -46,7 +52,7 @@ public abstract class MixinRenderItem {
             target = "Lnet/minecraft/client/renderer/entity/RenderItem;preTransform(Lnet/minecraft/item/ItemStack;)V"))
     private void versionedHandPreTransform(RenderItem renderer, ItemStack stack,
             ItemStack original, IBakedModel model, ItemCameraTransforms.TransformType transform) {
-        if (transform == ItemCameraTransforms.TransformType.FIRST_PERSON && ClientBlocks.serverItem(Item.getIdFromItem(stack.getItem())) != null) {
+        if (ClientItems.serverItem(Item.getIdFromItem(stack.getItem())) != null) {
             GlStateManager.color(1, 1, 1, 1);
         } else preTransform(stack);
     }
@@ -55,7 +61,7 @@ public abstract class MixinRenderItem {
             target = "Lnet/minecraft/client/renderer/entity/RenderItem;renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/resources/model/IBakedModel;)V"))
     private void versionedHandGeometry(RenderItem renderer, ItemStack stack, IBakedModel model,
             ItemStack original, IBakedModel originalModel, ItemCameraTransforms.TransformType transform) {
-        if (transform == ItemCameraTransforms.TransformType.FIRST_PERSON && ClientBlocks.serverItem(Item.getIdFromItem(stack.getItem())) != null) GlStateManager.scale(2F, 2F, 2F);
+        if (ClientItems.serverItem(Item.getIdFromItem(stack.getItem())) != null) GlStateManager.scale(2F, 2F, 2F);
         renderer.renderItem(stack, model);
     }
 }

@@ -1,6 +1,6 @@
 package com.viaversion.viaforge.common.blocks;
 
-import com.viaversion.viaforge.blocks.ClientBlocks;
+import com.viaversion.viaforge.items.ClientItems;
 import com.viaversion.viaforge.platform.ViaForgeProtocol;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -12,7 +12,7 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 
 /** The native 1.8 edge of the pipeline: inventory, held/dropped items and placement. */
 public final class ClientBlockItemRewriter extends ItemRewriter<ClientboundPackets1_8, ServerboundPackets1_8, ViaForgeProtocol> {
-    private final LegacyBlockItemBridge bridge = new LegacyBlockItemBridge(ClientBlocks::localItem, ClientBlocks::serverItem);
+    private final LegacyBlockItemBridge bridge = new LegacyBlockItemBridge(ClientItems::localItem, ClientItems::serverItem);
     public ClientBlockItemRewriter(ViaForgeProtocol protocol) { super(protocol, Types.ITEM1_8, Types.ITEM1_8_SHORT_ARRAY); }
     @Override protected void registerPackets() {
         registerSetContent(ClientboundPackets1_8.CONTAINER_SET_CONTENT);

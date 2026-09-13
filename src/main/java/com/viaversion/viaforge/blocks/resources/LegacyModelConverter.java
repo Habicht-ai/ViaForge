@@ -72,7 +72,7 @@ public final class LegacyModelConverter {
         if (model.has("parent")) {
             String parent = model.get("parent").getAsString();
             if (parent.startsWith("minecraft:")) parent = parent.substring(10);
-            if (parent.equals("builtin/generated")) result.addProperty("parent", parent);
+            if (parent.equals("builtin/generated") || parent.equals("builtin/entity")) result.addProperty("parent", parent);
             else {
                 if (parent.contains(":") || parent.startsWith("builtin/")) throw new IOException("Unsupported block model parent: " + parent);
                 result = flatten("models/" + parent + ".json", assets, chain);

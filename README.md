@@ -80,7 +80,18 @@ and preserve server IDs, metadata, names and NBT when moved or placed. Creative
 entries are filtered by the connected server's version. Double slabs, frosted ice
 and gateways do not invent inventory items absent from vanilla; beetroot plants
 use seeds, and structure-block items begin in 1.10. Falling concrete powder retains
-its block color. Existing items outside these block families still use Via's mappings.
+its block color. Standalone items through 1.12.2 are also included: end crystals,
+chorus fruit and popped fruit, beetroot and soup, dragon's breath, spectral/tipped
+arrows, all potion variants, shields with banner patterns, elytra, wooden boats,
+totems, shulker shells, iron nuggets and knowledge books. Dragon heads, spawn-egg
+variants and Frost Walker/Mending/curse books use their original item data.
+Inventory and hand models follow the selected profile; stack sizes, durability,
+eating/drinking, bow ammunition and equipment slots are supported. Shields use
+target-version third-person poses, including other players' offhand shields.
+Thrown splash/lingering potions retain their models and colors; lingering clouds
+display the server's particle color and radius. Creative categories follow the
+target release, and the dragon-head inventory orientation follows its 1.11.1 change. Item effects
+and consumption remain server-authoritative. See [item scope and limitations](docs/ITEMS.md).
 Beetroot crops acknowledge bonemeal use while immature, restoring the normal hand
 swing; growth and item consumption are confirmed by the server.
 
@@ -94,7 +105,7 @@ for server data, and cancelling leaves the server settings unchanged.
 Existing blocks also receive the target version's block textures. The first join
 downloads that version's vanilla client archive from Mojang (about 9-10 MB),
 verifies its published SHA-1 and caches it in `run/ViaForge/block-assets/`.
-Only block-related resources and models are loaded; the downloaded client code is never executed.
+Only the required block/item resources and models are loaded; the downloaded client code is never executed.
 Until loading finishes, the added blocks use temporary vanilla replacement
 textures. Failed downloads keep those textures and report the failure in chat;
 reconnecting retries. User and server resource packs retain their normal priority

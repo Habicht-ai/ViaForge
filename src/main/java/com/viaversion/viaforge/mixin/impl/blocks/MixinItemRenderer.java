@@ -1,6 +1,6 @@
 package com.viaversion.viaforge.mixin.impl.blocks;
 
-import com.viaversion.viaforge.blocks.ClientBlocks;
+import com.viaversion.viaforge.items.ClientItems;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
@@ -19,6 +19,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinItemRenderer {
     @Shadow private ItemStack itemToRender;
 
+    @Inject(method = "doBlockTransformations", at = @At("HEAD"), cancellable = true)
+    private void shieldBlocking(CallbackInfo ci) {
+        if (ClientItems.is(itemToRender, com.viaversion.viaforge.common.blocks.LegacyItemCatalog.Kind.SHIELD)) ci.cancel();
+    }
+
     @Inject(method = "transformFirstPersonItem", at = @At("HEAD"), cancellable = true)
     private void versionedHandTransform(float equipProgress, float swingProgress, CallbackInfo ci) {
         if (!isServerBlockItem(itemToRender)) return;
@@ -35,7 +40,7 @@ public abstract class MixinItemRenderer {
     }
 
     private static boolean isServerBlockItem(ItemStack stack) {
-        return stack != null && ClientBlocks.serverItem(Item.getIdFromItem(stack.getItem())) != null;
+        return stack != null && ClientItems.serverItem(Item.getIdFromItem(stack.getItem())) != null;
     }
 
     @Redirect(method = "renderItem", at = @At(value = "INVOKE",
@@ -44,6 +49,6 @@ public abstract class MixinItemRenderer {
             ItemStack stack, ItemCameraTransforms.TransformType transform) {
         // Compensate for renderItem's half-scale after the display transform instead,
         // so first-person model translations are not doubled along with geometry.
-        if (transform != ItemCameraTransforms.TransformType.FIRST_PERSON || !isServerBlockItem(stack)) GlStateManager.scale(x, y, z);
+        if (!isServerBlockItem(stack)) GlStateManager.scale(x, y, z);
     }
 }

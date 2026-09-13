@@ -10,8 +10,8 @@ import java.util.function.IntFunction;
 /** Uses Via's reversible item mappings, preserving original names, metadata and NBT. */
 public final class LegacyBlockItemBridge {
     private final IntBinaryOperator localItem;
-    private final IntFunction<LegacyBlockCatalog.Definition> serverItem;
-    public LegacyBlockItemBridge(IntBinaryOperator localItem, IntFunction<LegacyBlockCatalog.Definition> serverItem) {
+    private final IntFunction<? extends LegacyItemDefinition> serverItem;
+    public LegacyBlockItemBridge(IntBinaryOperator localItem, IntFunction<? extends LegacyItemDefinition> serverItem) {
         this.localItem = localItem; this.serverItem = serverItem;
     }
     public Item toClient(UserConnection user, Item fallback) {
@@ -25,22 +25,22 @@ public final class LegacyBlockItemBridge {
         }
         if (original == null) return fallback;
         int localId = localItem.applyAsInt(original.identifier(), original.data());
-        LegacyBlockCatalog.Definition block = localId < 0 ? null : serverItem.apply(localId);
+        LegacyItemDefinition block = localId < 0 ? null : serverItem.apply(localId);
         if (block == null || profile.protocol() < block.itemProtocol()) return fallback;
         original.setIdentifier(localId);
-        original.setData((short) 0);
+        if (!block.preservesDamage()) original.setData((short) 0);
         return original;
     }
     public Item toServer(UserConnection user, Item local) {
         if (local == null) return null;
-        LegacyBlockCatalog.Definition block = serverItem.apply(local.identifier());
+        LegacyItemDefinition block = serverItem.apply(local.identifier());
         if (block == null) return local;
         BlockVersionProfile profile = profile(user);
         // A stack carried over from another server must never send a local Forge id.
         if (profile == null || profile.protocol() < block.itemProtocol()) return null;
         Item fallback = local.copy();
         fallback.setIdentifier(block.itemId());
-        fallback.setData((short) block.itemData());
+        if (!block.preservesDamage()) fallback.setData((short) block.itemData());
         List<Protocol> pipes = user.getProtocolInfo().getPipeline().pipes();
         for (int i = pipes.size() - 1; i >= 0; i--) {
             Protocol pipe = pipes.get(i);

@@ -40,11 +40,18 @@ public class ViaForge implements ViaForgePlatform {
     @Mod.EventHandler
     public void onPreInit(FMLPreInitializationEvent event) {
         ClientBlocks.register();
+        com.viaversion.viaforge.items.ClientItems.register();
         ServerBlockSession.initialize();
     }
 
     @Mod.EventHandler
     public void onInit(FMLInitializationEvent event) {
+        net.minecraftforge.fml.client.registry.RenderingRegistry.registerEntityRenderingHandler(
+                com.viaversion.viaforge.items.ServerArrow.class,
+                new com.viaversion.viaforge.items.ServerArrowRenderer(Minecraft.getMinecraft().getRenderManager()));
+        net.minecraftforge.fml.client.registry.RenderingRegistry.registerEntityRenderingHandler(
+                com.viaversion.viaforge.items.ServerAreaEffectCloud.class,
+                new com.viaversion.viaforge.items.ServerCloudRenderer(Minecraft.getMinecraft().getRenderManager()));
         ViaForgeCommon.init(this);
         ViaForgeProtocol.INSTANCE.initialize();
     }

@@ -17,5 +17,6 @@ public abstract class MixinItemCreativeBeds {
     @Inject(method = "getSubItems", at = @At("HEAD"), cancellable = true)
     private void replaceLegacyBedEntry(Item item, CreativeTabs tab, List<ItemStack> items, CallbackInfo ci) {
         if ((Object) this == Items.bed && ServerBlockSession.supportsItem(LegacyBlockCatalog.state(26 << 4))) ci.cancel();
+        if ((Object) this == Items.boat && ServerBlockSession.supportsProtocol(107)) ci.cancel();
     }
 }

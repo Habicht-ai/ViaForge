@@ -23,13 +23,13 @@ public final class VersionBlockPack implements IResourcePack {
     private Map<String, byte[]> generated;
 
     public VersionBlockPack() {
-        try { generated = LegacyBlockModels.generate(assets); }
+        try { generated = generate(assets); }
         catch (IOException impossible) { throw new IllegalStateException("Invalid fallback models", impossible); }
     }
 
     public void setAssets(Map<String, byte[]> assets) {
         try {
-            Map<String, byte[]> models = LegacyBlockModels.generate(assets);
+            Map<String, byte[]> models = generate(assets);
             this.assets = assets;
             this.generated = models;
         } catch (IOException error) { throw new IllegalArgumentException("Could not convert server block models", error); }
@@ -39,17 +39,23 @@ public final class VersionBlockPack implements IResourcePack {
     public boolean resourceExists(ResourceLocation location) {
         String path = location.getResourcePath();
         if (location.getResourceDomain().equals("minecraft")) {
-            return path.startsWith("textures/blocks/") && assets.containsKey(path);
+            return (path.startsWith("textures/blocks/") || path.startsWith("textures/items/") || path.equals("textures/particle/particles.png")) && assets.containsKey(path);
         }
         if (!location.getResourceDomain().equals("viaforge")) return false;
-        return generated.containsKey(path) || (path.startsWith("models/") || path.startsWith("textures/")) && assets.containsKey(path);
+        return generated.containsKey(path) || (path.startsWith("models/") || path.startsWith("textures/") || path.startsWith("sounds/")) && assets.containsKey(path);
+    }
+
+    private static Map<String, byte[]> generate(Map<String, byte[]> assets) throws IOException {
+        Map<String, byte[]> models = new java.util.HashMap<>(LegacyBlockModels.generate(assets));
+        models.putAll(LegacyItemModels.generate(assets));
+        return models;
     }
 
     @Override
     public InputStream getInputStream(ResourceLocation location) throws IOException {
         if (!resourceExists(location)) throw new FileNotFoundException(location.toString());
         String path = location.getResourcePath();
-        if (location.getResourceDomain().equals("minecraft") || path.startsWith("textures/")) return new ByteArrayInputStream(assets.get(path));
+        if (location.getResourceDomain().equals("minecraft") || path.startsWith("textures/") || path.startsWith("sounds/")) return new ByteArrayInputStream(assets.get(path));
         byte[] converted = generated.get(path);
         if (converted != null) return new ByteArrayInputStream(converted);
         return new ByteArrayInputStream(LegacyBlockModels.qualifyModel(LegacyModelConverter.flatten(path, assets)).toString().getBytes(StandardCharsets.UTF_8));

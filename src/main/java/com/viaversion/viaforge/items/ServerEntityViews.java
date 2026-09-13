@@ -22,11 +22,12 @@ public final class ServerEntityViews {
         public boolean leftHanded, fallFlying;
         public boolean crystalBase = true;
         public net.minecraft.util.BlockPos crystalBeam;
+        public com.viaversion.viaforge.mobs.ServerMob leftShoulder, rightShoulder;
         View(int type) { this.type = type; }
     }
     private static WorldClient world;
     private static final Map<Integer, View> VIEWS = new HashMap<>();
-    public static void clear() { VIEWS.clear(); world = null; ServerTotemAnimation.clear(); ServerCombatState.clear(); }
+    public static void clear() { VIEWS.clear(); world = null; ServerTotemAnimation.clear(); ServerCombatState.clear(); com.viaversion.viaforge.mobs.ServerMobs.clear(); }
     public static View get(int id) { return world == Minecraft.getMinecraft().theWorld ? VIEWS.get(id) : null; }
     public static boolean blocking(EntityLivingBase entity, boolean offhand, ItemStack stack) {
         if (!ClientItems.is(stack, com.viaversion.viaforge.common.blocks.LegacyItemCatalog.Kind.SHIELD)) return false;
@@ -54,6 +55,8 @@ public final class ServerEntityViews {
         }
         if (operation == 9) { ServerParticlePackets.accept(world, input); return; }
         if (operation == 10) { ServerCombatState.attributes(input); return; }
+        if (operation == 17 || operation == 18) { ServerPotions.accept(world, operation, input); return; }
+        if (operation >= 11) { com.viaversion.viaforge.mobs.ServerMobs.accept(world, protocol, operation, input); return; }
         int entityId = operation == 4 ? -1 : Types.VAR_INT.readPrimitive(input);
         int first = protocol >= 210 ? 6 : 5;
         switch (operation) {
@@ -85,9 +88,14 @@ public final class ServerEntityViews {
                 VIEWS.put(entityId, new View(-1));
                 metadata(entityId, first, (protocol >= 335 ? Types.ENTITY_DATA_LIST1_12 : Types.ENTITY_DATA_LIST1_9).read(input));
                 break;
-            case 2: metadata(entityId, first, (protocol >= 335 ? Types.ENTITY_DATA_LIST1_12 : Types.ENTITY_DATA_LIST1_9).read(input)); break;
+            case 2: {
+                List<EntityData> data = (protocol >= 335 ? Types.ENTITY_DATA_LIST1_12 : Types.ENTITY_DATA_LIST1_9).read(input);
+                com.viaversion.viaforge.mobs.ServerMobs.metadata(world, entityId, data);
+                metadata(entityId, first, data); break;
+            }
             case 3: {
                 int slot = Types.VAR_INT.readPrimitive(input);
+                com.viaversion.viaforge.mobs.ServerMobs.equipment(world, entityId, slot, input.duplicate());
                 if (slot != 1) break;
                 View view = VIEWS.get(entityId);
                 if (view == null && world.getEntityByID(entityId) instanceof EntityPlayer) { view = new View(-1); VIEWS.put(entityId, view); }
@@ -96,7 +104,9 @@ public final class ServerEntityViews {
             }
             case 4:
                 int count = Types.VAR_INT.readPrimitive(input);
-                for (int i = 0; i < count; i++) VIEWS.remove(Types.VAR_INT.readPrimitive(input));
+                for (int i = 0; i < count; i++) {
+                    int id = Types.VAR_INT.readPrimitive(input); VIEWS.remove(id); com.viaversion.viaforge.mobs.ServerMobs.remove(id);
+                }
                 break;
             default: break;
         }
@@ -127,6 +137,9 @@ public final class ServerEntityViews {
                 if (data.id() == 0) view.fallFlying = ((Byte)value & 128) != 0;
                 if (data.id() == first) view.handState = (Byte)value;
                 if (data.id() == first + 8) view.leftHanded = (Byte)value == 0;
+            } else if (view.type == -1 && (data.id() == first + 9 || data.id() == first + 10)) {
+                com.viaversion.viaforge.mobs.ServerMob parrot = com.viaversion.viaforge.mobs.ShoulderParrots.create(world,value);
+                if (data.id() == first + 9) view.leftShoulder = parrot; else view.rightShoulder = parrot;
             }
         }
     }

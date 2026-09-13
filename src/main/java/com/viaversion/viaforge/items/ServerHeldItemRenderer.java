@@ -20,7 +20,8 @@ public final class ServerHeldItemRenderer {
     public static void render(ModelBiped model, EntityLivingBase entity, ItemStack stack, boolean otherHand) {
         if (stack == null) return;
         ServerEntityViews.View view = ServerEntityViews.get(entity.getEntityId());
-        boolean leftSide = otherHand ^ (view != null && view.leftHanded);
+        boolean leftSide = otherHand ^ (entity instanceof com.viaversion.viaforge.mobs.ServerMob
+                ? ((com.viaversion.viaforge.mobs.ServerMob)entity).state.leftHanded() : view != null && view.leftHanded);
         EntityLivingBase oldOwner = owner; boolean oldOffhand = offhand, oldLeft = left;
         owner = entity; offhand = otherHand; left = leftSide;
         GlStateManager.pushMatrix();

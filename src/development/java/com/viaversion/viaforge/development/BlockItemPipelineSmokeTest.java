@@ -184,7 +184,7 @@ final class BlockItemPipelineSmokeTest {
         } finally { mc.thePlayer = previous; }
     }
 
-    private static void send(EmbeddedChannel client, EmbeddedChannel server, ByteBuf packet) {
+    static void send(EmbeddedChannel client, EmbeddedChannel server, ByteBuf packet) {
         try { client.writeOutbound(packet); }
         finally {
             client.runPendingTasks();

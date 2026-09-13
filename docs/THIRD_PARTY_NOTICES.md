@@ -40,7 +40,7 @@ The versioned-block resource catalog records Mojang's official client download
 URLs, sizes and SHA-1 hashes from
 https://piston-meta.mojang.com/mc/game/version_manifest_v2.json (retrieved
 2026-09-12). Vanilla block resources are downloaded and converted locally at
-runtime. Minecraft artwork, models and client archives are not redistributed
+runtime. Original Minecraft artwork files, model resources and client archives are not redistributed
 inside the mod JAR or its source ZIP. The block implementation uses the existing
 ViaVersion chunk codecs, reversible ViaBackwards/ViaRewind item mappings and Forge
 block/rendering APIs. The locally read assets now include block-item models and
@@ -69,3 +69,14 @@ textures and the particle atlas are read locally from the verified archives. Moj
 The mod supplies its own compatibility implementation; no downloaded client
 classes are loaded or included in the release. Item names and effect names use
 the corresponding vanilla terminology.
+
+The mob compatibility implementation also uses the original 1.9-1.12.2 registries,
+model dimensions/UV layouts, render transforms, animation formulas, metadata,
+projectile behavior and dragon phase rendering as implementation references.
+Entity/armor textures and the horse/llama inventory sheet are loaded from the
+verified local archives. `mob-asset-indexes.json` records the official asset-index
+URLs, SHA-1 hashes and sizes retrieved from Mojang's version metadata on 2026-09-13.
+The index supplies the original sound definitions and recordings, downloaded
+from `resources.download.minecraft.net` with size/hash verification at runtime.
+The mod includes the numeric sound registry names/order, but does not redistribute
+the Minecraft recordings, textures, resource archives or original client classes.

@@ -30,6 +30,7 @@ public final class LegacyEntityPackets {
             case "ADD_ENTITY":
                 ByteBuf probe = input.duplicate(); Types.VAR_INT.readPrimitive(probe); probe.skipBytes(16);
                 int type = probe.readUnsignedByte();
+                if (type == 67 || type == 93 || (type == 68 || type == 79) && profile.protocol() >= 315) { operation = 16; break; }
                 if (type != 3 && type != 73 && type != 60 && type != 91 && type != 51) return null;
                 operation = 1; break;
             case "SET_ENTITY_DATA": operation = 2; break;
@@ -37,6 +38,14 @@ public final class LegacyEntityPackets {
             case "REMOVE_ENTITIES": operation = 4; break;
             case "ADD_PLAYER": operation = 5; break;
             case "UPDATE_ATTRIBUTES": operation = 10; break;
+            case "ADD_MOB": operation = 11; break;
+            case "ENTITY_EVENT": operation = 12; break;
+            case "SET_PASSENGERS": operation = 13; break;
+            case "UPDATE_MOB_EFFECT": case "REMOVE_MOB_EFFECT":
+                ByteBuf effect = input.duplicate(); Types.VAR_INT.readPrimitive(effect);
+                int effectId = effect.readUnsignedByte();
+                if (effectId < 24 || effectId > 27) return null;
+                operation = packets[id].getName().equals("UPDATE_MOB_EFFECT") ? 17 : 18; break;
             default: return null;
         }
         return message(source, input, operation);
@@ -48,6 +57,14 @@ public final class LegacyEntityPackets {
         int id = Types.VAR_INT.readPrimitive(input);
         if (id < 0 || id >= packets.length) return null;
         String name = packets[id].getName();
+        if (name.equals("SOUND")) {
+            String sound = MobSoundCatalog.name(profile.resourceVersion(),Types.VAR_INT.readPrimitive(input.duplicate()));
+            if (sound != null && sound.startsWith("entity.")) return message(source,input,14);
+        } else if (name.equals("CUSTOM_SOUND")) {
+            String sound = Types.STRING.read(input.duplicate());
+            if (sound.startsWith("minecraft:")) sound = sound.substring(10);
+            if (sound.startsWith("entity.")) return message(source,input,15);
+        }
         if (name.equals("LEVEL_EVENT")) {
             int event = input.getInt(input.readerIndex());
             if (event == 2002 || event == 2007 && profile.protocol() >= 315) return message(source, input, 7);
@@ -55,7 +72,7 @@ public final class LegacyEntityPackets {
             if (input.getByte(input.readerIndex() + 4) == 35) return message(source, input, 8);
         } else if (name.equals("LEVEL_PARTICLES")) {
             int particle = input.getInt(input.readerIndex());
-            if (particle == 45 || particle == 47 && profile.protocol() >= 315) return message(source, input, 9);
+            if (particle == 42 || particle == 43 || particle == 45 || (particle == 47 || particle == 48) && profile.protocol() >= 315) return message(source, input, 9);
         }
         return null;
     }

@@ -123,6 +123,7 @@ public final class BlockClientSmokeTest {
         world.doPreChunk(0, 0, false);
         world.doPreChunk(0, 0, true);
         LegacyShapeSmokeTest.verify(world);
+        ShulkerBoxRenderSmokeTest.verify(profile, world, report.toAbsolutePath().getParent());
         BlockHandSmokeTest.verify(profile, world, report.toAbsolutePath().getParent());
         ServerItemSmokeTest.models(profile, world, report.toAbsolutePath().getParent());
         CreativeCategorySmokeTest.verify(profile);
@@ -164,6 +165,9 @@ public final class BlockClientSmokeTest {
                 + "; 37 potion impact types/custom RGB without duplicate fallback effects, tipped/spectral arrow spawn/velocity/metadata/flight/ground/expiration/destroy, version-gated Totem particles/40-tick animation/original sound OK"
                 + "; Sweeping Edge I-III version/category/tooltip/NBT, sweep packet/lifetime, server attack-speed modifiers/timer/cubic hand recharge, 25 native tool hand models, cape texture selection/suppression/glint pose OK"
                 + "; crystal base/beam metadata and destroy, gateway NBT/chunk age/server events/versioned cooldown/exposed portal particles, native crystal/gateway rendering OK"
+                + "; native mob spawns/variants/partial metadata/movement/health/equipment/hurt, target textures/models and sounds, shulker attachment/bounds, baby sizes, dragon phases/8 part IDs, mob projectiles, versioned llama inventory slots and shoulder parrots OK"
+                + "; original projectile names/partial updates/clear, new status effects with level/timer/flags/removal and target inventory icons OK"
+                + (profile.protocol() >= 315 ? "; shulker box interior rendering independent of incoming face culling and support surface draw order, six facings/three lid stages, render state restored OK" : "")
                 + "; command editor activation/NBT/controls/cancel and target packets OK"
                 + (profile.protocol() >= 210 ? "; structure SAVE/LOAD/CORNER/DATA, save/load/detect/cancel, numeric limits and target packets OK" : "")
                 + (profile.protocol() >= 335 ? "; 16 bed colors: every world/item vertex, UV corner and face winding matches native ModelBed in all directions" : ""));

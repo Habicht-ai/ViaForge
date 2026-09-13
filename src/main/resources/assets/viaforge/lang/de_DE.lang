@@ -82,6 +82,7 @@ entity.VindicationIllager.name=Diener
 entity.Vex.name=Plagegeist
 entity.Llama.name=Lama
 entity.Parrot.name=Papagei
+entity.IllusionIllager.name=Illusionist
 potion.effect.night_vision=Trank der Nachtsicht
 potion.effect.invisibility=Trank der Unsichtbarkeit
 potion.effect.leaping=Trank der Sprungkraft

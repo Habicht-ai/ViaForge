@@ -125,6 +125,20 @@ group (for example 1.9.4 for 1.9.3/1.9.4, and 1.10.2 for 1.10.x).
 See [the block implementation notes](docs/BLOCKS.md) for the exact profile table,
 architecture, verification and next steps.
 
+## Versioned mobs
+
+Multiplayer profiles from 1.9 through 1.12.2 now preserve original mob identities,
+textures, models, hitboxes, equipment and sounds. This includes shulkers, polar
+bears, strays, husks, llamas, evokers, vindicators, vexes, parrots and illusioners,
+with their version-specific variants and projectiles. Existing mobs receive
+target textures and relevant pose/variant updates. Llama inventories, shoulder
+parrots and the newer dragon phases are also represented in the client.
+
+The server continues to control AI, movement, damage and inventories. Original
+assets are downloaded and verified locally; 1.8.9 servers and singleplayer keep
+their native behavior. See [the mob implementation notes](docs/MOBS.md) for
+scope, resource handling, automated checks and remaining real-server validation.
+
 ## Development and attribution
 
 This is a single Gradle project for Minecraft 1.8.9:

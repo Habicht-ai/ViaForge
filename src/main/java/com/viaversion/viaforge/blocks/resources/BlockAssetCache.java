@@ -53,6 +53,7 @@ public final class BlockAssetCache {
             }
         }
         Map<String, byte[]> assets = new HashMap<>(readAssets(jar));
+        assets.putAll(MobSoundAssets.load(cache,version));
         if (version.startsWith("1.11") || version.startsWith("1.12")) {
             // The 1.11 and 1.12 Mojang asset indexes reference this identical recording.
             String soundHash = "e7f0337931cdb05c4234d2a9bc1f38ead675db26";
@@ -81,13 +82,15 @@ public final class BlockAssetCache {
                 if (entry.isDirectory() || !name.startsWith("assets/minecraft/")) continue;
                 String path = name.substring("assets/minecraft/".length());
                 if (!(path.startsWith("textures/blocks/") || path.startsWith("models/block/") || path.startsWith("blockstates/")
+                        || path.startsWith("textures/entity/") || path.startsWith("textures/models/armor/") || path.equals("sounds.json")
                         || path.startsWith("models/item/") || path.startsWith("textures/entity/shulker/") || path.startsWith("textures/entity/bed/")
                         || path.equals("textures/entity/end_portal.png") || path.equals("textures/environment/end_sky.png")
                         || path.startsWith("textures/items/") || path.startsWith("textures/entity/shield/")
                         || path.equals("textures/entity/shield_base.png") || path.equals("textures/entity/shield_base_nopattern.png")
                         || path.equals("textures/entity/elytra.png") || path.equals("textures/entity/enderdragon/dragon.png")
                         || path.startsWith("textures/entity/projectiles/") || path.equals("textures/particle/particles.png")
-                        || path.equals("textures/entity/sweep.png") || path.equals("textures/gui/icons.png")
+                        || path.equals("textures/entity/sweep.png") || path.equals("textures/gui/icons.png") || path.equals("textures/gui/container/horse.png")
+                        || path.equals("textures/gui/container/inventory.png")
                         || path.equals("textures/entity/end_gateway_beam.png") || path.startsWith("textures/entity/endercrystal/"))) continue;
                 try (InputStream input = zip.getInputStream(entry)) {
                     byte[] data = readBounded(input, 2 * 1024 * 1024);
@@ -101,7 +104,7 @@ public final class BlockAssetCache {
         return Collections.unmodifiableMap(assets);
     }
 
-    private static boolean valid(Path path, long size, String hash) throws IOException {
+    static boolean valid(Path path, long size, String hash) throws IOException {
         if (!Files.isRegularFile(path) || Files.size(path) != size) return false;
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-1");
@@ -118,9 +121,9 @@ public final class BlockAssetCache {
         }
     }
 
-    private static void download(String address, Path target, long expectedSize) throws IOException {
+    static void download(String address, Path target, long expectedSize) throws IOException {
         URL url = new URL(address);
-        if (!"https".equals(url.getProtocol()) || !("piston-data.mojang.com".equals(url.getHost()) || "resources.download.minecraft.net".equals(url.getHost()))) {
+        if (!"https".equals(url.getProtocol()) || !("piston-data.mojang.com".equals(url.getHost()) || "piston-meta.mojang.com".equals(url.getHost()) || "resources.download.minecraft.net".equals(url.getHost()))) {
             throw new IOException("Untrusted Minecraft resource address");
         }
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();

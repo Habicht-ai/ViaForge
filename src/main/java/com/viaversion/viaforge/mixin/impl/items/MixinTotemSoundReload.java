@@ -12,5 +12,6 @@ public abstract class MixinTotemSoundReload {
     @Inject(method = "onResourceManagerReload", at = @At("RETURN"))
     private void reloadActivationSound(IResourceManager resources, CallbackInfo ci) {
         if (net.minecraft.client.Minecraft.getMinecraft().getSoundHandler() != null) ServerTotemSound.reload();
+        if (net.minecraft.client.Minecraft.getMinecraft().getSoundHandler() != null) com.viaversion.viaforge.mobs.ServerMobSounds.reload();
     }
 }

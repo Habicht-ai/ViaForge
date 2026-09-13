@@ -13,6 +13,10 @@ public final class ServerVisualParticles {
         int setting = mc.gameSettings.particleSetting;
         if (setting == 1 && world.rand.nextInt(3) == 0) setting = 2;
         if (!ignoreRange && (setting > 1 || camera.getDistanceSq(x, y, z) > 1024)) return null;
+        if (id == 42 || id == 43 || id == 48) {
+            EntityFX particle = new com.viaversion.viaforge.mobs.MobParticles(world,id,x,y,z,vx,vy,vz);
+            mc.effectRenderer.addEffect(particle); return particle;
+        }
         if (id == 47 || id == 45) {
             EntityFX particle = id == 47 ? new ServerTotemParticle(world, x, y, z, vx, vy, vz) : new ServerSweepParticle(world, x, y, z, vx);
             mc.effectRenderer.addEffect(particle); return particle;

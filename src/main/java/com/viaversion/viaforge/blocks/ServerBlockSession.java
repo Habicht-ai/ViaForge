@@ -131,7 +131,8 @@ public final class ServerBlockSession {
                 ((com.viaversion.viaforge.mixin.impl.blocks.VersionTextureCache)mc.getTextureManager()).viaForge$textures().keySet().iterator();
         while (textures.hasNext()) {
             net.minecraft.util.ResourceLocation texture = textures.next();
-            if (texture.getResourceDomain().equals("viaforge") && texture.getResourcePath().startsWith("textures/")) {
+            if (texture.getResourceDomain().equals("viaforge") && texture.getResourcePath().startsWith("textures/")
+                    || texture.getResourceDomain().equals("minecraft") && (texture.getResourcePath().startsWith("textures/entity/") || texture.getResourcePath().startsWith("textures/models/armor/"))) {
                 mc.getTextureManager().deleteTexture(texture);
                 textures.remove();
             }
@@ -140,5 +141,6 @@ public final class ServerBlockSession {
         mc.getTextureManager().deleteTexture(particles);
         mc.getTextureManager().loadTexture(particles, new net.minecraft.client.renderer.texture.SimpleTexture(particles));
         com.viaversion.viaforge.items.ServerTotemSound.reload();
+        com.viaversion.viaforge.mobs.ServerMobSounds.reload();
     }
 }

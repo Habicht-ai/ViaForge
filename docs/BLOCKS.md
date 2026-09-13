@@ -197,6 +197,15 @@ Renderer previews are saved under `build/logs/screenshots/`, including
 `block-hand-preview-1.12.2.png` with identical FOV for each held item.
 `beds-preview-1.12.2.png` compares all 16 bed world and inventory models.
 `block-editors-preview-1.12.2.png` shows the command and structure editor screens.
+`shulker-boxes-<version>.png` shows closed, half-open and fully open boxes in all
+six orientations for profiles from 1.11 onward. A pixel comparison verifies that
+their interior faces remain visible regardless of the preceding renderer's face
+culling state. As in vanilla, both sides of the shell are rendered and face
+culling is re-enabled afterward. The shell uses vanilla's 0.9995 inset around
+the block center to avoid depth fighting with the supporting block. Rendering
+that supporting surface before and after the box must produce identical pixels.
+`levitation-inventory-<version>.png` exercises the native inventory effect list
+with the original levitation icon, name and remaining duration.
 The first run may download each profile's assets. Normal `run.bat` launches are
 unaffected when this environment variable is absent.
 
@@ -239,8 +248,8 @@ profile. Renderer comparisons are saved as `end-crystals-<version>.png`,
 3. Extend world storage/rendering/light/position handling for modern dimension
    heights. Via's legacy height clipping must be addressed before claiming
    complete 1.18+ world support.
-4. Add non-block items and their original identity/interaction state, then combat and other
-   mechanics that depend on the server version.
+4. Extend the existing standalone-item, combat and [mob](MOBS.md) implementations
+   to additional verified server versions.
 
 Protocol support alone does not imply correct rendering or behavior for every
 block, and future versions require verified profiles rather than an automatic

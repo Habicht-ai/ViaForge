@@ -26,6 +26,9 @@ public final class ShulkerBlockRenderer extends TileEntitySpecialRenderer<Shulke
         GlStateManager.enableRescaleNormal();
         GlStateManager.color(1, 1, 1, 1);
         GlStateManager.translate(x + .5, y + .5, z + .5);
+        // Vanilla slightly insets the shell around its block center so its
+        // bottom does not share the supporting block's exact depth plane.
+        GlStateManager.scale(.9995F, .9995F, .9995F);
         switch (facing) {
             case DOWN: GlStateManager.rotate(180, 1, 0, 0); break;
             case NORTH: GlStateManager.rotate(-90, 1, 0, 0); break;
@@ -39,9 +42,16 @@ public final class ShulkerBlockRenderer extends TileEntitySpecialRenderer<Shulke
         float progress = tile.progress(partialTicks);
         lid.rotationPointY = -8 * progress;
         lid.rotateAngleY = (float) (Math.PI * 1.5) * progress;
-        bottom.render(1F / 16);
-        lid.render(1F / 16);
-        GlStateManager.disableRescaleNormal();
-        GlStateManager.popMatrix();
+        // Vanilla draws both sides of the shell: the alpha cutouts expose its
+        // back faces when the lid opens, so culling would leave holes inside.
+        GlStateManager.disableCull();
+        try {
+            bottom.render(1F / 16);
+            lid.render(1F / 16);
+        } finally {
+            GlStateManager.enableCull();
+            GlStateManager.disableRescaleNormal();
+            GlStateManager.popMatrix();
+        }
     }
 }

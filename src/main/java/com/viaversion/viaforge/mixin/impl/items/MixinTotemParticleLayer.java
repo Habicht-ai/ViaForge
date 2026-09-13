@@ -12,6 +12,7 @@ public abstract class MixinTotemParticleLayer {
     private float originalDepthLayer(EntityFX particle) {
         // ParticleSimpleAnimated disables depth writes even while fully opaque.
         // This return value only selects the list; the rendered alpha stays intact.
-        return particle instanceof ServerTotemParticle ? 0F : particle.getAlpha();
+        return particle instanceof ServerTotemParticle || particle instanceof com.viaversion.viaforge.mobs.MobParticles
+                && ((com.viaversion.viaforge.mobs.MobParticles)particle).type == 43 ? 0F : particle.getAlpha();
     }
 }

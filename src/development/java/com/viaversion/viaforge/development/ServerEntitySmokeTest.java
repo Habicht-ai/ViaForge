@@ -21,10 +21,12 @@ final class ServerEntitySmokeTest {
     static void pipeline(BlockVersionProfile profile, EmbeddedChannel client, EmbeddedChannel server, WorldClient world) throws Exception {
         Minecraft mc = Minecraft.getMinecraft(); WorldClient previous = mc.theWorld;
         net.minecraft.client.entity.EntityPlayerSP previousPlayer = mc.thePlayer;
+        net.minecraft.entity.Entity previousCamera = mc.getRenderViewEntity();
         NetHandlerPlayClient handler = new NetHandlerPlayClient(mc, null, new NetworkManager(EnumPacketDirection.CLIENTBOUND), new GameProfile(new UUID(0, 17), "VisualTest"));
         Field field = NetHandlerPlayClient.class.getDeclaredField("clientWorldController"); field.setAccessible(true); field.set(handler, world);
         mc.theWorld = world; ServerEntityViews.clear();
         mc.thePlayer = new net.minecraft.client.entity.EntityPlayerSP(mc, world, handler, new net.minecraft.stats.StatFileWriter());
+        mc.setRenderViewEntity(mc.thePlayer);
         int first = profile.protocol() >= 210 ? 6 : 5;
         try {
             spawn(profile, client, server, handler, 610, 3);
@@ -81,11 +83,13 @@ final class ServerEntitySmokeTest {
             ServerEffectsSmokeTest.pipeline(profile, client, server, handler, world);
             ServerCombatSmokeTest.pipeline(profile, client, server, handler, world);
             EndVisualSmokeTest.pipeline(profile, client, server, handler, world);
+            ServerMobSmokeTest.pipeline(profile, client, server, handler, world);
+            ServerPotionStatusSmokeTest.verify(profile, client, server, handler);
             ByteBuf remove = packet(profile, "REMOVE_ENTITIES"); Types.VAR_INT.writePrimitive(remove, 3);
             for (int id : new int[]{610, 611, 612}) Types.VAR_INT.writePrimitive(remove, id);
             send(client, server, handler, remove);
             require(world.getEntityByID(610) == null && world.getEntityByID(611) == null && ServerEntityViews.get(612) == null, "Entity destroy clears clouds/projectiles/hand state");
-        } finally { for (int id : new int[]{610, 611, 612}) world.removeEntityFromWorld(id); ServerEntityViews.clear(); mc.theWorld = previous; mc.thePlayer = previousPlayer; }
+        } finally { for (int id : new int[]{610, 611, 612}) world.removeEntityFromWorld(id); ServerEntityViews.clear(); mc.theWorld = previous; mc.thePlayer = previousPlayer; mc.setRenderViewEntity(previousCamera); }
     }
     private static void spawn(BlockVersionProfile profile, EmbeddedChannel client, EmbeddedChannel server, NetHandlerPlayClient handler, int id, int type) throws Exception {
         ByteBuf add = packet(profile, "ADD_ENTITY"); Types.VAR_INT.writePrimitive(add, id); add.writeLong(0).writeLong(id).writeByte(type);
@@ -102,7 +106,7 @@ final class ServerEntitySmokeTest {
                 int id = Types.VAR_INT.readPrimitive(received);
                 // Player construction uses a local profile fixture; the visual data
                 // still comes from the actual ADD_PLAYER packet through the pipeline.
-                if (id != 0x0e && id != 0x1c && id != 0x13 && id != 0x3f && id != 0x04 && id != 0x12 && id != 0x1a && id != 0x23 && id != 0x35 && id != 0x24 && id != 0x21) continue;
+                if (id != 0x0e && id != 0x0f && id != 0x15 && id != 0x17 && id != 0x18 && id != 0x19 && id != 0x1c && id != 0x13 && id != 0x3f && id != 0x04 && id != 0x12 && id != 0x1a && id != 0x23 && id != 0x35 && id != 0x24 && id != 0x21 && id != 0x2d && id != 0x2f && id != 0x30) continue;
                 Packet nativePacket = EnumConnectionState.PLAY.getPacket(EnumPacketDirection.CLIENTBOUND, id);
                 nativePacket.readPacketData(new PacketBuffer(received)); nativePacket.processPacket(handler);
             } finally { received.release(); }

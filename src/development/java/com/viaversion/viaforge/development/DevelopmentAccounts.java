@@ -20,6 +20,7 @@ public final class DevelopmentAccounts {
 
     @Mod.EventHandler
     public void onInit(FMLInitializationEvent event) {
+        if (BlockClientSmokeTest.installIfRequested()) return;
         Minecraft minecraft = Minecraft.getMinecraft();
         accounts = new AccountManager(minecraft, minecraft.mcDataDir.toPath().resolve("ViaForge/accounts"));
         MinecraftForge.EVENT_BUS.register(this);

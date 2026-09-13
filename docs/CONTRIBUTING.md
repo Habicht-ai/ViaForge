@@ -3,13 +3,15 @@
 This workspace targets Minecraft Forge 1.8.9 only. Open the root directory as a
 Gradle project using JDK 21. The Gradle wrapper is included.
 
-- `build.bat`: compile, run account tests on Java 8, verify and package the release.
+- `build.bat`: compile, run tests on Java 8, verify and package the release.
 - `run.bat`: build the Java 8 development JAR with account login support and launch Forge 1.8.9.
-- `build.bat test`: run the account tests.
+- `build.bat test`: run the account and block tests.
 
 Release code and resources live in `src/main`; the account manager, its screens
 and Forge event integration live in the separate `src/development` source set.
-Account tests live in `src/test` and run against the downgraded development JAR.
+Account and block compatibility tests live in `src/test` and run against the
+downgraded development JAR. The opt-in client renderer/pipeline smoke test is
+documented in [BLOCKS.md](BLOCKS.md).
 There are no version subprojects. Release outputs are in `build/libs`; the
 development JAR is in `build/development`. The source
 ZIP contains the matching source files and build scripts. Put manual verification

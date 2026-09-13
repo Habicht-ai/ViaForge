@@ -61,6 +61,59 @@ The **ViaForge** button opens the protocol selector. ViaForge's existing protoco
 translation through ViaVersion, ViaBackwards, ViaRewind, ViaLegacy and ViaAprilFools
 is included. The Minecraft client itself always remains on version 1.8.9.
 
+## Versioned blocks and block items
+
+Multiplayer connections using **1.9 through 1.12.2** now retain original server
+block states before Via converts them. The catalog covers all new block IDs in
+this range (198–252 and 255), with each family enabled from its own release:
+
+- **1.9+**: end rods, chorus plants/flowers, purpur blocks/pillars/stairs/slabs,
+  end stone bricks, beetroots, grass paths, frosted ice and the new command,
+  structure and gateway block representations.
+- **1.10+**: magma, nether wart blocks, red nether bricks, bone blocks and structure void.
+- **1.11+**: observers and all 16 shulker boxes, including server-controlled lid animation.
+- **1.12+**: all concrete, concrete powder and glazed terracotta colors, plus all
+  16 bed colors in the world, inventory and hand. Older profiles retain the red bed.
+
+Their block items now render in inventories and hands, support creative pick-block
+and preserve server IDs, metadata, names and NBT when moved or placed. Creative
+entries are filtered by the connected server's version. Double slabs, frosted ice
+and gateways do not invent inventory items absent from vanilla; beetroot plants
+use seeds, and structure-block items begin in 1.10. Falling concrete powder retains
+its block color. Existing items outside these block families still use Via's mappings.
+Beetroot crops acknowledge bonemeal use while immature, restoring the normal hand
+swing; growth and item consumption are confirmed by the server.
+
+All three command block types have editors from 1.9 onward, including command
+text, output tracking, mode, conditional execution and redstone activation.
+Structure blocks have save/load/corner/data editors from 1.10 onward, with size
+detection, placement settings and selection previews. The server enforces creative
+operator permissions and executes commands and structure operations. Editors wait
+for server data, and cancelling leaves the server settings unchanged.
+
+Existing blocks also receive the target version's block textures. The first join
+downloads that version's vanilla client archive from Mojang (about 9-10 MB),
+verifies its published SHA-1 and caches it in `run/ViaForge/block-assets/`.
+Only block-related resources and models are loaded; the downloaded client code is never executed.
+Until loading finishes, the added blocks use temporary vanilla replacement
+textures. Failed downloads keep those textures and report the failure in chat;
+reconnecting retries. User and server resource packs retain their normal priority
+over the vanilla texture profile.
+
+Singleplayer and native 1.8 connections use their normal block textures. The
+profile and creative entries are cleared when leaving a server.
+**1.13+, including 1.21, is a later milestone**; existing
+protocol connectivity remains available, but this block extension is not enabled
+for those versions yet. This is not complete 1.12 client emulation: gateway
+beams/portal effects and exact
+server-specific interaction behavior still need dedicated work and gameplay testing.
+
+Several patch releases share a protocol and cannot be distinguished by the
+protocol selector. Their default resource profiles use the last patch in that
+group (for example 1.9.4 for 1.9.3/1.9.4, and 1.10.2 for 1.10.x).
+See [the block implementation notes](docs/BLOCKS.md) for the exact profile table,
+architecture, verification and next steps.
+
 ## Development and attribution
 
 This is a single Gradle project for Minecraft 1.8.9:
@@ -69,7 +122,7 @@ This is a single Gradle project for Minecraft 1.8.9:
 | --- | --- |
 | `src/main/` | ViaForge, Forge integration and release resources |
 | `src/development/` | Developer account manager, screens and menu integration |
-| `src/test/` | Account tests |
+| `src/test/` | Account and block compatibility tests |
 | `docs/` | Development notes and source attribution |
 | `gradle/` | Gradle wrapper for reproducible builds |
 | `build/` | Generated JARs, intermediate files and verification reports |

@@ -25,9 +25,17 @@ import com.viaversion.viaforge.common.platform.ViaForgeProtocolBase;
 public final class ViaForgeProtocol extends ViaForgeProtocolBase<ClientboundPackets1_8, ClientboundPackets1_8, ServerboundPackets1_8, ServerboundPackets1_8> {
 
     public static final ViaForgeProtocol INSTANCE = new ViaForgeProtocol();
+    private final com.viaversion.viaforge.common.blocks.ClientBlockItemRewriter items = new com.viaversion.viaforge.common.blocks.ClientBlockItemRewriter(this);
 
     public ViaForgeProtocol() {
         super(ClientboundPackets1_8.class, ClientboundPackets1_8.class, ServerboundPackets1_8.class, ServerboundPackets1_8.class);
+        // This adapter lives at the native edge; Via's shared registrations need
+        // explicit version metadata even for an identity protocol.
+        setClientVersion(com.viaversion.viaversion.api.protocol.version.ProtocolVersion.v1_8);
+        setServerVersion(com.viaversion.viaversion.api.protocol.version.ProtocolVersion.v1_8);
     }
+
+    @Override protected void registerPackets() { items.register(); }
+    @Override public com.viaversion.viaforge.common.blocks.ClientBlockItemRewriter getItemRewriter() { return items; }
 
 }

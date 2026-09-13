@@ -23,20 +23,30 @@ import com.viaversion.viaforge.common.platform.ViaForgePlatform;
 import com.viaversion.viaforge.common.platform.ViaForgeProtocolBase;
 import com.viaversion.viaforge.platform.ViaForgeGameProfileFetcher;
 import com.viaversion.viaforge.platform.ViaForgeProtocol;
+import com.viaversion.viaforge.blocks.ClientBlocks;
+import com.viaversion.viaforge.blocks.ServerBlockSession;
 import java.io.File;
 import net.minecraft.client.Minecraft;
 import net.minecraft.realms.RealmsSharedConstants;
 import net.minecraft.util.Session;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.provider.GameProfileFetcher;
 
 @Mod(modid = "viaforge", name = "ViaForge", acceptableRemoteVersions = "*", clientSideOnly = true, useMetadata = true)
 public class ViaForge implements ViaForgePlatform {
 
     @Mod.EventHandler
+    public void onPreInit(FMLPreInitializationEvent event) {
+        ClientBlocks.register();
+        ServerBlockSession.initialize();
+    }
+
+    @Mod.EventHandler
     public void onInit(FMLInitializationEvent event) {
         ViaForgeCommon.init(this);
+        ViaForgeProtocol.INSTANCE.initialize();
     }
 
     @Override

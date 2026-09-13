@@ -52,6 +52,7 @@ dependencies {
     accountTestLibraries 'junit:junit:4.13.2'
     accountTestLibraries 'com.google.code.gson:gson:2.2.4'
     accountTestLibraries 'org.apache.httpcomponents:httpclient:4.3.3'
+    accountTestLibraries 'io.netty:netty-all:4.0.23.Final'
 }
 
 sourceSets.main.classTokenReplacer { property('\${version}', project.version) }
@@ -164,7 +165,7 @@ tasks.register('installDevelopmentJar', Copy) {
 tasks.named('remapJar') { enabled = false }
 tasks.named('assemble') { dependsOn tasks.named('shadeDowngradedApi') }
 tasks.named('compileTestJava') {
-    classpath = files(sourceSets.development.output, configurations.accountTestLibraries)
+    classpath = files(sourceSets.main.output, sourceSets.development.output, configurations.accountTestLibraries, configurations.library)
     sourceCompatibility = '8'
     targetCompatibility = '8'
     options.release = 8
@@ -173,7 +174,7 @@ tasks.named('test') {
     useJUnit()
     javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(8) }
     dependsOn tasks.named('shadeDevelopmentApi')
-    // Exercise the development-only account implementation on the game's JVM.
+    // Exercise accounts and the block protocol/resource foundation on the game's JVM.
     classpath = files(sourceSets.test.output, tasks.named('shadeDevelopmentApi'), configurations.accountTestLibraries)
 }
 

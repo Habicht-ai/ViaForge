@@ -35,3 +35,13 @@ The JAR includes ViaVersion, ViaBackwards, ViaRewind, ViaAprilFools, ViaLegacy,
 Mixin, SLF4J and the required JVM Downgrader compatibility code. Embedded
 dependency license notices are retained where provided upstream.
 `build/libs/*-sources.zip` contains the matching project sources and build scripts.
+
+The versioned-block resource catalog records Mojang's official client download
+URLs, sizes and SHA-1 hashes from
+https://piston-meta.mojang.com/mc/game/version_manifest_v2.json (retrieved
+2026-09-12). Vanilla block resources are downloaded and converted locally at
+runtime. Minecraft artwork, models and client archives are not redistributed
+inside the mod JAR or its source ZIP. The block implementation uses the existing
+ViaVersion chunk codecs, reversible ViaBackwards/ViaRewind item mappings and Forge
+block/rendering APIs. The locally read assets now include block-item models and
+the specific entity/icon textures used by shulker boxes, colored beds, gateways and block seeds.

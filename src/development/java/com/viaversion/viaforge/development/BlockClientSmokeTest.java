@@ -168,6 +168,7 @@ public final class BlockClientSmokeTest {
                 + "; native mob spawns/variants/partial metadata/movement/health/equipment/hurt, target textures/models and sounds, shulker attachment/bounds, baby sizes, dragon phases/8 part IDs, mob projectiles, versioned llama inventory slots and shoulder parrots OK"
                 + "; original projectile names/partial updates/clear, new status effects with level/timer/flags/removal and target inventory icons OK"
                 + "; original item cooldown packets/slot sharing/replacement/removal/respawn, pearl prediction in both modes, use gates and native overlay pixels OK; worn dragon head limb swing and placed redstone clock/freeze/resume in all orientations OK"
+                + "; modern boat models/six woods, original coordinates/metadata, both seats/ticking/transfers, driver-only movement and rowing packets, versioned paddles, water/ice physics, placement in both modes OK"
                 + (profile.protocol() >= 315 ? "; shulker box interior rendering independent of incoming face culling and support surface draw order, six facings/three lid stages, render state restored OK" : "")
                 + "; command editor activation/NBT/controls/cancel and target packets OK"
                 + (profile.protocol() >= 210 ? "; structure SAVE/LOAD/CORNER/DATA, save/load/detect/cancel, numeric limits and target packets OK" : "")
@@ -175,6 +176,7 @@ public final class BlockClientSmokeTest {
     }
 
     private static void checkFallbackModels() {
+        BoatSmokeTest.disconnected();
         CreativeCategorySmokeTest.disconnected();
         ServerItemSmokeTest.disconnected();
         for (int raw = 0; raw < com.viaversion.viaforge.common.blocks.LegacyBlockCatalog.STATE_LIMIT; raw++) {

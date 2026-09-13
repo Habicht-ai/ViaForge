@@ -85,3 +85,10 @@ The index supplies the original sound definitions and recordings, downloaded
 from `resources.download.minecraft.net` with size/hash verification at runtime.
 The mod includes the numeric sound registry names/order, but does not redistribute
 the Minecraft recordings, textures, resource archives or original client classes.
+
+The boat implementation was compared with the original EntityBoat, ItemBoat,
+ModelBoat, RenderBoat and local-player behavior in the supported 1.9–1.12.2
+client archives. Hull/oar dimensions, UVs, movement constants, seat offsets,
+water handling and version-specific paddle timing are compatibility references.
+The six wood textures and 1.12 rowing recordings use the same verified runtime
+asset cache; they are not redistributed in the mod.

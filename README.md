@@ -92,6 +92,10 @@ Thrown splash/lingering potions retain their models and colors; lingering clouds
 display the server's particle color and radius. Creative categories follow the
 target release, and the dragon-head inventory orientation follows its 1.11.1 change. Item effects
 and consumption remain server-authoritative. See [item scope and limitations](docs/ITEMS.md).
+Boats on 1.9–1.12.2 servers use the six original wood models, versioned rowing,
+water/ice movement and two independent passenger seats. The first passenger drives;
+the second can ride and dismount normally. Native 1.8 boats retain their original
+behavior. See [boat behavior and verification](docs/BOATS.md).
 Beetroot crops acknowledge bonemeal use while immature, restoring the normal hand
 swing; growth and item consumption are confirmed by the server.
 

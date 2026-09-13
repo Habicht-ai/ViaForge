@@ -35,7 +35,7 @@ public final class ViaForgeProtocol extends ViaForgeProtocolBase<ClientboundPack
         setServerVersion(com.viaversion.viaversion.api.protocol.version.ProtocolVersion.v1_8);
     }
 
-    @Override protected void registerPackets() { items.register(); }
+    @Override protected void registerPackets() { items.register(); com.viaversion.viaforge.boats.BoatPackets.register(this); }
     @Override public com.viaversion.viaforge.common.blocks.ClientBlockItemRewriter getItemRewriter() { return items; }
 
 }

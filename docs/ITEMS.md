@@ -178,12 +178,12 @@ item rendering and powered/unpowered placed heads in all five orientations.
 ## Current limits
 
 This item extension does not supply a local offhand inventory/control scheme,
-Elytra flight input/physics, firework flight boosts, a 1.12 recipe-book screen,
-or the other new mob/projectile/boat entity models and movement. Thrown potions,
+Elytra flight input/physics, firework flight boosts or a 1.12 recipe-book screen.
+Modern boats now have original models, movement and two seats; see [BOATS.md](BOATS.md).
+The mob compatibility extension is documented in [MOBS.md](MOBS.md). Thrown potions,
 lingering clouds, tipped/spectral arrows, Totem activation and other players' offhand shields are supported as described
-above. Other entities still use the existing protocol translation where
-available. For example, a new spawn egg is sent with the correct entity type, but
-the spawned mob can still appear as Via's 1.8 substitute. The knowledge book sends
+above. Other unsupported entities use the existing protocol translation where
+available. The knowledge book sends
 its recipe list to the server; the 1.8 client has no recipe-book UI. The worn Elytra
 model covers standing/sneaking and server-reported wing spread, not full player flight rendering.
 Enchanted shield glint remains a visual follow-up. This is not complete 1.12 client emulation.

@@ -47,6 +47,9 @@ public class ViaForge implements ViaForgePlatform {
     @Mod.EventHandler
     public void onInit(FMLInitializationEvent event) {
         net.minecraftforge.fml.client.registry.RenderingRegistry.registerEntityRenderingHandler(
+                com.viaversion.viaforge.boats.ServerBoat.class,
+                new com.viaversion.viaforge.boats.ServerBoatRenderer(Minecraft.getMinecraft().getRenderManager()));
+        net.minecraftforge.fml.client.registry.RenderingRegistry.registerEntityRenderingHandler(
                 com.viaversion.viaforge.mobs.ServerMobProjectile.class,
                 new com.viaversion.viaforge.mobs.ServerMobProjectileRenderer(Minecraft.getMinecraft().getRenderManager()));
         net.minecraftforge.fml.client.registry.RenderingRegistry.registerEntityRenderingHandler(

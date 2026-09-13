@@ -16,7 +16,7 @@ public abstract class MixinMobMetadata {
         PacketThreadUtil.checkThreadAndEnqueue(packet, (NetHandlerPlayClient)(Object)this, mc);
         if (mc.theWorld != null) {
             net.minecraft.entity.Entity entity = mc.theWorld.getEntityByID(packet.getEntityId());
-            if (entity instanceof ServerMob || entity instanceof ServerMobProjectile) ci.cancel();
+            if (entity instanceof ServerMob || entity instanceof ServerMobProjectile || entity instanceof com.viaversion.viaforge.boats.ServerBoat) ci.cancel();
         }
     }
 }

@@ -76,6 +76,7 @@ public class ServerItem extends Item {
     }
     @Override public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
         if (!world.isRemote || !ServerBlockSession.supportsItem(definition)) return stack;
+        if (definition.kind == Kind.BOAT) com.viaversion.viaforge.boats.BoatPlacement.use(stack, world, player);
         EnumAction action = getItemUseAction(stack);
         if (action != EnumAction.NONE && (action != EnumAction.EAT || player.canEat(definition.id == 432))) player.setItemInUse(stack, getMaxItemUseDuration(stack));
         return stack;

@@ -27,7 +27,7 @@ public final class ServerEntityViews {
     }
     private static WorldClient world;
     private static final Map<Integer, View> VIEWS = new HashMap<>();
-    public static void clear() { VIEWS.clear(); world = null; ServerTotemAnimation.clear(); ServerCombatState.clear(); ServerItemCooldowns.clear(); com.viaversion.viaforge.mobs.ServerMobs.clear(); }
+    public static void clear() { VIEWS.clear(); world = null; ServerTotemAnimation.clear(); ServerCombatState.clear(); ServerItemCooldowns.clear(); com.viaversion.viaforge.mobs.ServerMobs.clear(); com.viaversion.viaforge.boats.ServerBoats.clear(); }
     public static View get(int id) { return world == Minecraft.getMinecraft().theWorld ? VIEWS.get(id) : null; }
     public static boolean blocking(EntityLivingBase entity, boolean offhand, ItemStack stack) {
         if (!ClientItems.is(stack, com.viaversion.viaforge.common.blocks.LegacyItemCatalog.Kind.SHIELD)) return false;
@@ -58,6 +58,9 @@ public final class ServerEntityViews {
         if (operation == 10) { ServerCombatState.attributes(input); return; }
         if (operation == 17 || operation == 18) { ServerPotions.accept(world, operation, input); return; }
         if (operation == 19) { ServerItemCooldowns.accept(input); return; }
+        if (operation == 20) { com.viaversion.viaforge.boats.ServerBoats.spawn(world, protocol, input); return; }
+        if (operation >= 21 && operation <= 25) { com.viaversion.viaforge.boats.ServerBoats.motion(world, operation, input); return; }
+        if (operation == 13 && com.viaversion.viaforge.boats.ServerBoats.seats(world, input.duplicate())) return;
         if (operation >= 11) { com.viaversion.viaforge.mobs.ServerMobs.accept(world, protocol, operation, input); return; }
         int entityId = operation == 4 ? -1 : Types.VAR_INT.readPrimitive(input);
         int first = protocol >= 210 ? 6 : 5;
@@ -92,6 +95,7 @@ public final class ServerEntityViews {
                 break;
             case 2: {
                 List<EntityData> data = (protocol >= 335 ? Types.ENTITY_DATA_LIST1_12 : Types.ENTITY_DATA_LIST1_9).read(input);
+                if (world.getEntityByID(entityId) instanceof com.viaversion.viaforge.boats.ServerBoat) ((com.viaversion.viaforge.boats.ServerBoat)world.getEntityByID(entityId)).metadata(data);
                 com.viaversion.viaforge.mobs.ServerMobs.metadata(world, entityId, data);
                 metadata(entityId, first, data); break;
             }
@@ -107,7 +111,7 @@ public final class ServerEntityViews {
             case 4:
                 int count = Types.VAR_INT.readPrimitive(input);
                 for (int i = 0; i < count; i++) {
-                    int id = Types.VAR_INT.readPrimitive(input); VIEWS.remove(id); com.viaversion.viaforge.mobs.ServerMobs.remove(id);
+                    int id = Types.VAR_INT.readPrimitive(input); VIEWS.remove(id); com.viaversion.viaforge.mobs.ServerMobs.remove(id); com.viaversion.viaforge.boats.ServerBoats.remove(world, id);
                 }
                 break;
             default: break;

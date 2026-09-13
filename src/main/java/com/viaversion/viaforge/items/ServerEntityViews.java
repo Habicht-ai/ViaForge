@@ -27,7 +27,7 @@ public final class ServerEntityViews {
     }
     private static WorldClient world;
     private static final Map<Integer, View> VIEWS = new HashMap<>();
-    public static void clear() { VIEWS.clear(); world = null; ServerTotemAnimation.clear(); ServerCombatState.clear(); com.viaversion.viaforge.mobs.ServerMobs.clear(); }
+    public static void clear() { VIEWS.clear(); world = null; ServerTotemAnimation.clear(); ServerCombatState.clear(); ServerItemCooldowns.clear(); com.viaversion.viaforge.mobs.ServerMobs.clear(); }
     public static View get(int id) { return world == Minecraft.getMinecraft().theWorld ? VIEWS.get(id) : null; }
     public static boolean blocking(EntityLivingBase entity, boolean offhand, ItemStack stack) {
         if (!ClientItems.is(stack, com.viaversion.viaforge.common.blocks.LegacyItemCatalog.Kind.SHIELD)) return false;
@@ -40,6 +40,7 @@ public final class ServerEntityViews {
         if (!ServerBlockSession.supportsProtocol(107)) return;
         WorldClient current = Minecraft.getMinecraft().theWorld;
         if (world != current || operation == 0) { clear(); world = current; }
+        if (operation == 6) ServerItemCooldowns.clear();
         // A same-dimension respawn retains the native world and its tracked entities.
         if (world == null || operation == 0 || operation == 6) return;
         if (operation == 7) {
@@ -56,6 +57,7 @@ public final class ServerEntityViews {
         if (operation == 9) { ServerParticlePackets.accept(world, input); return; }
         if (operation == 10) { ServerCombatState.attributes(input); return; }
         if (operation == 17 || operation == 18) { ServerPotions.accept(world, operation, input); return; }
+        if (operation == 19) { ServerItemCooldowns.accept(input); return; }
         if (operation >= 11) { com.viaversion.viaforge.mobs.ServerMobs.accept(world, protocol, operation, input); return; }
         int entityId = operation == 4 ? -1 : Types.VAR_INT.readPrimitive(input);
         int first = protocol >= 210 ? 6 : 5;

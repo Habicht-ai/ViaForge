@@ -19,9 +19,18 @@ public abstract class MixinWornDragonHead {
         if (!ClientItems.is(entity.getCurrentArmor(3), Kind.HEAD)) return;
         GlStateManager.pushMatrix();
         if (entity.isSneaking()) GlStateManager.translate(0, .2F, 0);
-        if (entity.isChild()) { GlStateManager.scale(.7F, .7F, .7F); GlStateManager.translate(0, 16 * scale, 0); }
+        boolean villager = entity instanceof net.minecraft.entity.passive.EntityVillager;
+        boolean villagerHead = villager || entity instanceof net.minecraft.entity.monster.EntityZombie && ((net.minecraft.entity.monster.EntityZombie)entity).isVillager()
+                || entity instanceof com.viaversion.viaforge.mobs.ServerMob && ((com.viaversion.viaforge.mobs.ServerMob)entity).state.kind == com.viaversion.viaforge.common.blocks.MobKind.ZOMBIE_VILLAGER;
+        if (entity.isChild() && !villager) {
+            GlStateManager.translate(0, .5F * scale, 0);
+            GlStateManager.scale(.7F, .7F, .7F); GlStateManager.translate(0, 16 * scale, 0);
+        }
         field_177209_a.postRender(.0625F); GlStateManager.color(1, 1, 1, 1); GlStateManager.scale(1.1875F, -1.1875F, -1.1875F);
-        ServerItemRenderer.renderDragon(-.5F, 0, -.5F, EnumFacing.UP, 180, entity.ticksExisted + partial);
+        if (villagerHead) GlStateManager.translate(0, .0625F, 0);
+        // All 1.9-1.12.2 head layers pass limb swing, not age in ticks. This
+        // also keeps heads on idle players, passengers and armor stands still.
+        ServerItemRenderer.renderDragon(-.5F, 0, -.5F, EnumFacing.UP, 180, limb);
         GlStateManager.popMatrix(); ci.cancel();
     }
 }

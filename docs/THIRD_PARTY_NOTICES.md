@@ -56,6 +56,11 @@ Sweeping Edge registry/levels, the sweep particle sheet and animation, attack
 indicator coordinates, weapon speeds, held-item charge transforms, and cape/elytra
 texture selection and wing poses were checked against those same client references.
 The sweep sheet and target GUI icons are loaded from the verified local archives.
+Item cooldown tracking, item-overlay geometry and dragon-head animation timing
+were compared against the corresponding classes in all ten supported Mojang
+client archives (1.9 through 1.12.2). Original entity textures and sounds continue
+to be read from the verified local asset cache, not bundled in this mod.
+
 Gateway portal projection, exposed-face particles, age/cooldown beam timing and
 colors, and crystal base/beam rendering were checked against the cached 1.9-1.12.2
 clients. Their portal, gateway-beam and crystal textures are loaded from those

@@ -41,6 +41,7 @@ public final class LegacyEntityPackets {
             case "ADD_MOB": operation = 11; break;
             case "ENTITY_EVENT": operation = 12; break;
             case "SET_PASSENGERS": operation = 13; break;
+            case "COOLDOWN": operation = 19; break;
             case "UPDATE_MOB_EFFECT": case "REMOVE_MOB_EFFECT":
                 ByteBuf effect = input.duplicate(); Types.VAR_INT.readPrimitive(effect);
                 int effectId = effect.readUnsignedByte();

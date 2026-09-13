@@ -9,5 +9,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(EntityPlayer.class)
 public abstract class MixinCombatTick {
     @Inject(method = "onUpdate", at = @At("RETURN"))
-    private void attackTimer(CallbackInfo ci) { ServerCombatState.tick((EntityPlayer)(Object)this); }
+    private void attackTimer(CallbackInfo ci) {
+        ServerCombatState.tick((EntityPlayer)(Object)this);
+        com.viaversion.viaforge.items.ServerItemCooldowns.tick((EntityPlayer)(Object)this);
+    }
 }

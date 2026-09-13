@@ -85,6 +85,8 @@ final class ServerEntitySmokeTest {
             EndVisualSmokeTest.pipeline(profile, client, server, handler, world);
             ServerMobSmokeTest.pipeline(profile, client, server, handler, world);
             ServerPotionStatusSmokeTest.verify(profile, client, server, handler);
+            ItemCooldownSmokeTest.verify(profile, client, server, handler, world);
+            DragonHeadSmokeTest.verify(profile, world);
             ByteBuf remove = packet(profile, "REMOVE_ENTITIES"); Types.VAR_INT.writePrimitive(remove, 3);
             for (int id : new int[]{610, 611, 612}) Types.VAR_INT.writePrimitive(remove, id);
             send(client, server, handler, remove);

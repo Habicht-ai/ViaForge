@@ -136,6 +136,45 @@ Explicit Totem particle packets are also supported. World changes and disconnect
 clear the animation. The sound is fetched once into the local verified asset cache;
 it is not bundled in the mod.
 
+## Item cooldowns and dragon-head animation
+
+For each supported 1.9-1.12.2 profile, original `COOLDOWN` packets preserve the
+server item ID and duration through Via. The client blocks the item's local use
+while it cools down and draws the original fading white overlay in inventory and
+hotbar slots. Activating a block (for example, a chest or lever) still works with
+a cooling item in hand, and use packets follow the target controller's ordering.
+Cooldowns belong to the original item type, so moving stacks, changing their NBT,
+or using a second slot does not bypass them. Updates replace the current duration;
+zero removes it. Respawn, a new local player and disconnect clear the tracker.
+
+The original client code was compared for all ten resource profiles, including
+1.9.1, 1.9.2, 1.9.4, 1.10.2, 1.11, 1.11.2, 1.12 and 1.12.1. These timings agree
+throughout the supported range:
+
+| Item/action | Vanilla behavior |
+| --- | --- |
+| Chorus fruit | 32 ticks of eating; server starts a 20-tick cooldown after completion |
+| Ender pearl | Client predicts 20 ticks immediately on use, including Creative; server updates override it |
+| Disabled shield | Server sets 100 ticks; the client follows the packet rather than guessing the disable trigger |
+| Other server-assigned cooldowns | Original item ID and duration, without a hard-coded item whitelist |
+
+The separate attack recharge timer remains independent of these item cooldowns.
+
+In the same versions, worn dragon heads animate from the renderer's limb-swing
+phase, not elapsed entity age. Idle players, mobs and armor stands therefore do
+not endlessly open/close their mouths. Child and villager head offsets follow
+the original layer. Held, inventory and dropped head items use a fixed phase.
+Placed dragon heads use a per-tile clock that advances only while powered by
+redstone. Removing power freezes the current pose; restoring power resumes it.
+The behavior applies to floor and wall placement without affecting other skulls.
+
+The compressed-pipeline smoke run checks cooldown replacement/removal, independent
+items/shared variants, slot changes, use-in-air and use-on-block, Creative pearls,
+respawn and the exact expiration tick for all profiles. Pixel checks exercise the
+native inventory overlay and its disappearance after expiration; screenshots are
+written as `item-cooldown-<id>.png`. Renderer checks cover worn/idle/moving heads,
+item rendering and powered/unpowered placed heads in all five orientations.
+
 ## Current limits
 
 This item extension does not supply a local offhand inventory/control scheme,
@@ -147,8 +186,7 @@ available. For example, a new spawn egg is sent with the correct entity type, bu
 the spawned mob can still appear as Via's 1.8 substitute. The knowledge book sends
 its recipe list to the server; the 1.8 client has no recipe-book UI. The worn Elytra
 model covers standing/sneaking and server-reported wing spread, not full player flight rendering.
-The dragon head's powered world jaw animation and enchanted shield glint remain
-visual follow-ups. This is not complete 1.12 client emulation.
+Enchanted shield glint remains a visual follow-up. This is not complete 1.12 client emulation.
 
 Versions 1.13 and later are a separate milestone. Existing Via connectivity is
 unchanged, but this native item registry is only enabled for the supported profiles.

@@ -21,7 +21,7 @@ public final class LegacyItemSnapshot {
         }
         if (probe == null) return;
         LegacyItemDefinition definition = ClientItems.serverItem(ClientItems.localItem(probe.identifier(), probe.data()));
-        if (definition == null || profile.protocol() < definition.itemProtocol()) return;
+        if ((definition == null || profile.protocol() < definition.itemProtocol()) && !LegacyBlockItemBridge.nativeEnchantments(probe, profile)) return;
         CompoundTag snapshot = new CompoundTag(); snapshot.putInt("id", item.identifier()); snapshot.putShort("data", item.data());
         if (item.tag() != null) {
             CompoundTag original = item.tag().copy(); original.remove(KEY);

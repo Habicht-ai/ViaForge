@@ -13,8 +13,8 @@ public final class ServerVisualParticles {
         int setting = mc.gameSettings.particleSetting;
         if (setting == 1 && world.rand.nextInt(3) == 0) setting = 2;
         if (!ignoreRange && (setting > 1 || camera.getDistanceSq(x, y, z) > 1024)) return null;
-        if (id == 47) {
-            EntityFX particle = new ServerTotemParticle(world, x, y, z, vx, vy, vz);
+        if (id == 47 || id == 45) {
+            EntityFX particle = id == 47 ? new ServerTotemParticle(world, x, y, z, vx, vy, vz) : new ServerSweepParticle(world, x, y, z, vx);
             mc.effectRenderer.addEffect(particle); return particle;
         }
         return mc.effectRenderer.spawnEffectParticle(id, x, y, z, vx, vy, vz, args);

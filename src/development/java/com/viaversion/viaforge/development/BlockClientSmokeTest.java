@@ -162,6 +162,8 @@ public final class BlockClientSmokeTest {
                 + "; all available standalone item/potion/egg/book variants, durability/NBT/creative/click round trips, target item models, hand transforms, eating/drinking/shield/bow/equip actions OK"
                 + "; original projectile/cloud/offhand packets, cloud RGB/radius/destroy/respawn, shield matrices for both hands/poses/skin widths, target creative categories/order/search OK"
                 + "; 37 potion impact types/custom RGB without duplicate fallback effects, tipped/spectral arrow spawn/velocity/metadata/flight/ground/expiration/destroy, version-gated Totem particles/40-tick animation/original sound OK"
+                + "; Sweeping Edge I-III version/category/tooltip/NBT, sweep packet/lifetime, server attack-speed modifiers/timer/cubic hand recharge, 25 native tool hand models, cape texture selection/suppression/glint pose OK"
+                + "; crystal base/beam metadata and destroy, gateway NBT/chunk age/server events/versioned cooldown/exposed portal particles, native crystal/gateway rendering OK"
                 + "; command editor activation/NBT/controls/cancel and target packets OK"
                 + (profile.protocol() >= 210 ? "; structure SAVE/LOAD/CORNER/DATA, save/load/detect/cancel, numeric limits and target packets OK" : "")
                 + (profile.protocol() >= 335 ? "; 16 bed colors: every world/item vertex, UV corner and face winding matches native ModelBed in all directions" : ""));

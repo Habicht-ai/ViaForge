@@ -285,6 +285,21 @@ final class LegacyClientBlockTypes {
     }
     static final class Gateway extends Cube {
         Gateway() { super(Material.portal); setLightOpacity(0); }
+        @Override public int getRenderType() { return -1; }
+        @Override public boolean hasTileEntity(IBlockState state) { return true; }
+        @Override public net.minecraft.tileentity.TileEntity createTileEntity(World world, IBlockState state) { return new GatewayBlockEntity(); }
+        @Override public boolean onBlockEventReceived(World world, BlockPos pos, IBlockState state, int id, int value) {
+            net.minecraft.tileentity.TileEntity tile = world.getTileEntity(pos);
+            return tile != null && tile.receiveClientEvent(id, value);
+        }
+        @Override public boolean shouldSideBeRendered(net.minecraft.world.IBlockAccess world, BlockPos neighbor, EnumFacing side) {
+            Block adjacent = world.getBlockState(neighbor).getBlock();
+            return !adjacent.isOpaqueCube() && adjacent != this;
+        }
+        @Override public void randomDisplayTick(World world, BlockPos pos, IBlockState state, java.util.Random random) {
+            net.minecraft.tileentity.TileEntity tile = world.getTileEntity(pos);
+            if (tile instanceof GatewayBlockEntity) ((GatewayBlockEntity)tile).particles(random);
+        }
         @Override public boolean isOpaqueCube() { return false; }
         @Override public boolean isFullCube() { return false; }
         @Override public AxisAlignedBB getCollisionBoundingBox(World world, BlockPos pos, IBlockState state) { return null; }

@@ -46,6 +46,7 @@ public class ViaForge implements ViaForgePlatform {
 
     @Mod.EventHandler
     public void onInit(FMLInitializationEvent event) {
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(new com.viaversion.viaforge.items.ServerCombatIndicator());
         net.minecraftforge.fml.client.registry.RenderingRegistry.registerEntityRenderingHandler(
                 com.viaversion.viaforge.items.ServerArrow.class,
                 new com.viaversion.viaforge.items.ServerArrowRenderer(Minecraft.getMinecraft().getRenderManager()));

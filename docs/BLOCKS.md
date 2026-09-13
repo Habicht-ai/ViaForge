@@ -207,11 +207,31 @@ transitions, reconnection, resource reload and return to singleplayer. Test with
 OptiFine/Patcher separately when present. Synthetic and renderer checks do not
 establish full gameplay or third-party-mod compatibility.
 
+## End gateways and crystals
+
+End gateways use a tile renderer with the original projected, animated portal
+layers and distance-dependent detail, rather than a baked texture cube. Only
+exposed faces are drawn; those faces determine the native violet portal-particle
+count. Original chunk and tile NBT preserve gateway age, and server block events
+trigger the activation beam. Creation lasts 200 ticks. Through 1.10.2, cooldown
+beams last 20 ticks and extend up to 25 blocks; from 1.11 they last 40 ticks and
+extend up to 50 blocks. Colors and interpolation follow the target release,
+including the changed dye colors in 1.12. Teleportation remains server-controlled.
+
+End crystals retain the original server `ShowBottom` flag and optional beam target.
+The native crystal model selects its base accordingly; a player-placed crystal
+therefore has no unwanted bedrock pedestal. Beam targets can be changed or cleared
+independently, and removal/world changes discard the visual metadata. Textures
+come from the target's cached client archive. Native 1.8 rendering is unchanged.
+
+The Forge packet tests cover crystal metadata changes/removal and gateway
+updates, chunk age, cooldown lifetime and exposed-face particle counts for every
+profile. Renderer comparisons are saved as `end-crystals-<version>.png`,
+`end-crystal-beam-<version>.png` and `end-gateway-<version>.png` for 1.9 and 1.12.2.
+
 ## Next milestones
 
-1. Verify real-server interactions and complete special behavior/rendering:
-   gateway portal layers/beams and third-party rendering compatibility.
-   The gateway currently has a textured portal cube. Chorus
+1. Verify real-server interactions and third-party rendering compatibility. Chorus
    multipart conversion selects a deterministic variant from weighted decorative
    alternatives, so small surface details may differ from native random choices.
 2. Add 1.13+ state registries and packet adapters, preserving the same separation

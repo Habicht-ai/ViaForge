@@ -19,12 +19,14 @@ public final class ServerEntityViews {
         public final int type;
         public ItemStack potion, offhand;
         public int handState;
-        public boolean leftHanded;
+        public boolean leftHanded, fallFlying;
+        public boolean crystalBase = true;
+        public net.minecraft.util.BlockPos crystalBeam;
         View(int type) { this.type = type; }
     }
     private static WorldClient world;
     private static final Map<Integer, View> VIEWS = new HashMap<>();
-    public static void clear() { VIEWS.clear(); world = null; ServerTotemAnimation.clear(); }
+    public static void clear() { VIEWS.clear(); world = null; ServerTotemAnimation.clear(); ServerCombatState.clear(); }
     public static View get(int id) { return world == Minecraft.getMinecraft().theWorld ? VIEWS.get(id) : null; }
     public static boolean blocking(EntityLivingBase entity, boolean offhand, ItemStack stack) {
         if (!ClientItems.is(stack, com.viaversion.viaforge.common.blocks.LegacyItemCatalog.Kind.SHIELD)) return false;
@@ -50,14 +52,15 @@ public final class ServerEntityViews {
             if (input.readByte() == 35 && protocol >= 315 && entity != null) ServerTotemAnimation.activate(entity);
             return;
         }
-        if (operation == 9) { ServerTotemAnimation.particlePacket(world, input); return; }
+        if (operation == 9) { ServerParticlePackets.accept(world, input); return; }
+        if (operation == 10) { ServerCombatState.attributes(input); return; }
         int entityId = operation == 4 ? -1 : Types.VAR_INT.readPrimitive(input);
         int first = protocol >= 210 ? 6 : 5;
         switch (operation) {
             case 1: {
                 input.skipBytes(16); int type = input.readUnsignedByte();
                 double x = input.readDouble(), y = input.readDouble(), z = input.readDouble();
-                if (type != 3 && type != 73 && type != 60 && type != 91) return;
+                if (type != 3 && type != 73 && type != 60 && type != 91 && type != 51) return;
                 View view = new View(type); VIEWS.put(entityId, view);
                 if (type == 3) {
                     ServerAreaEffectCloud cloud = new ServerAreaEffectCloud(world);
@@ -74,7 +77,7 @@ public final class ServerEntityViews {
                     arrow.setVelocity(input.readShort() / 8000D, input.readShort() / 8000D, input.readShort() / 8000D);
                     if (world.getEntityByID(owner) instanceof EntityLivingBase) arrow.shootingEntity = (EntityLivingBase)world.getEntityByID(owner);
                     world.addEntityToWorld(entityId, arrow);
-                } else view.potion = item(new com.viaversion.viaversion.api.minecraft.item.DataItem(438, (byte)1, (short)0, null));
+                } else if (type == 73) view.potion = item(new com.viaversion.viaversion.api.minecraft.item.DataItem(438, (byte)1, (short)0, null));
                 break;
             }
             case 5:
@@ -114,7 +117,14 @@ public final class ServerEntityViews {
                 ServerArrow arrow = (ServerArrow)world.getEntityByID(id);
                 if (data.id() == first && value instanceof Byte) arrow.setIsCritical(((Byte)value & 1) != 0);
                 if (view.type == 60 && data.id() == first + 1 && value instanceof Integer) arrow.color = (Integer)value;
+            } else if (view.type == 51) {
+                if (data.id() == first && (value == null || value instanceof com.viaversion.viaversion.api.minecraft.BlockPosition)) {
+                    com.viaversion.viaversion.api.minecraft.BlockPosition pos = (com.viaversion.viaversion.api.minecraft.BlockPosition)value;
+                    view.crystalBeam = pos == null ? null : new net.minecraft.util.BlockPos(pos.x(), pos.y(), pos.z());
+                }
+                if (data.id() == first + 1 && value instanceof Boolean) view.crystalBase = (Boolean)value;
             } else if (view.type == -1 && value instanceof Byte) {
+                if (data.id() == 0) view.fallFlying = ((Byte)value & 128) != 0;
                 if (data.id() == first) view.handState = (Byte)value;
                 if (data.id() == first + 8) view.leftHanded = (Byte)value == 0;
             }

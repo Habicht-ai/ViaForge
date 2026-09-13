@@ -12,7 +12,7 @@ in creative inventory only while connected to a supported newer server. Native
 | 1.9 | End crystal; chorus fruit and popped chorus fruit; beetroot and soup; dragon's breath; splash/lingering potions; spectral/tipped arrows; shield; elytra; spruce, birch, jungle, acacia and dark oak boats; dragon head; shulker spawn egg; Frost Walker I/II and Mending books |
 | 1.10 | Polar bear spawn egg |
 | 1.11 | Totem of Undying; shulker shell; separate donkey, mule, skeleton/zombie horse, elder guardian, wither skeleton, stray, husk and zombie villager eggs; evoker, vindicator, vex and llama eggs; Binding/Vanishing curse books |
-| 1.11.1 | Iron nugget |
+| 1.11.1 | Iron nugget; Sweeping Edge I-III books |
 | 1.12 | Knowledge book; parrot spawn egg |
 
 The target formats of ordinary potions, spawn eggs, enchanted books and the oak
@@ -20,14 +20,14 @@ boat are covered too. Beetroot seeds and the sixteen 1.12 bed colors are registe
 by `ClientBlocks`. Item ID 451 is unused. The ten protocol/resource profiles are
 listed in [BLOCKS.md](BLOCKS.md).
 
-The 1.12.2 profile represents 208 standalone variants: 36 drinkable potions,
-36 splash potions, 36 lingering potions, 32 tipped arrows, 43 spawn eggs, five new
+The 1.12.2 profile represents 211 standalone variants: 36 drinkable potions,
+36 splash potions, 36 lingering potions, 32 tipped arrows, 43 spawn eggs, eight new
 enchanted-book variants and the other individual items. Incoming custom potion
 effects/colors, entity data, names/lore, enchantments, shield patterns, recipe lists
 and equipment damage are retained. Other enchantments on received books retain
 the native book tooltip. Invalid/empty variants can be received without being
 added to the normal creative list. The knowledge book is command-only, as in
-vanilla, so the normal search contains 207 of these variants.
+vanilla, so the normal search contains 210 of these variants.
 
 Creative categories follow the target release. End rods, chorus plants/flowers,
 shulker boxes, beds, glazed terracotta, dragon heads and end crystals belong to
@@ -61,6 +61,8 @@ shield durability, elytra names and empty display compounds. `LegacyItemSnapshot
 saves the item at those mapping boundaries and restores it when reversing that
 layer. Temporary snapshots are grouped by layer and removed before the client or
 server receives the item; the current count is retained when splitting stacks.
+Native equipment with newer enchantments uses the same restoration path, retaining
+the original enchantment order and NBT instead of substitute tooltip lore.
 
 The normal packet path covers slots, full inventories, creative actions, container
 clicks, equipment, item entity metadata, merchant trades and use-on-block packets.
@@ -76,6 +78,28 @@ Dragon heads use their own inventory/world/worn geometry and can be picked with
 the middle mouse button. The inventory head yaw follows the change in 1.11.1;
 older profiles use the original 1.9 orientation. Shield patterns are composited
 using the target textures.
+
+Sweeping Edge (enchantment ID 22) displays on received books and swords. From
+1.11.1, Combat offers level III and search includes I-III; older profiles do not
+offer it. The sweep attack itself exists since 1.9. Its original server particle
+packet now renders the four-tick animated sheet exactly once, without replacement
+particles or a locally invented sweep on every swing.
+
+Newer servers also use the original crosshair attack indicator and a game-tick
+attack timer. The charged-attack icon appears from 1.11.1; earlier profiles show
+only the recharge bar, with their original positioning. Server attack-speed base values and all three modifier operations
+are retained; local weapon switches reapply the target's sword/tool speed. The
+hand lowers and recovers using the original cubic charge curve. All 25 original
+sword/tool models use target display transforms in first/third person and inventory.
+Sword right-click no longer triggers the 1.8 blocking pose on these profiles.
+The ViaRewind title cooldown replacement is suppressed only for supported native
+profiles. Attack damage, cooldown penalties and sweep eligibility remain server-owned.
+
+Worn elytra use a visible player's cape texture, falling back to the target's
+default wings when the cape is unavailable or disabled in skin settings. The cape
+layer is suppressed while elytra are worn. Wing pivots, pose smoothing and crouching
+follow vanilla, with server-reported fall-flying flags used for wing spread.
+Enchantment glint passes share the same pose. This does not add local flight controls.
 
 `LegacyEntityPackets` carries original visual data through the native packet
 queue after Via translation, including when Via cancels an unsupported cloud or
@@ -122,7 +146,7 @@ above. Other entities still use the existing protocol translation where
 available. For example, a new spawn egg is sent with the correct entity type, but
 the spawned mob can still appear as Via's 1.8 substitute. The knowledge book sends
 its recipe list to the server; the 1.8 client has no recipe-book UI. The worn Elytra
-model covers standing/sneaking poses, not a backport of player flight rendering.
+model covers standing/sneaking and server-reported wing spread, not full player flight rendering.
 The dragon head's powered world jaw animation and enchanted shield glint remain
 visual follow-ups. This is not complete 1.12 client emulation.
 
@@ -162,6 +186,9 @@ Review images from the actual Forge renderer are written to:
 - `build/logs/screenshots/entity-visuals-1.12.2.png`
 - `build/logs/screenshots/lingering-cloud-1.12.2.png`
 - `build/logs/screenshots/creative-order-1.12.2.png`
+- `build/logs/screenshots/elytra-cape-1.12.2.png` (diagnostic cape pattern)
+- `build/logs/screenshots/sword-swing-1.12.2-tick-14.png` (also ticks 0/4/9)
+- `build/logs/screenshots/sweep-1.12.2.png`
 - `build/logs/screenshots/potion-impact-1.12.2.png`
 - `build/logs/screenshots/arrow-effects-1.12.2.png`
 - `build/logs/screenshots/totem-1.12.2-tick-16.png` (also ticks 4/32 and version 1.11)

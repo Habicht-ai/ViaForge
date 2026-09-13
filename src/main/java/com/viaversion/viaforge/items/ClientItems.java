@@ -16,6 +16,7 @@ public final class ClientItems {
     private static final Map<Integer, Item> ITEMS = new HashMap<>();
     private static final Map<Integer, Definition> DEFINITIONS = new HashMap<>();
     public static void register() {
+        ServerCombatModels.register();
         ServerEnchantments.register();
         ServerPotions.register();
         for (Definition definition : LegacyItemCatalog.ITEMS) {

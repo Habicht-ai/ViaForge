@@ -52,6 +52,14 @@ layouts were checked against the 1.9-1.12.2 client registries and rendering code
 The shield grip, slim-arm offsets, version-dependent skull inventory orientation,
 creative categories and area-effect-cloud particle behavior were also checked
 against those local vanilla references.
+Sweeping Edge registry/levels, the sweep particle sheet and animation, attack
+indicator coordinates, weapon speeds, held-item charge transforms, and cape/elytra
+texture selection and wing poses were checked against those same client references.
+The sweep sheet and target GUI icons are loaded from the verified local archives.
+Gateway portal projection, exposed-face particles, age/cooldown beam timing and
+colors, and crystal base/beam rendering were checked against the cached 1.9-1.12.2
+clients. Their portal, gateway-beam and crystal textures are loaded from those
+archives at runtime and are not bundled in the mod.
 Potion impact event formats, arrow metadata/particle cadence and Totem activation
 movement and particles were checked against the same original clients. Projectile
 textures and the particle atlas are read locally from the verified archives. Mojang's

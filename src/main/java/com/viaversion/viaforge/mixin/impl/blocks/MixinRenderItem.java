@@ -29,7 +29,7 @@ public abstract class MixinRenderItem {
             target = "Lnet/minecraft/client/renderer/entity/RenderItem;setupGuiTransform(IIZ)V"))
     private void versionedGuiTransform(RenderItem renderer, int x, int y, boolean gui3d,
             ItemStack stack, int slotX, int slotY) {
-        if (ClientItems.serverItem(Item.getIdFromItem(stack.getItem())) == null) {
+        if (!com.viaversion.viaforge.items.ServerCombatModels.imported(stack)) {
             setupGuiTransform(x, y, gui3d);
             return;
         }
@@ -44,7 +44,7 @@ public abstract class MixinRenderItem {
     private void versionedGuiGeometry(RenderItem renderer, ItemStack stack, IBakedModel model) {
         // Undo renderItem's legacy half-scale after the model's display transform,
         // keeping display translations at their original size as well.
-        if (ClientItems.serverItem(Item.getIdFromItem(stack.getItem())) != null) GlStateManager.scale(2F, 2F, 2F);
+        if (com.viaversion.viaforge.items.ServerCombatModels.imported(stack)) GlStateManager.scale(2F, 2F, 2F);
         renderer.renderItem(stack, model);
     }
 
@@ -52,7 +52,7 @@ public abstract class MixinRenderItem {
             target = "Lnet/minecraft/client/renderer/entity/RenderItem;preTransform(Lnet/minecraft/item/ItemStack;)V"))
     private void versionedHandPreTransform(RenderItem renderer, ItemStack stack,
             ItemStack original, IBakedModel model, ItemCameraTransforms.TransformType transform) {
-        if (ClientItems.serverItem(Item.getIdFromItem(stack.getItem())) != null) {
+        if (com.viaversion.viaforge.items.ServerCombatModels.imported(stack)) {
             GlStateManager.color(1, 1, 1, 1);
         } else preTransform(stack);
     }
@@ -61,7 +61,7 @@ public abstract class MixinRenderItem {
             target = "Lnet/minecraft/client/renderer/entity/RenderItem;renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/resources/model/IBakedModel;)V"))
     private void versionedHandGeometry(RenderItem renderer, ItemStack stack, IBakedModel model,
             ItemStack original, IBakedModel originalModel, ItemCameraTransforms.TransformType transform) {
-        if (ClientItems.serverItem(Item.getIdFromItem(stack.getItem())) != null) GlStateManager.scale(2F, 2F, 2F);
+        if (com.viaversion.viaforge.items.ServerCombatModels.imported(stack)) GlStateManager.scale(2F, 2F, 2F);
         renderer.renderItem(stack, model);
     }
 }

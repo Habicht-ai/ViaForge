@@ -11,7 +11,7 @@ import net.minecraft.item.*;
 public final class ServerHeldItemRenderer {
     private static EntityLivingBase owner;
     private static boolean offhand, left;
-    public static boolean imported(ItemStack stack) { return stack != null && ClientItems.serverItem(Item.getIdFromItem(stack.getItem())) != null; }
+    public static boolean imported(ItemStack stack) { return ServerCombatModels.imported(stack); }
     public static boolean left() { return owner != null && left; }
     public static boolean blocking(ItemStack stack) {
         if (owner != null) return ServerEntityViews.blocking(owner, offhand, stack);

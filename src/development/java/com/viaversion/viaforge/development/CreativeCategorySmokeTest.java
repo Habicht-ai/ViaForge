@@ -71,6 +71,7 @@ final class CreativeCategorySmokeTest {
             Map<Integer, Integer> expected = new HashMap<>();
             if (tab == CreativeTabs.tabCombat) { expected.put(9, 2); if (profile.protocol() >= 315) { expected.put(70, 1); expected.put(10, 1); expected.put(71, 1); } }
             if (tab == CreativeTabs.tabTools) { expected.put(70, 1); if (profile.protocol() >= 315) expected.put(71, 1); }
+            if (tab == CreativeTabs.tabCombat && profile.protocol() >= 316) expected.put(22, 3);
             ServerEntitySmokeTest.require(books.equals(expected), "Target enchantment category " + tab.getTabLabel() + ": " + books + " expected " + expected);
         }
     }

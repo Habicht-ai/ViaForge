@@ -79,6 +79,8 @@ final class ServerEntitySmokeTest {
             equipment = packet(profile, "SET_EQUIPPED_ITEM"); Types.VAR_INT.writePrimitive(equipment, 612); Types.VAR_INT.writePrimitive(equipment, 1); Types.ITEM1_8.write(equipment, null);
             send(client, server, handler, equipment); require(view.offhand == null, "Empty equipment clears remote shield");
             ServerEffectsSmokeTest.pipeline(profile, client, server, handler, world);
+            ServerCombatSmokeTest.pipeline(profile, client, server, handler, world);
+            EndVisualSmokeTest.pipeline(profile, client, server, handler, world);
             ByteBuf remove = packet(profile, "REMOVE_ENTITIES"); Types.VAR_INT.writePrimitive(remove, 3);
             for (int id : new int[]{610, 611, 612}) Types.VAR_INT.writePrimitive(remove, id);
             send(client, server, handler, remove);
@@ -100,7 +102,7 @@ final class ServerEntitySmokeTest {
                 int id = Types.VAR_INT.readPrimitive(received);
                 // Player construction uses a local profile fixture; the visual data
                 // still comes from the actual ADD_PLAYER packet through the pipeline.
-                if (id != 0x0e && id != 0x1c && id != 0x13 && id != 0x3f && id != 0x04 && id != 0x12 && id != 0x1a) continue;
+                if (id != 0x0e && id != 0x1c && id != 0x13 && id != 0x3f && id != 0x04 && id != 0x12 && id != 0x1a && id != 0x23 && id != 0x35 && id != 0x24 && id != 0x21) continue;
                 Packet nativePacket = EnumConnectionState.PLAY.getPacket(EnumPacketDirection.CLIENTBOUND, id);
                 nativePacket.readPacketData(new PacketBuffer(received)); nativePacket.processPacket(handler);
             } finally { received.release(); }

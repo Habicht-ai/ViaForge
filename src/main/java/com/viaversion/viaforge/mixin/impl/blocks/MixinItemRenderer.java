@@ -40,7 +40,7 @@ public abstract class MixinItemRenderer {
     }
 
     private static boolean isServerBlockItem(ItemStack stack) {
-        return stack != null && ClientItems.serverItem(Item.getIdFromItem(stack.getItem())) != null;
+        return com.viaversion.viaforge.items.ServerCombatModels.imported(stack);
     }
 
     @Redirect(method = "renderItem", at = @At(value = "INVOKE",

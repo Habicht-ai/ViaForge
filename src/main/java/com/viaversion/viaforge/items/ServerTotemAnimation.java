@@ -1,7 +1,6 @@
 package com.viaversion.viaforge.items;
 
 import com.viaversion.viaforge.blocks.ServerBlockSession;
-import io.netty.buffer.ByteBuf;
 import java.util.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
@@ -65,17 +64,6 @@ public final class ServerTotemAnimation {
             GlStateManager.popAttrib(); GlStateManager.popMatrix(); RenderHelper.disableStandardItemLighting();
             GlStateManager.enableCull(); GlStateManager.disableDepth();
         }
-    }
-    public static void particlePacket(WorldClient world, ByteBuf input) {
-        if (input.readInt() != 47) return;
-        boolean longDistance = input.readBoolean();
-        double x = input.readFloat(), y = input.readFloat(), z = input.readFloat();
-        double dx = input.readFloat(), dy = input.readFloat(), dz = input.readFloat(), speed = input.readFloat();
-        int count = input.readInt();
-        if (count == 0) particle(world, longDistance, x, y, z, dx * speed, dy * speed, dz * speed);
-        else for (int i = 0; i < count; i++) particle(world, longDistance,
-                x + RANDOM.nextGaussian() * dx, y + RANDOM.nextGaussian() * dy, z + RANDOM.nextGaussian() * dz,
-                RANDOM.nextGaussian() * speed, RANDOM.nextGaussian() * speed, RANDOM.nextGaussian() * speed);
     }
     private static void particle(WorldClient world, boolean longDistance, double x, double y, double z, double vx, double vy, double vz) {
         Minecraft mc = Minecraft.getMinecraft(); Entity camera = mc.getRenderViewEntity();

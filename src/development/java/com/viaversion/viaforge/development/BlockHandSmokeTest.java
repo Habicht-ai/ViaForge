@@ -56,6 +56,9 @@ final class BlockHandSmokeTest {
                 java.util.List<ItemStack> variants = ServerItemSmokeTest.variants(definition);
                 if (!variants.isEmpty()) held.add(variants.get(0));
             }
+            for (String material : new String[]{"wooden", "stone", "iron", "diamond", "golden"}) {
+                for (String tool : new String[]{"sword", "axe", "pickaxe", "shovel", "hoe"}) held.add(new ItemStack(Item.itemRegistry.getObject(new net.minecraft.util.ResourceLocation(material + "_" + tool))));
+            }
             for (ItemStack stack : held) {
                 IBakedModel model = mc.getRenderItem().getItemModelMesher().getItemModel(stack);
                 GlStateManager.loadIdentity();
@@ -101,6 +104,8 @@ final class BlockHandSmokeTest {
             verifyBonemeal(mc, world, player);
             ServerItemSmokeTest.interactions(profile, world, player);
             EntityRenderSmokeTest.verify(profile, world, directory);
+            CombatRenderSmokeTest.verify(profile, world, directory);
+            EndRenderSmokeTest.verify(profile, world, directory);
             CreativeOrderPreview.verify(profile, directory);
             // Restore the idle pose after the interaction test for the review image.
             player.isSwingInProgress = false; player.swingProgress = player.prevSwingProgress = 0;

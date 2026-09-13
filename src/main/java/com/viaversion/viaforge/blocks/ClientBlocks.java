@@ -34,6 +34,7 @@ public final class ClientBlocks {
     public static void register() {
         net.minecraftforge.fml.client.registry.ClientRegistry.registerTileEntity(EditorBlockEntity.class, "viaforge:block_editor", new StructureBlockRenderer());
         net.minecraftforge.fml.client.registry.ClientRegistry.registerTileEntity(ShulkerBlockEntity.class, "viaforge:shulker_box", new ShulkerBlockRenderer());
+        net.minecraftforge.fml.client.registry.ClientRegistry.registerTileEntity(GatewayBlockEntity.class, "viaforge:end_gateway", new GatewayBlockRenderer());
         for (Definition definition : LegacyBlockCatalog.BLOCKS) {
             Block block = LegacyClientBlockTypes.create(definition);
             block.setUnlocalizedName("viaforge." + definition.name);

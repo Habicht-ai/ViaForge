@@ -68,6 +68,7 @@ public final class LegacyBlockPackets {
         LegacyBlockCatalog.Definition definition = LegacyBlockCatalog.state(world.get(pos.x(), pos.y(), pos.z()));
         if (definition == null) return 0;
         if (definition.kind == LegacyBlockCatalog.Kind.COMMAND) return 2;
+        if (definition.kind == LegacyBlockCatalog.Kind.GATEWAY) return 8;
         return definition.kind == LegacyBlockCatalog.Kind.STRUCTURE && profile.protocol() >= 210 ? 7 : 0;
     }
 

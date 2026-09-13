@@ -12,6 +12,9 @@ public final class LegacyItemModels {
         Map<String, byte[]> models = new HashMap<>();
         Set<String> names = new HashSet<>(Arrays.asList("shield_blocking", "broken_elytra"));
         for (LegacyItemCatalog.Definition item : LegacyItemCatalog.ITEMS) names.add(item.model);
+        for (String material : new String[]{"wooden", "stone", "iron", "diamond", "golden"}) {
+            for (String tool : new String[]{"sword", "axe", "pickaxe", "shovel", "hoe"}) names.add(material + "_" + tool);
+        }
         for (String name : names) {
             String path = "models/item/" + name + ".json";
             JsonObject model;
@@ -21,6 +24,9 @@ public final class LegacyItemModels {
                 JsonObject textures = new JsonObject(); textures.addProperty("layer0", "minecraft:items/paper"); model.add("textures", textures);
             }
             models.put(path, model.toString().getBytes(StandardCharsets.UTF_8));
+            if (name.endsWith("_sword") || name.endsWith("_axe") || name.endsWith("_pickaxe") || name.endsWith("_shovel") || name.endsWith("_hoe")) {
+                models.put("models/item/combat/" + name + ".json", model.toString().getBytes(StandardCharsets.UTF_8));
+            }
             if (name.equals("shield") || name.equals("shield_blocking")) {
                 JsonObject mirrored = new JsonParser().parse(model.toString()).getAsJsonObject();
                 JsonObject display = mirrored.has("display") ? mirrored.getAsJsonObject("display") : new JsonObject();

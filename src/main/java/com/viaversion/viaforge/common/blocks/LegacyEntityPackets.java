@@ -30,12 +30,13 @@ public final class LegacyEntityPackets {
             case "ADD_ENTITY":
                 ByteBuf probe = input.duplicate(); Types.VAR_INT.readPrimitive(probe); probe.skipBytes(16);
                 int type = probe.readUnsignedByte();
-                if (type != 3 && type != 73 && type != 60 && type != 91) return null;
+                if (type != 3 && type != 73 && type != 60 && type != 91 && type != 51) return null;
                 operation = 1; break;
             case "SET_ENTITY_DATA": operation = 2; break;
             case "SET_EQUIPPED_ITEM": operation = 3; break;
             case "REMOVE_ENTITIES": operation = 4; break;
             case "ADD_PLAYER": operation = 5; break;
+            case "UPDATE_ATTRIBUTES": operation = 10; break;
             default: return null;
         }
         return message(source, input, operation);
@@ -52,8 +53,9 @@ public final class LegacyEntityPackets {
             if (event == 2002 || event == 2007 && profile.protocol() >= 315) return message(source, input, 7);
         } else if (name.equals("ENTITY_EVENT") && profile.protocol() >= 315) {
             if (input.getByte(input.readerIndex() + 4) == 35) return message(source, input, 8);
-        } else if (name.equals("LEVEL_PARTICLES") && profile.protocol() >= 315) {
-            if (input.getInt(input.readerIndex()) == 47) return message(source, input, 9);
+        } else if (name.equals("LEVEL_PARTICLES")) {
+            int particle = input.getInt(input.readerIndex());
+            if (particle == 45 || particle == 47 && profile.protocol() >= 315) return message(source, input, 9);
         }
         return null;
     }

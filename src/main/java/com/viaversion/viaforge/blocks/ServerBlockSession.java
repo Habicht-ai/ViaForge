@@ -124,6 +124,18 @@ public final class ServerBlockSession {
         mc.getBlockRendererDispatcher().onResourceManagerReload(resources);
         mc.getRenderItem().onResourceManagerReload(resources);
         mc.renderGlobal.onResourceManagerReload(resources);
+        // Standalone entity/HUD textures are not part of the rebuilt item atlas.
+        // Evict them so the next bind uploads this connection's version. Merely
+        // deleting the GL texture leaves TextureManager holding the old object.
+        java.util.Iterator<net.minecraft.util.ResourceLocation> textures =
+                ((com.viaversion.viaforge.mixin.impl.blocks.VersionTextureCache)mc.getTextureManager()).viaForge$textures().keySet().iterator();
+        while (textures.hasNext()) {
+            net.minecraft.util.ResourceLocation texture = textures.next();
+            if (texture.getResourceDomain().equals("viaforge") && texture.getResourcePath().startsWith("textures/")) {
+                mc.getTextureManager().deleteTexture(texture);
+                textures.remove();
+            }
+        }
         net.minecraft.util.ResourceLocation particles = new net.minecraft.util.ResourceLocation("textures/particle/particles.png");
         mc.getTextureManager().deleteTexture(particles);
         mc.getTextureManager().loadTexture(particles, new net.minecraft.client.renderer.texture.SimpleTexture(particles));

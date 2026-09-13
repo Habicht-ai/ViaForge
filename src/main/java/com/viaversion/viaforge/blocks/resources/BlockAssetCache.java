@@ -86,7 +86,9 @@ public final class BlockAssetCache {
                         || path.startsWith("textures/items/") || path.startsWith("textures/entity/shield/")
                         || path.equals("textures/entity/shield_base.png") || path.equals("textures/entity/shield_base_nopattern.png")
                         || path.equals("textures/entity/elytra.png") || path.equals("textures/entity/enderdragon/dragon.png")
-                        || path.startsWith("textures/entity/projectiles/") || path.equals("textures/particle/particles.png"))) continue;
+                        || path.startsWith("textures/entity/projectiles/") || path.equals("textures/particle/particles.png")
+                        || path.equals("textures/entity/sweep.png") || path.equals("textures/gui/icons.png")
+                        || path.equals("textures/entity/end_gateway_beam.png") || path.startsWith("textures/entity/endercrystal/"))) continue;
                 try (InputStream input = zip.getInputStream(entry)) {
                     byte[] data = readBounded(input, 2 * 1024 * 1024);
                     total += data.length;

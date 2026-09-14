@@ -92,3 +92,8 @@ client archives. Hull/oar dimensions, UVs, movement constants, seat offsets,
 water handling and version-specific paddle timing are compatibility references.
 The six wood textures and 1.12 rowing recordings use the same verified runtime
 asset cache; they are not redistributed in the mod.
+
+The two-hand implementation uses the original 1.9–1.12.2 hand display transforms,
+player inventory/Creative layouts, arm poses, item-use ordering and packet formats
+as compatibility references. Inventory/hotbar sheets and the empty shield-slot
+icon are loaded from the same verified Mojang archive cache at runtime.

@@ -12,5 +12,6 @@ public abstract class MixinCombatTick {
     private void attackTimer(CallbackInfo ci) {
         ServerCombatState.tick((EntityPlayer)(Object)this);
         com.viaversion.viaforge.items.ServerItemCooldowns.tick((EntityPlayer)(Object)this);
+        com.viaversion.viaforge.hands.Offhand.tick((EntityPlayer)(Object)this);
     }
 }

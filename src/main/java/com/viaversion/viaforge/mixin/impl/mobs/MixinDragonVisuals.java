@@ -1,5 +1,5 @@
 package com.viaversion.viaforge.mixin.impl.mobs;
-import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.compatibility.ServerSession;
 import com.viaversion.viaforge.mobs.*;
 import net.minecraft.entity.boss.*;
 import net.minecraft.util.MathHelper;
@@ -17,7 +17,7 @@ public abstract class MixinDragonVisuals extends net.minecraft.entity.EntityLivi
     @Unique private int viaForge$phase = -1, viaForge$phaseTicks;
     @Inject(method="<init>",at=@At("RETURN"))
     private void newerParts(World world,CallbackInfo ci) {
-        if (!ServerBlockSession.supportsProtocol(107)) return;
+        if (!ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.MOBS)) return;
         EntityDragon dragon=(EntityDragon)(Object)this;
         viaForge$neck=new EntityDragonPart(dragon,"neck",6,6);
         dragon.dragonPartArray=new EntityDragonPart[]{dragon.dragonPartHead,viaForge$neck,dragon.dragonPartBody,dragon.dragonPartTail1,dragon.dragonPartTail2,dragon.dragonPartTail3,dragon.dragonPartWing1,dragon.dragonPartWing2};

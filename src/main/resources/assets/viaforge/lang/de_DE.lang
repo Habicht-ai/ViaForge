@@ -59,6 +59,7 @@ enchantment.binding_curse=Fluch der Bindung
 enchantment.vanishing_curse=Fluch des Verschwindens
 
 viaforge.item.spawn=%s-Spawn-Ei
+key.viaforge.swapHands=Gegenstände in Händen tauschen
 item.viaforge.oak_boat.name=Eichenholzboot
 item.viaforge.spruce_boat.name=Fichtenholzboot
 item.viaforge.birch_boat.name=Birkenholzboot
@@ -164,3 +165,7 @@ tipped_arrow.effect.mundane=Getränkter Pfeil
 tipped_arrow.effect.thick=Getränkter Pfeil
 tipped_arrow.effect.awkward=Getränkter Pfeil
 enchantment.sweeping=Schwungkraft
+
+options.viaforge.mainHand=Haupthand
+options.viaforge.left=Links
+options.viaforge.right=Rechts

@@ -44,3 +44,4 @@ via-forge-button-position: "TOP_LEFT"
 # This option indicates where the ViaForge set version button should be located in the add server screen.
 # Possible options: TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT
 add-server-screen-button-position: "TOP_LEFT"
+left-main-hand: false

@@ -1,6 +1,6 @@
 package com.viaversion.viaforge.items;
 
-import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.compatibility.ServerSession;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import java.util.*;
@@ -20,7 +20,7 @@ public final class ServerCombatState {
     private static int ticks;
     private static double base = 4;
     private static final Map<UUID, Modifier> MODIFIERS = new LinkedHashMap<>();
-    public static boolean active() { return ServerBlockSession.supportsProtocol(107); }
+    public static boolean active() { return ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.COMBAT); }
     public static void clear() { player = null; previous = null; attributeHand = null; hasAttributes = false; ticks = 0; base = 4; MODIFIERS.clear(); }
     private static boolean ready() {
         if (!active() || Minecraft.getMinecraft().thePlayer == null) return false;

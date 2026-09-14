@@ -1,6 +1,6 @@
 package com.viaversion.viaforge.items;
 
-import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.compatibility.ServerSession;
 import java.util.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
@@ -24,7 +24,7 @@ public final class ServerTotemAnimation {
     public static void clear() { EMITTERS.clear(); world = null; item = null; remaining = 0; }
     public static void activate(Entity entity) {
         Minecraft mc = Minecraft.getMinecraft();
-        if (!ServerBlockSession.supportsProtocol(315) || entity.worldObj != mc.theWorld) return;
+        if (!ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.TOTEM) || entity.worldObj != mc.theWorld) return;
         if (world != mc.theWorld) { clear(); world = mc.theWorld; }
         Emitter emitter = new Emitter(entity); emitter.tick(); EMITTERS.add(emitter);
         entity.worldObj.playSound(entity.posX, entity.posY, entity.posZ, "viaforge:totem_use", 1, 1, false);
@@ -34,7 +34,7 @@ public final class ServerTotemAnimation {
         }
     }
     public static void tick() {
-        if (world != Minecraft.getMinecraft().theWorld || !ServerBlockSession.supportsProtocol(315)) { clear(); return; }
+        if (world != Minecraft.getMinecraft().theWorld || !ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.TOTEM)) { clear(); return; }
         if (remaining > 0 && --remaining == 0) item = null;
         for (Iterator<Emitter> iterator = EMITTERS.iterator(); iterator.hasNext();) {
             Emitter emitter = iterator.next(); emitter.tick();
@@ -43,7 +43,7 @@ public final class ServerTotemAnimation {
     }
     public static void render(float partialTicks) {
         Minecraft mc = Minecraft.getMinecraft();
-        if (remaining <= 0 || item == null || world != mc.theWorld || !ServerBlockSession.supportsProtocol(315)) return;
+        if (remaining <= 0 || item == null || world != mc.theWorld || !ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.TOTEM)) return;
         ScaledResolution resolution = new ScaledResolution(mc);
         int width = resolution.getScaledWidth(), height = resolution.getScaledHeight();
         float progress = (40 - remaining + partialTicks) / 40F, square = progress * progress, cube = square * progress;

@@ -41,7 +41,7 @@ included only in the development JAR; the release mod uses the launcher account.
 - **Microsoft login**: sign in through your browser and enter the displayed code.
   As in Vibe, Microsoft identifies the application as **In-Game Account Switcher**.
 - **Cookie login**: select your own Microsoft cookie file in Netscape format.
-- **More → Offline profile**: create a profile for singleplayer and offline servers.
+- **More â†’ Offline profile**: create a profile for singleplayer and offline servers.
 - **Use account**: sign in with a saved account; **Auto Login** enables automatic
   sign-in with that account on the next launch.
 - **More** provides backup import/export, access to the cookie folder and an option
@@ -65,7 +65,7 @@ is included. The Minecraft client itself always remains on version 1.8.9.
 
 Multiplayer connections using **1.9 through 1.12.2** now retain original server
 block states before Via converts them. The catalog covers all new block IDs in
-this range (198–252 and 255), with each family enabled from its own release:
+this range (198â€“252 and 255), with each family enabled from its own release:
 
 - **1.9+**: end rods, chorus plants/flowers, purpur blocks/pillars/stairs/slabs,
   end stone bricks, beetroots, grass paths, frosted ice and the new command,
@@ -88,11 +88,15 @@ variants and Frost Walker/Mending/curse books use their original item data.
 Inventory and hand models follow the selected profile; stack sizes, durability,
 eating/drinking, bow ammunition and equipment slots are supported. Shields use
 target-version third-person poses, including other players' offhand shields.
+The local offhand has its original inventory slot, hotbar display and item use.
+Press **F** to swap hands; change the main hand under Skin Customization. Both
+hands have separate rendering, and bows can use offhand ammunition. See
+[two-hand controls and verification](docs/HANDS.md).
 Thrown splash/lingering potions retain their models and colors; lingering clouds
 display the server's particle color and radius. Creative categories follow the
 target release, and the dragon-head inventory orientation follows its 1.11.1 change. Item effects
 and consumption remain server-authoritative. See [item scope and limitations](docs/ITEMS.md).
-Boats on 1.9–1.12.2 servers use the six original wood models, versioned rowing,
+Boats on 1.9â€“1.12.2 servers use the six original wood models, versioned rowing,
 water/ice movement and two independent passenger seats. The first passenger drives;
 the second can ride and dismount normally. Native 1.8 boats retain their original
 behavior. See [boat behavior and verification](docs/BOATS.md).
@@ -126,6 +130,11 @@ server-specific interaction behavior still need dedicated work and gameplay test
 Several patch releases share a protocol and cannot be distinguished by the
 protocol selector. Their default resource profiles use the last patch in that
 group (for example 1.9.4 for 1.9.3/1.9.4, and 1.10.2 for 1.10.x).
+The shared [compatibility pipeline](docs/COMPATIBILITY.md) separates exact packet
+codecs, inherited client behavior and target resources. New version families can
+reuse existing features through explicit adapters; the architecture refactor alone
+does not add 1.13+ support.
+
 See [the block implementation notes](docs/BLOCKS.md) for the exact profile table,
 architecture, verification and next steps.
 

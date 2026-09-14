@@ -1,4 +1,5 @@
 package com.viaversion.viaforge.blocks;
+import com.viaversion.viaforge.compatibility.ServerSession;
 
 import com.viaversion.viaforge.blocks.gui.BlockEditorScreen;
 import com.viaversion.viaforge.blocks.gui.CommandBlockScreen;
@@ -52,7 +53,7 @@ public final class EditorBlockEntity extends TileEntity {
 
     public static boolean open(World world, BlockPos pos, EntityPlayer player) {
         Definition definition = ClientBlocks.definition(world.getBlockState(pos).getBlock());
-        if (!world.isRemote || !ServerBlockSession.supportsItem(definition) || !player.capabilities.isCreativeMode || !player.capabilities.allowEdit) return false;
+        if (!world.isRemote || !ServerSession.supportsItem(definition) || !player.capabilities.isCreativeMode || !player.capabilities.allowEdit) return false;
         TileEntity tile = world.getTileEntity(pos);
         if (!(tile instanceof EditorBlockEntity)) return false;
         EditorBlockEntity editor = (EditorBlockEntity) tile;

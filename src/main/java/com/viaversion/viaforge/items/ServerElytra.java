@@ -1,6 +1,6 @@
 package com.viaversion.viaforge.items;
 
-import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.compatibility.ServerSession;
 import com.viaversion.viaforge.common.blocks.LegacyItemCatalog.Definition;
 import java.util.List;
 import net.minecraft.client.model.*;
@@ -22,13 +22,13 @@ public final class ServerElytra extends ItemArmor {
         setMaxDamage(432); setUnlocalizedName("viaforge.elytra"); setCreativeTab(CreativeTabs.tabTransport);
     }
     @Override public String getItemStackDisplayName(ItemStack stack) { return "Elytra"; }
-    @Override public void getSubItems(Item item, CreativeTabs tab, List<ItemStack> entries) { if (ServerBlockSession.supportsItem(definition)) entries.add(new ItemStack(item)); }
+    @Override public void getSubItems(Item item, CreativeTabs tab, List<ItemStack> entries) { if (ServerSession.supportsItem(definition)) entries.add(new ItemStack(item)); }
     @Override public boolean getIsRepairable(ItemStack stack, ItemStack repair) { return repair.getItem() == Items.leather; }
     @Override public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
-        return world.isRemote && ServerBlockSession.supportsItem(definition) ? super.onItemRightClick(stack, world, player) : stack;
+        return world.isRemote && ServerSession.supportsItem(definition) ? super.onItemRightClick(stack, world, player) : stack;
     }
     @Override public String getArmorTexture(ItemStack stack, Entity entity, int slot, String type) {
-        if (ServerBlockSession.supportsItem(definition) && entity instanceof net.minecraft.client.entity.AbstractClientPlayer) {
+        if (ServerSession.supportsItem(definition) && entity instanceof net.minecraft.client.entity.AbstractClientPlayer) {
             net.minecraft.client.entity.AbstractClientPlayer player = (net.minecraft.client.entity.AbstractClientPlayer)entity;
             if (player.hasPlayerInfo() && player.getLocationCape() != null && player.isWearing(net.minecraft.entity.player.EnumPlayerModelParts.CAPE)) return player.getLocationCape().toString();
         }

@@ -1,6 +1,6 @@
 package com.viaversion.viaforge.mixin.impl.items;
 
-import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.compatibility.ServerSession;
 import com.viaversion.viaforge.items.DragonHeadAnimation;
 import net.minecraft.tileentity.TileEntitySkull;
 import net.minecraft.util.ITickable;
@@ -13,7 +13,7 @@ public abstract class MixinDragonHeadTick implements ITickable, DragonHeadAnimat
     @Unique private boolean viaForge$powered;
     @Override public void update() {
         TileEntitySkull skull = (TileEntitySkull)(Object)this;
-        viaForge$powered = ServerBlockSession.supportsProtocol(107) && skull.getSkullType() == 5
+        viaForge$powered = ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.ITEMS) && skull.getSkullType() == 5
                 && skull.getWorld() != null && skull.getWorld().isBlockPowered(skull.getPos());
         if (viaForge$powered) viaForge$jawTicks++;
     }

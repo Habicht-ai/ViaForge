@@ -1,4 +1,5 @@
 package com.viaversion.viaforge.mixin.impl.items;
+import com.viaversion.viaforge.compatibility.ServerSession;
 
 import com.viaversion.viaforge.items.ServerItemCooldowns;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
@@ -15,7 +16,7 @@ public abstract class MixinItemCooldownUse {
     @Inject(method = "sendUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;useItemRightClick(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;"), cancellable = true)
     private void cooldown(EntityPlayer player, World world, ItemStack stack, CallbackInfoReturnable<Boolean> ci) {
         if (ServerItemCooldowns.cooling(stack)) ci.setReturnValue(false);
-        else if (com.viaversion.viaforge.blocks.ServerBlockSession.supportsProtocol(107)
+        else if (com.viaversion.viaforge.compatibility.ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.COOLDOWNS)
                 && stack.getItem() == net.minecraft.init.Items.ender_pearl && player.capabilities.isCreativeMode) {
             stack.useItemRightClick(world, player);
             // Modern creative pearl use succeeds without changing the stack count.

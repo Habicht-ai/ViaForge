@@ -177,8 +177,9 @@ item rendering and powered/unpowered placed heads in all five orientations.
 
 ## Current limits
 
-This item extension does not supply a local offhand inventory/control scheme,
-Elytra flight input/physics, firework flight boosts or a 1.12 recipe-book screen.
+Local offhand inventory, controls and both-hand rendering are documented in
+[HANDS.md](HANDS.md). This item extension does not supply Elytra flight input/physics,
+firework flight boosts or a 1.12 recipe-book screen.
 Modern boats now have original models, movement and two seats; see [BOATS.md](BOATS.md).
 The mob compatibility extension is documented in [MOBS.md](MOBS.md). Thrown potions,
 lingering clouds, tipped/spectral arrows, Totem activation and other players' offhand shields are supported as described

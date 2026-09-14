@@ -33,10 +33,8 @@ import com.viaversion.viaversion.platform.ViaDecodeHandler;
 import com.viaversion.viaversion.platform.ViaEncodeHandler;
 import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
 import com.viaversion.viaforge.common.extended.ExtendedNetworkManager;
-import com.viaversion.viaforge.common.blocks.BlockVersionProfile;
-import com.viaversion.viaforge.common.blocks.BlockPreservingDecodeHandler;
 import com.viaversion.viaforge.blocks.ClientBlocks;
-import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.compatibility.ServerSession;
 import com.viaversion.viaforge.common.platform.ViaForgeConfig;
 import com.viaversion.viaforge.common.platform.ViaForgePlatform;
 import com.viaversion.viaforge.common.protocoltranslator.platform.ViaForgePlatformLoader;
@@ -123,10 +121,12 @@ public class ViaForgeCommon {
         final ChannelPipeline pipeline = channel.pipeline();
 
         // ViaVersion
-        BlockVersionProfile blockProfile = BlockVersionProfile.forProtocol(networkManager.viaForge$getTrackedVersion().getVersion());
-        ViaDecodeHandler decoder = blockProfile == null ? new ViaDecodeHandler(user)
-                : new BlockPreservingDecodeHandler(user, blockProfile, ClientBlocks::localState,
-                        () -> ServerBlockSession.join(channel, blockProfile), () -> ServerBlockSession.leave(channel));
+        com.viaversion.viaforge.common.compatibility.CompatibilityProfile target =
+                com.viaversion.viaforge.common.compatibility.CompatibilityRegistry.DEFAULT.resolve(networkManager.viaForge$getTrackedVersion().getVersion());
+        user.put(target);
+        ViaDecodeHandler decoder = !target.extended() ? new ViaDecodeHandler(user)
+                : new com.viaversion.viaforge.common.compatibility.CompatibilityDecodeHandler(user,target.adapter().create(target,ClientBlocks::localState),
+                        () -> ServerSession.join(channel,target), () -> ServerSession.leave(channel));
         pipeline.addBefore(platform.getDecodeHandlerName(), ViaDecodeHandler.NAME, decoder);
         pipeline.addBefore("encoder", ViaEncodeHandler.NAME, new ViaEncodeHandler(user));
 

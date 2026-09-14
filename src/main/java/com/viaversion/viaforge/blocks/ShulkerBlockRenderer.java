@@ -1,4 +1,5 @@
 package com.viaversion.viaforge.blocks;
+import com.viaversion.viaforge.compatibility.ServerSession;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
@@ -19,7 +20,7 @@ public final class ShulkerBlockRenderer extends TileEntitySpecialRenderer<Shulke
         com.viaversion.viaforge.common.blocks.LegacyBlockCatalog.Definition definition = ClientBlocks.definition(tile.getBlockType());
         if (definition == null) return;
         ResourceLocation texture = new ResourceLocation("viaforge:textures/entity/shulker/shulker_" + ClientBlocks.COLORS[definition.id - 219] + ".png");
-        if (ServerBlockSession.getLoadedResourceVersion() == null) texture = new ResourceLocation("minecraft:textures/entity/chest/ender.png");
+        if (ServerSession.getLoadedResourceVersion() == null) texture = new ResourceLocation("minecraft:textures/entity/chest/ender.png");
         bindTexture(texture);
         EnumFacing facing = EnumFacing.getFront(tile.getBlockMetadata() & 7);
         GlStateManager.pushMatrix();

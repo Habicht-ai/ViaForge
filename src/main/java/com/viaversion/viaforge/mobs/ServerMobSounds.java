@@ -51,7 +51,7 @@ public final class ServerMobSounds {
         return "viaforge:"+key;
     }
     public static void packet(WorldClient world,int protocol,int operation,ByteBuf input) throws Exception {
-        String name = operation == 14 ? MobSoundCatalog.name(BlockVersionProfile.forProtocol(protocol).resourceVersion(),Types.VAR_INT.readPrimitive(input)) : Types.STRING.read(input);
+        String name = operation == 14 ? MobSoundCatalog.name(com.viaversion.viaforge.common.compatibility.ClientEventFormat.legacy(protocol).soundRegistryVersion(),Types.VAR_INT.readPrimitive(input)) : Types.STRING.read(input);
         if (name != null && name.startsWith("minecraft:")) name = name.substring(10);
         int category = Types.VAR_INT.readPrimitive(input);
         double x = input.readInt()/8D, y = input.readInt()/8D, z = input.readInt()/8D;

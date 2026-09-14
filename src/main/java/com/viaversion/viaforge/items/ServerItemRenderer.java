@@ -1,6 +1,6 @@
 package com.viaversion.viaforge.items;
 
-import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.compatibility.ServerSession;
 import com.viaversion.viaforge.common.blocks.LegacyItemCatalog.Kind;
 import java.util.*;
 import net.minecraft.client.Minecraft;
@@ -48,7 +48,7 @@ public final class ServerItemRenderer {
             GlStateManager.popMatrix(); Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
         }
     }
-    public static float inventoryDragonYaw() { return ServerBlockSession.supportsProtocol(316) ? 180 : 0; }
+    public static float inventoryDragonYaw() { return ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.REVERSED_DRAGON_HEAD_ITEM) ? 180 : 0; }
     public static void renderDragon(float x, float y, float z, EnumFacing facing, float yaw, float animation) {
         Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation("viaforge:textures/entity/enderdragon/dragon.png"));
         GlStateManager.pushMatrix(); GlStateManager.disableCull();
@@ -71,7 +71,7 @@ public final class ServerItemRenderer {
         if (!stack.hasTagCompound() || !stack.getTagCompound().hasKey("BlockEntityTag", 10)) return new ResourceLocation("viaforge:textures/entity/shield_base_nopattern.png");
         TileEntityBanner banner = new TileEntityBanner();
         ItemStack pattern = stack.copy(); pattern.setItemDamage(0); banner.setItemValues(pattern);
-        String key = ServerBlockSession.getLoadedResourceVersion() + "/" + banner.getPatternResourceLocation();
+        String key = ServerSession.getLoadedResourceVersion() + "/" + banner.getPatternResourceLocation();
         ResourceLocation texture = PATTERNS.get(key);
         if (texture == null) {
             if (PATTERNS.size() >= 128) { Iterator<ResourceLocation> old = PATTERNS.values().iterator(); Minecraft.getMinecraft().getTextureManager().deleteTexture(old.next()); old.remove(); }

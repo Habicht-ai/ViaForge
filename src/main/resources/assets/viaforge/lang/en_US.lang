@@ -1,3 +1,4 @@
+key.viaforge.swapHands=Swap Items In Hands
 viaforge.editor.waiting=Waiting for block data from the server...
 viaforge.editor.invalid.numbers=Check offsets (-32..32), size (0..32), integrity (0..1) and seed.
 viaforge.editor.invalid.command_length=The command is too long to send.
@@ -159,3 +160,7 @@ entity.Llama.name=Llama
 entity.Parrot.name=Parrot
 entity.IllusionIllager.name=Illusioner
 enchantment.sweeping=Sweeping Edge
+
+options.viaforge.mainHand=Main Hand
+options.viaforge.left=Left
+options.viaforge.right=Right

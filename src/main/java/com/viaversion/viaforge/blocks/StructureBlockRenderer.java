@@ -1,4 +1,5 @@
 package com.viaversion.viaforge.blocks;
+import com.viaversion.viaforge.compatibility.ServerSession;
 
 import com.viaversion.viaforge.common.blocks.LegacyBlockCatalog;
 import net.minecraft.client.Minecraft;
@@ -18,7 +19,7 @@ public final class StructureBlockRenderer extends TileEntitySpecialRenderer<Edit
     @Override public void renderTileEntityAt(EditorBlockEntity tile, double x, double y, double z, float partialTicks, int destroyStage) {
         Minecraft mc = Minecraft.getMinecraft();
         if (!tile.structure() || !tile.received() || mc.thePlayer == null || !mc.thePlayer.capabilities.isCreativeMode
-                || !ServerBlockSession.supportsItem(ClientBlocks.definition(tile.getBlockType()))) return;
+                || !ServerSession.supportsItem(ClientBlocks.definition(tile.getBlockType()))) return;
         NBTTagCompound data = tile.snapshot();
         boolean save = data.getString("mode").equals("SAVE"), load = data.getString("mode").equals("LOAD");
         if (!save && !load || load && !data.getBoolean("showboundingbox")) return;

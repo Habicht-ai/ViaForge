@@ -21,6 +21,7 @@ public final class LegacyEntityPackets {
                 : profile.protocol() >= 335 ? ClientboundPackets1_12.values()
                 : profile.protocol() >= 110 ? ClientboundPackets1_9_3.values() : ClientboundPackets1_9.values();
     }
+    public void clear() { boats.clear();dimension=null; }
     public ByteBuf capture(ByteBuf source) {
         ByteBuf input = source.duplicate();
         int id = Types.VAR_INT.readPrimitive(input);
@@ -61,6 +62,16 @@ public final class LegacyEntityPackets {
             case "TELEPORT_ENTITY": operation = 24; break;
             case "MOVE_VEHICLE": operation = 25; break;
             case "COOLDOWN": operation = 19; break;
+            case "CONTAINER_SET_CONTENT":
+                ByteBuf content=input.duplicate();int window=content.readUnsignedByte();
+                if(window!=0)return null;
+                com.viaversion.viaversion.api.minecraft.item.Item[] items=Types.ITEM1_8_SHORT_ARRAY.read(content);
+                if(items.length!=46)return null;
+                ByteBuf held=source.alloc().buffer();try{Types.ITEM1_8.write(held,items[45]);return message(source,held,26);}finally{held.release();}
+            case "CONTAINER_SET_SLOT":
+                ByteBuf slot=input.duplicate();int slotWindow=slot.readByte(),index=slot.readShort();
+                if(!(slotWindow==0&&index==45 || slotWindow==-2&&index==40))return null;
+                return message(source,slot,26);
             case "UPDATE_MOB_EFFECT": case "REMOVE_MOB_EFFECT":
                 ByteBuf effect = input.duplicate(); Types.VAR_INT.readPrimitive(effect);
                 int effectId = effect.readUnsignedByte();
@@ -78,6 +89,10 @@ public final class LegacyEntityPackets {
         int id = Types.VAR_INT.readPrimitive(input);
         if (id < 0 || id >= packets.length) return null;
         String name = packets[id].getName();
+        if(name.equals("ANIMATE")){
+            ByteBuf animation=input.duplicate();Types.VAR_INT.readPrimitive(animation);int kind=animation.readUnsignedByte();
+            if(kind==0||kind==3)return message(source,input,27);
+        }
         if (name.equals("SOUND")) {
             String sound = MobSoundCatalog.name(profile.resourceVersion(),Types.VAR_INT.readPrimitive(input.duplicate()));
             if (sound != null && sound.startsWith("entity.")) return message(source,input,14);
@@ -103,7 +118,7 @@ public final class LegacyEntityPackets {
         try {
             Types.VAR_INT.writePrimitive(output, ClientboundPackets1_8.CUSTOM_PAYLOAD.getId());
             Types.STRING.write(output, CHANNEL);
-            output.writeShort(profile.protocol()).writeByte(operation);
+            com.viaversion.viaforge.common.compatibility.ClientEventEnvelope.write(output,com.viaversion.viaforge.common.compatibility.ClientEventFormat.legacy(profile.protocol()),operation);
             if (operation != 0) output.writeBytes(input);
             return output;
         } catch (Throwable failure) { output.release(); throw failure; }

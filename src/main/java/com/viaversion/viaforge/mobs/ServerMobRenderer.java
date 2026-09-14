@@ -59,7 +59,7 @@ public final class ServerMobRenderer extends RenderLiving<ServerMob> {
     public ResourceLocation texture(ServerMob mob) {
         String name;
         switch (mob.kind()) {
-            case SHULKER: name = mob.state.protocol < 315 ? "shulker/endergolem.png" : "shulker/shulker_" + COLORS[MathHelper.clamp_int(mob.state.number(mob.state.first+3,10),0,15)] + ".png"; break;
+            case SHULKER: name = !com.viaversion.viaforge.compatibility.ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.COLORED_SHULKERS) ? "shulker/endergolem.png" : "shulker/shulker_" + COLORS[MathHelper.clamp_int(mob.state.number(mob.state.first+3,10),0,15)] + ".png"; break;
             case POLAR_BEAR: name = "bear/polarbear.png"; break;
             case LLAMA: name = "llama/llama_"+new String[]{"creamy","white","brown","gray"}[MathHelper.clamp_int(mob.state.number(mob.state.first+6,0),0,3)]+".png"; break;
             case PARROT: name = "parrot/parrot_"+new String[]{"red_blue","blue","green","yellow_blue","grey"}[MathHelper.clamp_int(mob.state.number(mob.state.first+3,0),0,4)]+".png"; break;

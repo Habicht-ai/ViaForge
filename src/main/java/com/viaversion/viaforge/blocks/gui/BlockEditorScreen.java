@@ -2,7 +2,7 @@ package com.viaversion.viaforge.blocks.gui;
 
 import com.viaversion.viaforge.blocks.ClientBlocks;
 import com.viaversion.viaforge.blocks.EditorBlockEntity;
-import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.compatibility.ServerSession;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -98,7 +98,7 @@ public abstract class BlockEditorScreen extends GuiScreen {
     }
     @Override public void updateScreen() {
         if (mc.theWorld != tile.getWorld() || tile.isInvalid() || mc.thePlayer == null || !mc.thePlayer.capabilities.isCreativeMode
-                || !ServerBlockSession.supportsItem(ClientBlocks.definition(tile.getBlockType()))) { mc.displayGuiScreen(null); return; }
+                || !ServerSession.supportsItem(ClientBlocks.definition(tile.getBlockType()))) { mc.displayGuiScreen(null); return; }
         for (GuiTextField field : fields.values()) field.updateCursorCounter();
     }
     @Override public void drawScreen(int mouseX, int mouseY, float partialTicks) {

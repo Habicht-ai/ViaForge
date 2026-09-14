@@ -1,4 +1,5 @@
 package com.viaversion.viaforge.items;
+import com.viaversion.viaforge.compatibility.ServerSession;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -21,7 +22,7 @@ public final class ServerCombatIndicator extends Gui {
     public void draw(int width, int height) {
         Minecraft mc = Minecraft.getMinecraft(); float strength = ServerCombatState.strength(0);
         // The ready-to-sweep icon and the one-pixel centering correction arrived in 1.11.1.
-        boolean modernIcon = com.viaversion.viaforge.blocks.ServerBlockSession.supportsProtocol(316);
+        boolean modernIcon = com.viaversion.viaforge.compatibility.ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.MODERN_ATTACK_ICON);
         boolean ready = modernIcon && mc.pointedEntity instanceof EntityLivingBase && ((EntityLivingBase)mc.pointedEntity).isEntityAlive() && strength >= 1 && ServerCombatState.period() > 5;
         if (!ready && strength >= 1) return;
         int x = width / 2 - (modernIcon ? 8 : 7), y = height / 2 + 9;

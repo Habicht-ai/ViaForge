@@ -1,11 +1,9 @@
 package com.viaversion.viaforge.boats;
 
-import com.viaversion.viaforge.common.blocks.BlockVersionProfile;
 import com.viaversion.viaforge.platform.ViaForgeProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.*;
-import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
@@ -29,17 +27,9 @@ public final class BoatPackets {
     public static void paddles(ServerBoat boat) { if(boat.controlled()) Minecraft.getMinecraft().thePlayer.sendQueue.addToSendQueue(rowing(boat.paddle(0),boat.paddle(1))); }
     public static void register(ViaForgeProtocol protocol) {
         protocol.registerServerbound(ServerboundPackets1_8.CUSTOM_PAYLOAD, wrapper -> {
-            String channel=wrapper.passthrough(Types.STRING); if(!CHANNEL.equals(channel)) return;
-            wrapper.cancel();
-            if(BlockVersionProfile.forProtocol(wrapper.user().getProtocolInfo().serverProtocolVersion().getVersion())==null) return;
-            int operation=wrapper.read(Types.UNSIGNED_BYTE);
-            ServerboundPackets1_9 type=operation==0 ? ServerboundPackets1_9.MOVE_VEHICLE:operation==1 ? ServerboundPackets1_9.PADDLE_BOAT:ServerboundPackets1_9.PLAYER_INPUT;
-            PacketWrapper modern=PacketWrapper.create(type,wrapper.user());
-            if(operation==0) { modern.write(Types.DOUBLE,wrapper.read(Types.DOUBLE)); modern.write(Types.DOUBLE,wrapper.read(Types.DOUBLE)); modern.write(Types.DOUBLE,wrapper.read(Types.DOUBLE)); modern.write(Types.FLOAT,wrapper.read(Types.FLOAT)); modern.write(Types.FLOAT,wrapper.read(Types.FLOAT)); }
-            else if(operation==1) { modern.write(Types.BOOLEAN,wrapper.read(Types.BOOLEAN)); modern.write(Types.BOOLEAN,wrapper.read(Types.BOOLEAN)); }
-            else if(operation==2) { modern.write(Types.FLOAT,wrapper.read(Types.FLOAT)); modern.write(Types.FLOAT,wrapper.read(Types.FLOAT)); modern.write(Types.UNSIGNED_BYTE,wrapper.read(Types.UNSIGNED_BYTE)); }
-            else return;
-            modern.sendToServer(Protocol1_9To1_8.class,true);
+            String channel=wrapper.passthrough(Types.STRING);
+            if(CHANNEL.equals(channel)||com.viaversion.viaforge.hands.HandPackets.CHANNEL.equals(channel))
+                com.viaversion.viaforge.common.compatibility.ExtensionPackets.translate(channel,wrapper);
         });
     }
     private BoatPackets() { }

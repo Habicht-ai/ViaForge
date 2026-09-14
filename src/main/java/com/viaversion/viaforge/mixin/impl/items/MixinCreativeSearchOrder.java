@@ -1,6 +1,6 @@
 package com.viaversion.viaforge.mixin.impl.items;
 
-import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.compatibility.ServerSession;
 import com.viaversion.viaforge.items.ServerCreativeOrder;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.creativetab.CreativeTabs;
@@ -14,7 +14,7 @@ public abstract class MixinCreativeSearchOrder {
     @Inject(method = "updateCreativeSearch", at = @At("RETURN"))
     private void orderSearch(CallbackInfo ci) {
         GuiContainerCreative screen = (GuiContainerCreative)(Object)this;
-        if (!ServerBlockSession.supportsProtocol(107) || screen.getSelectedTabIndex() != CreativeTabs.tabAllSearch.getTabIndex()) return;
+        if (!ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.ITEMS) || screen.getSelectedTabIndex() != CreativeTabs.tabAllSearch.getTabIndex()) return;
         // Search builds its own list and appends native books after filtering setup.
         ServerCreativeOrder.sortSearch(screen.inventorySlots);
     }

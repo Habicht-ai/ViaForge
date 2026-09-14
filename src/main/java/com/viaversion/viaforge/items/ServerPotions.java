@@ -8,7 +8,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.compatibility.ServerSession;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.util.ResourceLocation;
@@ -36,9 +36,9 @@ final class ServerPotions extends Potion {
             ((EntityLivingBase)entity).addPotionEffect(effect);
         }
     }
-    @Override public boolean shouldRender(PotionEffect effect) { return ServerBlockSession.supportsProtocol(107); }
+    @Override public boolean shouldRender(PotionEffect effect) { return ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.ENTITY_VISUALS); }
     @Override public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
-        if (ServerBlockSession.getLoadedResourceVersion() == null) return;
+        if (ServerSession.getLoadedResourceVersion() == null) return;
         // These slots are absent from the 1.8 inventory atlas. Use the target
         // atlas in Forge's custom icon hook while retaining the native text/timer.
         int column = getId() == 25 ? 3 : getId() == 24 ? 4 : getId() == 26 ? 5 : 6;

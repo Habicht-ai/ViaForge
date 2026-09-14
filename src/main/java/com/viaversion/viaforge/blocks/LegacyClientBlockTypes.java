@@ -1,4 +1,5 @@
 package com.viaversion.viaforge.blocks;
+import com.viaversion.viaforge.compatibility.ServerSession;
 
 import com.viaversion.viaforge.common.blocks.LegacyBlockCatalog.Definition;
 import com.viaversion.viaforge.common.blocks.LegacyBlockCatalog.Kind;
@@ -213,7 +214,7 @@ final class LegacyClientBlockTypes {
         @Override public void setBlockBoundsBasedOnState(IBlockAccess world, BlockPos pos) { setBlockBounds(0, 0, 0, 1, (world.getBlockState(pos).getValue(AGE) + 1) * .125F, 1); }
         @Override public boolean canPlaceBlockAt(World world, BlockPos pos) { return world.getBlockState(pos.down()).getBlock() == Blocks.farmland; }
         @Override public boolean canGrow(World world, BlockPos pos, IBlockState state, boolean client) {
-            return ServerBlockSession.supports(ClientBlocks.definition(this)) && state.getValue(AGE) < 3;
+            return ServerSession.supports(ClientBlocks.definition(this)) && state.getValue(AGE) < 3;
         }
         @Override public boolean canUseBonemeal(World world, java.util.Random random, BlockPos pos, IBlockState state) { return state.getValue(AGE) < 3; }
         @Override public void grow(World world, java.util.Random random, BlockPos pos, IBlockState state) {

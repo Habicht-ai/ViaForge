@@ -1,6 +1,6 @@
 package com.viaversion.viaforge.items;
 
-import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.compatibility.ServerSession;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.*;
 import net.minecraft.client.renderer.*;
@@ -13,11 +13,11 @@ public final class ServerCrystalVisuals {
     private static final ModelBase NO_BASE = new ModelEnderCrystal(0, false);
     public static ModelBase model(ModelBase original, Entity entity) {
         ServerEntityViews.View view = ServerEntityViews.get(entity.getEntityId());
-        return ServerBlockSession.supportsProtocol(107) && view != null && view.type == 51 && !view.crystalBase ? NO_BASE : original;
+        return ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.ENTITY_VISUALS) && view != null && view.type == 51 && !view.crystalBase ? NO_BASE : original;
     }
     public static boolean hasBeam(Entity entity) {
         ServerEntityViews.View view = ServerEntityViews.get(entity.getEntityId());
-        return ServerBlockSession.supportsProtocol(107) && view != null && view.type == 51 && view.crystalBeam != null;
+        return ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.ENTITY_VISUALS) && view != null && view.type == 51 && view.crystalBeam != null;
     }
     public static void beam(EntityEnderCrystal entity, double x, double y, double z, float partial) {
         if (!hasBeam(entity)) return;
@@ -25,7 +25,7 @@ public final class ServerCrystalVisuals {
         float tx = pos.getX() + .5F, ty = pos.getY() + .5F, tz = pos.getZ() + .5F;
         float bob = MathHelper.sin((entity.innerRotation + partial) * .2F) / 2F + .5F; bob = bob * bob + bob;
         Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation("viaforge:textures/entity/endercrystal/endercrystal_beam.png"));
-        if (ServerBlockSession.supportsProtocol(210)) {
+        if (ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.CRYSTAL_BEAM_OFFSET)) {
             renderBeam(x + tx - entity.posX, y - .3 + bob * .4F + ty - entity.posY, z + tz - entity.posZ,
                     partial, tx, ty, tz, entity.innerRotation, entity.posX, entity.posY, entity.posZ);
         } else {

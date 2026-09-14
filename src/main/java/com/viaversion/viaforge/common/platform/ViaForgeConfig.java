@@ -31,6 +31,8 @@ import java.util.logging.Logger;
 public class ViaForgeConfig extends Config {
 
     public static final String CLIENT_SIDE_VERSION = "client-side-version";
+    public static final String LEFT_MAIN_HAND = "left-main-hand";
+    public boolean isLeftMainHand() { return getBoolean(LEFT_MAIN_HAND, false); }
     public static final String VERIFY_SESSION_IN_OLD_VERSIONS = "verify-session-in-old-versions";
     public static final String ALLOW_BETACRAFT_AUTHENTICATION = "allow-betacraft-authentication";
     public static final String SHOW_PROTOCOL_VERSION_IN_F3 = "show-protocol-version-in-f3";

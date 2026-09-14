@@ -1,6 +1,6 @@
 package com.viaversion.viaforge.items;
 
-import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.compatibility.ServerSession;
 import com.viaversion.viaforge.common.blocks.LegacyItemDefinition;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ public final class ServerCreativeOrder {
         container.viaForge$scrollTo(0);
     }
     public static void sort(List<ItemStack> entries) {
-        if (!ServerBlockSession.supportsProtocol(107) || entries.size() < 2) return;
+        if (!ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.ITEMS) || entries.size() < 2) return;
         List<ItemStack> vanilla = new ArrayList<>();
         List<Integer> positions = new ArrayList<>();
         for (int i = 0; i < entries.size(); i++) {
@@ -26,7 +26,7 @@ public final class ServerCreativeOrder {
             if (serverId(stack) < 0) continue;
             vanilla.add(stack); positions.add(i);
         }
-        boolean booksAtEnd = !ServerBlockSession.supportsProtocol(335);
+        boolean booksAtEnd = !ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.MERGED_MATERIALS_TAB);
         vanilla.sort((a, b) -> {
             int first = serverId(a), second = serverId(b);
             // Through 1.11.2, tabs/search append books after the item registry.
@@ -46,7 +46,7 @@ public final class ServerCreativeOrder {
         if (stack == null) return -1;
         Item item = stack.getItem();
         LegacyItemDefinition definition = ClientItems.serverItem(Item.getIdFromItem(item));
-        if (definition != null) return ServerBlockSession.supportsItem(definition) ? definition.itemId() : -1;
+        if (definition != null) return ServerSession.supportsItem(definition) ? definition.itemId() : -1;
         ResourceLocation name = Item.itemRegistry.getNameForObject(item);
         return name != null && name.getResourceDomain().equals("minecraft") ? Item.getIdFromItem(item) : -1;
     }

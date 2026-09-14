@@ -64,8 +64,10 @@ final class BlockPipelineSmokeTest {
         // Both must precede EmbeddedChannel's inbound message collector.
         channel.pipeline().addFirst("encoder", new ChannelOutboundHandlerAdapter());
         channel.pipeline().addFirst("decoder", new ChannelInboundHandlerAdapter());
+        com.viaversion.viaforge.common.compatibility.CompatibilityProfile target=com.viaversion.viaforge.common.compatibility.CompatibilityRegistry.DEFAULT.resolve(profile.protocol());
+        user.put(target);
         channel.pipeline().addBefore("decoder", ViaDecodeHandler.NAME,
-                new BlockPreservingDecodeHandler(user, profile, ClientBlocks::localState, () -> {}, () -> {}));
+                new com.viaversion.viaforge.common.compatibility.CompatibilityDecodeHandler(user,target.adapter().create(target,ClientBlocks::localState), () -> {}, () -> {}));
         channel.pipeline().addBefore("encoder", ViaEncodeHandler.NAME, new ViaEncodeHandler(user));
         try {
             enableCompression(channel);

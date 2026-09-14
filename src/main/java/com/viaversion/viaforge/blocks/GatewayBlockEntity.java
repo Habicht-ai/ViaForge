@@ -1,4 +1,5 @@
 package com.viaversion.viaforge.blocks;
+import com.viaversion.viaforge.compatibility.ServerSession;
 
 import java.util.Random;
 import net.minecraft.nbt.NBTTagCompound;
@@ -14,9 +15,9 @@ public final class GatewayBlockEntity extends TileEntity implements ITickable {
     public int cooldown() { return cooldown; }
     public boolean spawning() { return age < 200; }
     public boolean cooling() { return cooldown > 0; }
-    public int cooldownLength() { return ServerBlockSession.supportsProtocol(315) ? 40 : 20; }
+    public int cooldownLength() { return ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.INTERPOLATED_GATEWAY_COOLDOWN) ? 40 : 20; }
     public float progress(float partial) {
-        float fraction = ServerBlockSession.supportsProtocol(315) ? partial : 0;
+        float fraction = ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.INTERPOLATED_GATEWAY_COOLDOWN) ? partial : 0;
         return spawning() ? MathHelper.clamp_float((age + fraction) / 200F, 0, 1)
                 : 1 - MathHelper.clamp_float((cooldown - fraction) / cooldownLength(), 0, 1);
     }

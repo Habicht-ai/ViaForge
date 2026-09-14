@@ -1,6 +1,6 @@
 package com.viaversion.viaforge.items;
 
-import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.compatibility.ServerSession;
 import com.viaversion.viaforge.common.blocks.LegacyItemDefinition;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.type.Types;
@@ -27,17 +27,20 @@ public final class ServerEntityViews {
     }
     private static WorldClient world;
     private static final Map<Integer, View> VIEWS = new HashMap<>();
-    public static void clear() { VIEWS.clear(); world = null; ServerTotemAnimation.clear(); ServerCombatState.clear(); ServerItemCooldowns.clear(); com.viaversion.viaforge.mobs.ServerMobs.clear(); com.viaversion.viaforge.boats.ServerBoats.clear(); }
+    public static void clear() { VIEWS.clear(); world = null; ServerTotemAnimation.clear(); ServerCombatState.clear(); ServerItemCooldowns.clear(); com.viaversion.viaforge.hands.Offhand.clear(); com.viaversion.viaforge.mobs.ServerMobs.clear(); com.viaversion.viaforge.boats.ServerBoats.clear(); }
     public static View get(int id) { return world == Minecraft.getMinecraft().theWorld ? VIEWS.get(id) : null; }
     public static boolean blocking(EntityLivingBase entity, boolean offhand, ItemStack stack) {
         if (!ClientItems.is(stack, com.viaversion.viaforge.common.blocks.LegacyItemCatalog.Kind.SHIELD)) return false;
-        if (entity == Minecraft.getMinecraft().thePlayer) return !offhand && ((EntityPlayer)entity).getItemInUse() == stack;
+        if (entity == Minecraft.getMinecraft().thePlayer) return (offhand==(com.viaversion.viaforge.hands.Offhand.useHand==1)) && ((EntityPlayer)entity).getItemInUse() == stack;
         View view = get(entity.getEntityId());
         return view != null && (view.handState & 1) != 0 && ((view.handState & 2) != 0) == offhand;
     }
     public static void accept(ByteBuf input) throws Exception {
-        int protocol = input.readUnsignedShort(), operation = input.readUnsignedByte();
-        if (!ServerBlockSession.supportsProtocol(107)) return;
+        com.viaversion.viaforge.common.compatibility.ClientEventEnvelope envelope=com.viaversion.viaforge.common.compatibility.ClientEventEnvelope.read(input);
+        int protocol=envelope.format.revision(),operation=envelope.operation; // Internal layout only; behavior comes from ServerSession.
+        if(!ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientEventEnvelope.feature(operation))
+                && !(operation==13&&ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.BOATS)))return;
+        if (!ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.ENTITY_VISUALS)) return;
         WorldClient current = Minecraft.getMinecraft().theWorld;
         if (world != current || operation == 0) { clear(); world = current; }
         if (operation == 6) ServerItemCooldowns.clear();
@@ -58,6 +61,8 @@ public final class ServerEntityViews {
         if (operation == 10) { ServerCombatState.attributes(input); return; }
         if (operation == 17 || operation == 18) { ServerPotions.accept(world, operation, input); return; }
         if (operation == 19) { ServerItemCooldowns.accept(input); return; }
+        if (operation == 26) { com.viaversion.viaforge.hands.Offhand.accept(input); return; }
+        if (operation == 27) { com.viaversion.viaforge.hands.Offhand.animation(input); return; }
         if (operation == 20) { com.viaversion.viaforge.boats.ServerBoats.spawn(world, protocol, input); return; }
         if (operation >= 21 && operation <= 25) { com.viaversion.viaforge.boats.ServerBoats.motion(world, operation, input); return; }
         if (operation == 13 && com.viaversion.viaforge.boats.ServerBoats.seats(world, input.duplicate())) return;
@@ -111,7 +116,7 @@ public final class ServerEntityViews {
             case 4:
                 int count = Types.VAR_INT.readPrimitive(input);
                 for (int i = 0; i < count; i++) {
-                    int id = Types.VAR_INT.readPrimitive(input); VIEWS.remove(id); com.viaversion.viaforge.mobs.ServerMobs.remove(id); com.viaversion.viaforge.boats.ServerBoats.remove(world, id);
+                    int id = Types.VAR_INT.readPrimitive(input); VIEWS.remove(id); com.viaversion.viaforge.hands.Offhand.remove(id); com.viaversion.viaforge.mobs.ServerMobs.remove(id); com.viaversion.viaforge.boats.ServerBoats.remove(world, id);
                 }
                 break;
             default: break;
@@ -155,7 +160,7 @@ public final class ServerEntityViews {
         com.viaversion.viaversion.api.minecraft.item.Item copy = source.copy();
         if (local >= 0) {
             LegacyItemDefinition definition = ClientItems.serverItem(local);
-            if (!ServerBlockSession.supportsItem(definition)) return null;
+            if (!ServerSession.supportsItem(definition)) return null;
             copy.setIdentifier(local); if (!definition.preservesDamage()) copy.setData((short)0);
         } else if (source.identifier() >= 198 && source.identifier() < 256 || source.identifier() > 425) return null;
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());

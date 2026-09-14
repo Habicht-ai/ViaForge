@@ -1,4 +1,5 @@
 package com.viaversion.viaforge.blocks;
+import com.viaversion.viaforge.compatibility.ServerSession;
 
 import java.nio.FloatBuffer;
 import java.util.Random;
@@ -26,7 +27,7 @@ public final class GatewayBlockRenderer extends TileEntitySpecialRenderer<Gatewa
         if (tile.spawning() || tile.cooling()) {
             GlStateManager.alphaFunc(516, .1F); bindTexture(BEAM);
             float progress = MathHelper.sin(tile.progress(partial) * (float)Math.PI);
-            int height = MathHelper.floor_double(progress * (tile.spawning() ? 256D - y : ServerBlockSession.supportsProtocol(315) ? 50D : 25D));
+            int height = MathHelper.floor_double(progress * (tile.spawning() ? 256D - y : ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.EXTENDED_GATEWAY_BEAM) ? 50D : 25D));
             float[] color = beamColor(tile.spawning());
             GatewayBeamRenderer.render(x, y, z, partial, progress, tile.getWorld().getTotalWorldTime(), height, color);
             GatewayBeamRenderer.render(x, y, z, partial, progress, tile.getWorld().getTotalWorldTime(), -height, color);
@@ -53,7 +54,7 @@ public final class GatewayBlockRenderer extends TileEntitySpecialRenderer<Gatewa
             float red = (random.nextFloat() * .5F + .1F) * brightness;
             float green = (random.nextFloat() * .5F + .4F) * brightness;
             float blue = (random.nextFloat() * .5F + .5F) * brightness;
-            if (i == 0 && !ServerBlockSession.supportsProtocol(315)) red = green = blue = brightness;
+            if (i == 0 && !ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.EXTENDED_GATEWAY_BEAM)) red = green = blue = brightness;
             WorldRenderer buffer = Tessellator.getInstance().getWorldRenderer(); buffer.begin(7, DefaultVertexFormats.POSITION_COLOR);
             faces(buffer, visibleFaces, x, y, z, red, green, blue);
             Tessellator.getInstance().draw();
@@ -71,11 +72,11 @@ public final class GatewayBlockRenderer extends TileEntitySpecialRenderer<Gatewa
         return squaredDistance > 36864 ? 2 : squaredDistance > 25600 ? 4 : squaredDistance > 16384 ? 6 : squaredDistance > 9216 ? 8 : squaredDistance > 4096 ? 10 : squaredDistance > 1024 ? 12 : squaredDistance > 576 ? 14 : squaredDistance > 256 ? 15 : 16;
     }
     public static float[] beamColor(boolean spawning) {
-        if (ServerBlockSession.supportsProtocol(335)) {
+        if (ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.UPDATED_DYE_COLORS)) {
             int rgb = spawning ? 0xC74EBD : 0x8932B8;
             return new float[]{(rgb >> 16 & 255) / 255F, (rgb >> 8 & 255) / 255F, (rgb & 255) / 255F};
         }
-        return spawning ? new float[]{.7F, .3F, .85F} : ServerBlockSession.supportsProtocol(315) ? new float[]{.5F, .25F, .7F} : new float[]{.9F, .9F, .2F};
+        return spawning ? new float[]{.7F, .3F, .85F} : ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.EXTENDED_GATEWAY_BEAM) ? new float[]{.5F, .25F, .7F} : new float[]{.9F, .9F, .2F};
     }
     private static void faces(WorldRenderer b, int visible, double x, double y, double z, float r, float g, float blue) {
         for (int face = 0; face < CORNERS.length; face++) {

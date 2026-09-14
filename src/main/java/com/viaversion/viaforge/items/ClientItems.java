@@ -1,7 +1,7 @@
 package com.viaversion.viaforge.items;
 
 import com.viaversion.viaforge.blocks.ClientBlocks;
-import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.compatibility.ServerSession;
 import com.viaversion.viaforge.common.blocks.LegacyItemCatalog;
 import com.viaversion.viaforge.common.blocks.LegacyItemCatalog.*;
 import com.viaversion.viaforge.common.blocks.LegacyItemDefinition;
@@ -52,7 +52,7 @@ public final class ClientItems {
     }
     public static Definition definition(ItemStack stack) { return stack == null ? null : DEFINITIONS.get(Item.getIdFromItem(stack.getItem())); }
     public static Item item(Definition definition) { return ITEMS.get(definition.id); }
-    public static boolean is(ItemStack stack, Kind kind) { Definition definition = definition(stack); return definition != null && definition.kind == kind && ServerBlockSession.supportsItem(definition); }
+    public static boolean is(ItemStack stack, Kind kind) { Definition definition = definition(stack); return definition != null && definition.kind == kind && ServerSession.supportsItem(definition); }
     public static boolean arrow(ItemStack stack) { return is(stack, Kind.ARROW) || is(stack, Kind.TIPPED_ARROW); }
     private ClientItems() { }
 }

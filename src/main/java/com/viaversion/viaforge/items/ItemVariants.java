@@ -1,7 +1,7 @@
 package com.viaversion.viaforge.items;
 
 import com.google.gson.*;
-import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.compatibility.ServerSession;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -25,7 +25,7 @@ public final class ItemVariants {
     }
     public static ItemStack egg(ItemStack stack, JsonObject egg) {
         NBTTagCompound tag = new NBTTagCompound(), entity = new NBTTagCompound();
-        entity.setString("id", ServerBlockSession.supportsProtocol(315) ? "minecraft:" + egg.get("name").getAsString() : egg.get("legacy").getAsString());
+        entity.setString("id", ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.NAMESPACED_ENTITY_IDS) ? "minecraft:" + egg.get("name").getAsString() : egg.get("legacy").getAsString());
         tag.setTag("EntityTag", entity); stack.setTagCompound(tag); return stack;
     }
     public static String potionName(ItemStack stack) {

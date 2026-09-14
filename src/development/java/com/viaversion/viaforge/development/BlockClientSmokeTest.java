@@ -169,6 +169,7 @@ public final class BlockClientSmokeTest {
                 + "; original projectile names/partial updates/clear, new status effects with level/timer/flags/removal and target inventory icons OK"
                 + "; original item cooldown packets/slot sharing/replacement/removal/respawn, pearl prediction in both modes, use gates and native overlay pixels OK; worn dragon head limb swing and placed redstone clock/freeze/resume in all orientations OK"
                 + "; modern boat models/six woods, original coordinates/metadata, both seats/ticking/transfers, driver-only movement and rowing packets, versioned paddles, water/ice physics, placement in both modes OK"
+                + "; two hands: original slot 45/full/direct updates, NBT, click/creative/swap/use/interact/swing/settings packets, hand priority/continuous shield and food use, both bow hands/ammunition, actual inventory/creative/Forge hotbar pixels and first-person models OK"
                 + (profile.protocol() >= 315 ? "; shulker box interior rendering independent of incoming face culling and support surface draw order, six facings/three lid stages, render state restored OK" : "")
                 + "; command editor activation/NBT/controls/cancel and target packets OK"
                 + (profile.protocol() >= 210 ? "; structure SAVE/LOAD/CORNER/DATA, save/load/detect/cancel, numeric limits and target packets OK" : "")
@@ -176,6 +177,7 @@ public final class BlockClientSmokeTest {
     }
 
     private static void checkFallbackModels() {
+        require(!com.viaversion.viaforge.hands.Offhand.active()&&com.viaversion.viaforge.hands.Offhand.get()==null&&!com.viaversion.viaforge.hands.HandRenderer.needed(),"Native/disconnected sessions do not enable two hands");
         BoatSmokeTest.disconnected();
         CreativeCategorySmokeTest.disconnected();
         ServerItemSmokeTest.disconnected();

@@ -1,0 +1,9 @@
+package com.viaversion.viaforge.common.compatibility;
+
+/** Named behavior changes. Later profiles inherit these and may override them. */
+public enum ClientRule {
+    CRYSTAL_BEAM_OFFSET, EXTENDED_GATEWAY_BEAM, INTERPOLATED_GATEWAY_COOLDOWN,
+    UPDATED_DYE_COLORS, REVERSED_DRAGON_HEAD_ITEM, MODERN_ATTACK_ICON,
+    MERGED_MATERIALS_TAB, COMBAT_CURSE_BOOKS, NAMESPACED_ENTITY_IDS,
+    FAST_PADDLE_CYCLE, EXCLUSIVE_TURN_PADDLES, COLORED_SHULKERS, UPDATED_ILLAGER_ARMS
+}

@@ -1,6 +1,7 @@
 package com.viaversion.viaforge.common.blocks;
 
-/** Wire formats and vanilla resources are selected per connection, never globally. */
+/** Legacy wire layouts and their default resource releases.
+ * Global connection support is selected by CompatibilityRegistry, not this enum. */
 public enum BlockVersionProfile {
     V1_9(107, "1.9"),
     V1_9_1(108, "1.9.1"),

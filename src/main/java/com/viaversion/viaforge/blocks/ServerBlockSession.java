@@ -1,146 +1,20 @@
 package com.viaversion.viaforge.blocks;
 
-import com.viaversion.viaforge.blocks.resources.BlockAssetCache;
-import com.viaversion.viaforge.blocks.resources.VersionBlockPack;
 import com.viaversion.viaforge.common.blocks.BlockVersionProfile;
-import com.viaversion.viaforge.mixin.impl.blocks.MinecraftResourcePacks;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.ChatComponentText;
+import com.viaversion.viaforge.common.compatibility.CompatibilityRegistry;
+import com.viaversion.viaforge.compatibility.ServerSession;
 
-/** All session/resource changes happen on Minecraft's main thread. */
+/** Legacy fixture API. Runtime modules use the feature-based ServerSession. */
+@Deprecated
 public final class ServerBlockSession {
-    private static final Logger LOGGER = Logger.getLogger("ViaForge/Blocks");
-    private static final VersionBlockPack PACK = new VersionBlockPack();
-    private static final ExecutorService DOWNLOADS = Executors.newSingleThreadExecutor(task -> {
-        Thread thread = new Thread(task, "ViaForge block resources");
-        thread.setDaemon(true);
-        return thread;
-    });
-    private static Object activeConnection;
-    private static boolean resourcesLoaded;
-    private static String loadedResourceVersion;
-    private static BlockVersionProfile activeProfile;
-
-    private ServerBlockSession() { }
-
-    public static String getLoadedResourceVersion() { return loadedResourceVersion; }
-    public static boolean supportsItem(com.viaversion.viaforge.common.blocks.LegacyItemDefinition item) {
-        return item != null && supportsProtocol(item.itemProtocol());
-    }
-    public static boolean supportsProtocol(int protocol) {
-        return activeProfile != null && activeProfile.protocol() >= protocol && !Minecraft.getMinecraft().isSingleplayer();
-    }
-    public static boolean supports(com.viaversion.viaforge.common.blocks.LegacyBlockCatalog.Definition block) {
-        return block != null && activeProfile != null && activeProfile.protocol() >= block.protocol
-                && !Minecraft.getMinecraft().isSingleplayer();
-    }
-    public static boolean supportsItem(com.viaversion.viaforge.common.blocks.LegacyBlockCatalog.Definition block) {
-        return supports(block) && activeProfile.protocol() >= block.itemProtocol();
-    }
-
-    public static void initialize() {
-        Minecraft mc = Minecraft.getMinecraft();
-        ((MinecraftResourcePacks) mc).viaForge$defaultResourcePacks().add(PACK);
-        // Forge first builds block models before the next full resource reload.
-        // Expose our fallback definitions to that initial bake as well.
-        ((net.minecraft.client.resources.SimpleReloadableResourceManager) mc.getResourceManager()).reloadResourcePack(PACK);
-    }
-
-    public static void join(Object connection, BlockVersionProfile profile) {
-        Minecraft mc = Minecraft.getMinecraft();
-        mc.addScheduledTask(() -> {
-            if (mc.isSingleplayer()) return;
-            activeConnection = connection;
-            activeProfile = profile;
-            if (resourcesLoaded) resetResources(mc);
-            DOWNLOADS.execute(() -> {
-                try {
-                    BlockAssetCache cache = new BlockAssetCache(mc.mcDataDir.toPath().resolve("ViaForge/block-assets"));
-                    Map<String, byte[]> assets = cache.load(profile.resourceVersion());
-                    mc.addScheduledTask(() -> {
-                        if (activeConnection != connection || mc.isSingleplayer()) return;
-                        PACK.setAssets(assets);
-                        resourcesLoaded = true;
-                        reloadBlockModels(mc);
-                        loadedResourceVersion = profile.resourceVersion();
-                        LOGGER.info("Loaded block resources for Minecraft " + profile.resourceVersion());
-                    });
-                } catch (Exception error) {
-                    LOGGER.log(Level.WARNING, "Could not load block resources for " + profile.resourceVersion(), error);
-                    mc.addScheduledTask(() -> {
-                        if (activeConnection == connection && mc.thePlayer != null) {
-                            mc.thePlayer.addChatMessage(new ChatComponentText("[ViaForge] Block textures for " + profile.resourceVersion()
-                                    + " could not be loaded. Temporary replacement textures remain active; reconnect to retry."));
-                        }
-                    });
-                }
-            });
-        });
-    }
-
-    public static void leave(Object connection) {
-        Minecraft mc = Minecraft.getMinecraft();
-        mc.addScheduledTask(() -> {
-            if (activeConnection != connection) return;
-            activeConnection = null;
-            activeProfile = null;
-            if (resourcesLoaded) resetResources(mc);
-        });
-    }
-
-    /** Called before loading any disconnected or integrated world, including fast server switches. */
-    public static void unload() {
-        com.viaversion.viaforge.items.ServerEntityViews.clear();
-        activeConnection = null;
-        activeProfile = null;
-        if (resourcesLoaded) resetResources(Minecraft.getMinecraft());
-    }
-
-    private static void resetResources(Minecraft mc) {
-        PACK.setAssets(Collections.emptyMap());
-        resourcesLoaded = false;
-        loadedResourceVersion = null;
-        reloadBlockModels(mc);
-    }
-
-    private static void reloadBlockModels(Minecraft mc) {
-        // The pack object is already in the resource manager; only its contents
-        // changed. Rebuild atlas consumers without restarting 1.8's asynchronous
-        // sound engine on every join/leave (rapid reloads can break OpenAL).
-        net.minecraft.client.resources.IResourceManager resources = mc.getResourceManager();
-        if (mc.theWorld != null) {
-            // Drain chunk compilation workers before replacing their models and
-            // atlas. New chunks are submitted only after this main-thread task.
-            mc.renderGlobal.loadRenderers();
-            mc.effectRenderer.clearEffects(mc.theWorld);
-        }
-        mc.getBlockRendererDispatcher().getBlockModelShapes().getModelManager().onResourceManagerReload(resources);
-        mc.getBlockRendererDispatcher().onResourceManagerReload(resources);
-        mc.getRenderItem().onResourceManagerReload(resources);
-        mc.renderGlobal.onResourceManagerReload(resources);
-        // Standalone entity/HUD textures are not part of the rebuilt item atlas.
-        // Evict them so the next bind uploads this connection's version. Merely
-        // deleting the GL texture leaves TextureManager holding the old object.
-        java.util.Iterator<net.minecraft.util.ResourceLocation> textures =
-                ((com.viaversion.viaforge.mixin.impl.blocks.VersionTextureCache)mc.getTextureManager()).viaForge$textures().keySet().iterator();
-        while (textures.hasNext()) {
-            net.minecraft.util.ResourceLocation texture = textures.next();
-            if (texture.getResourceDomain().equals("viaforge") && texture.getResourcePath().startsWith("textures/")
-                    || texture.getResourceDomain().equals("minecraft") && (texture.getResourcePath().startsWith("textures/entity/") || texture.getResourcePath().startsWith("textures/models/armor/"))) {
-                mc.getTextureManager().deleteTexture(texture);
-                textures.remove();
-            }
-        }
-        net.minecraft.util.ResourceLocation particles = new net.minecraft.util.ResourceLocation("textures/particle/particles.png");
-        mc.getTextureManager().deleteTexture(particles);
-        mc.getTextureManager().loadTexture(particles, new net.minecraft.client.renderer.texture.SimpleTexture(particles));
-        com.viaversion.viaforge.items.ServerTotemSound.reload();
-        com.viaversion.viaforge.mobs.ServerMobSounds.reload();
-    }
+    public static void initialize(){ServerSession.initialize();}
+    public static void join(Object connection,BlockVersionProfile profile){ServerSession.join(connection,CompatibilityRegistry.DEFAULT.resolve(profile.protocol()));}
+    public static void leave(Object connection){ServerSession.leave(connection);}
+    public static void unload(){ServerSession.unload();}
+    public static String getLoadedResourceVersion(){return ServerSession.getLoadedResourceVersion();}
+    public static boolean supportsProtocol(int revision){return ServerSession.contentSince(revision);}
+    public static boolean supports(com.viaversion.viaforge.common.blocks.LegacyBlockCatalog.Definition block){return ServerSession.supports(block);}
+    public static boolean supportsItem(com.viaversion.viaforge.common.blocks.LegacyItemDefinition item){return ServerSession.supportsItem(item);}
+    public static boolean supportsItem(com.viaversion.viaforge.common.blocks.LegacyBlockCatalog.Definition block){return ServerSession.supportsItem(block);}
+    private ServerBlockSession(){ }
 }

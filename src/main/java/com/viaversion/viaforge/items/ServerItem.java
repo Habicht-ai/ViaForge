@@ -1,7 +1,7 @@
 package com.viaversion.viaforge.items;
 
 import com.google.gson.*;
-import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.compatibility.ServerSession;
 import com.viaversion.viaforge.common.blocks.LegacyItemCatalog.*;
 import java.util.List;
 import net.minecraft.creativetab.CreativeTabs;
@@ -24,7 +24,7 @@ public class ServerItem extends Item {
     }
     @Override public CreativeTabs getCreativeTab() { return ServerCreativeTabs.item(definition); }
     @Override public void getSubItems(Item item, CreativeTabs tab, List<ItemStack> entries) {
-        if (!ServerBlockSession.supportsItem(definition)) return;
+        if (!ServerSession.supportsItem(definition)) return;
         if (potion()) {
             for (JsonElement element : ItemVariants.POTIONS) {
                 JsonObject potion = element.getAsJsonObject(); String name = potion.get("name").getAsString();
@@ -32,7 +32,7 @@ public class ServerItem extends Item {
                 entries.add(ItemVariants.potion(new ItemStack(item), name));
             }
         } else if (definition.kind == Kind.EGG) {
-            for (JsonElement element : ItemVariants.EGGS) if (ServerBlockSession.supportsProtocol(element.getAsJsonObject().get("protocol").getAsInt())) entries.add(ItemVariants.egg(new ItemStack(item), element.getAsJsonObject()));
+            for (JsonElement element : ItemVariants.EGGS) if (ServerSession.contentSince(element.getAsJsonObject().get("protocol").getAsInt())) entries.add(ItemVariants.egg(new ItemStack(item), element.getAsJsonObject()));
         } else entries.add(new ItemStack(item));
     }
     private boolean potion() { return definition.kind == Kind.POTION || definition.kind == Kind.SPLASH || definition.kind == Kind.LINGERING || definition.kind == Kind.TIPPED_ARROW; }
@@ -75,7 +75,7 @@ public class ServerItem extends Item {
         return definition.kind == Kind.SHIELD ? 72000 : getItemUseAction(stack) != EnumAction.NONE ? 32 : 0;
     }
     @Override public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
-        if (!world.isRemote || !ServerBlockSession.supportsItem(definition)) return stack;
+        if (!world.isRemote || !ServerSession.supportsItem(definition)) return stack;
         if (definition.kind == Kind.BOAT) com.viaversion.viaforge.boats.BoatPlacement.use(stack, world, player);
         EnumAction action = getItemUseAction(stack);
         if (action != EnumAction.NONE && (action != EnumAction.EAT || player.canEat(definition.id == 432))) player.setItemInUse(stack, getMaxItemUseDuration(stack));
@@ -86,7 +86,7 @@ public class ServerItem extends Item {
         return stack;
     }
     @Override public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float x, float y, float z) {
-        if (!world.isRemote || !ServerBlockSession.supportsItem(definition) || stack.stackSize <= 0) return false;
+        if (!world.isRemote || !ServerSession.supportsItem(definition) || stack.stackSize <= 0) return false;
         switch (definition.kind) {
             case CRYSTAL:
                 return (world.getBlockState(pos).getBlock() == Blocks.obsidian || world.getBlockState(pos).getBlock() == Blocks.bedrock)

@@ -1,6 +1,6 @@
 package com.viaversion.viaforge.items;
 
-import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.compatibility.ServerSession;
 import com.viaversion.viaforge.common.blocks.LegacyItemDefinition;
 import com.viaversion.viaforge.mixin.impl.items.MinecraftItemTimer;
 import com.viaversion.viaversion.api.type.Types;
@@ -28,7 +28,7 @@ public final class ServerItemCooldowns {
     public static void clear() { ENTRIES.clear(); owner = null; tick = 0; }
     private static boolean active() {
         Minecraft mc = Minecraft.getMinecraft();
-        if (!ServerBlockSession.supportsProtocol(107) || mc.thePlayer == null) return false;
+        if (!ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.COOLDOWNS) || mc.thePlayer == null) return false;
         if (owner != mc.thePlayer) { clear(); owner = mc.thePlayer; }
         return true;
     }

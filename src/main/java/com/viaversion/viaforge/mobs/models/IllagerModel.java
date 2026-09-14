@@ -47,6 +47,6 @@ public final class IllagerModel extends MobGeometry {
     @Override public void render(Entity entity, float limb, float amount, float age, float yaw, float pitch, float scale) {
         setRotationAngles(limb, amount, age, yaw, pitch, scale, entity);
         head.render(scale); body.render(scale); leg1.render(scale); leg2.render(scale);
-        if (folded) (((ServerMob)entity).state.protocol < 335 ? oldArms : arms).render(scale); else { rightArm.render(scale); leftArm.render(scale); }
+        if (folded) (!com.viaversion.viaforge.compatibility.ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.UPDATED_ILLAGER_ARMS) ? oldArms : arms).render(scale); else { rightArm.render(scale); leftArm.render(scale); }
     }
 }

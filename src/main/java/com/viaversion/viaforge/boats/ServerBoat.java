@@ -19,7 +19,8 @@ import net.minecraft.world.World;
 /** Original modern boat simulation on the controlling client; server owns seats and damage. */
 public final class ServerBoat extends Entity {
     public enum Status { WATER, UNDER_WATER, FLOWING_WATER, LAND, AIR }
-    public final int protocol;
+    public final int protocol; // Internal event data format, not the negotiated server version.
+    private final com.viaversion.viaforge.common.compatibility.VersionRules behavior;
     public int wood, hurtTime, hurtDirection = 1;
     public float damage, deltaRotation, landGlide;
     public Status status = Status.AIR;
@@ -32,7 +33,7 @@ public final class ServerBoat extends Entity {
     private int lerpSteps;
     public double wireX, wireY, wireZ;
     public float wireYaw, wirePitch;
-    public ServerBoat(World world, int protocol) { super(world); this.protocol = protocol; preventEntitySpawning = true; setSize(1.375F, .5625F); }
+    public ServerBoat(World world, int protocol) { super(world); this.protocol = protocol; this.behavior=com.viaversion.viaforge.compatibility.ServerSession.profile().extended()?com.viaversion.viaforge.compatibility.ServerSession.rules():com.viaversion.viaforge.common.compatibility.CompatibilityRegistry.DEFAULT.resolve(protocol).rules(); preventEntitySpawning = true; setSize(1.375F, .5625F); }
     @Override protected void entityInit() { }
     @Override protected void readEntityFromNBT(NBTTagCompound nbt) { wood = MathHelper.clamp_int(nbt.getInteger("ViaForgeWood"), 0, 5); }
     @Override protected void writeEntityToNBT(NBTTagCompound nbt) { nbt.setInteger("ViaForgeWood", wood); }
@@ -107,9 +108,9 @@ public final class ServerBoat extends Entity {
     public boolean paddle(int side) { return !passengers.isEmpty() && paddles[side]; }
     public float paddlePhase(int side, float partial) {
         if (!paddle(side)) return 0;
-        double step = protocol >= 335 ? (double).3926991F : .01;
+        double step = behavior.enabled(com.viaversion.viaforge.common.compatibility.ClientRule.FAST_PADDLE_CYCLE) ? (double).3926991F : .01;
         float phase = (float)(paddleTime[side] - step + step * partial);
-        return protocol >= 335 ? phase : phase * 40;
+        return behavior.enabled(com.viaversion.viaforge.common.compatibility.ClientRule.FAST_PADDLE_CYCLE) ? phase : phase * 40;
     }
     @Override public void onUpdate() {
         previousStatus = status; status = environment();
@@ -135,13 +136,13 @@ public final class ServerBoat extends Entity {
         }
         for (int side = 0; side < 2; side++) {
             if (!paddle(side)) { paddleTime[side] = 0; continue; }
-            if (protocol >= 335 && !isSilent() && paddleTime[side] % ((float)Math.PI*2) <= .7853981852531433
+            if (behavior.enabled(com.viaversion.viaforge.common.compatibility.ClientRule.FAST_PADDLE_CYCLE) && !isSilent() && paddleTime[side] % ((float)Math.PI*2) <= .7853981852531433
                     && (paddleTime[side] + (double).3926991F) % 6.2831854820251465 >= .7853981852531433) {
                 Status soundStatus = environment();
                 String sound = soundStatus == Status.AIR ? null : ServerMobSounds.key(soundStatus == Status.LAND ? "entity.boat.paddle_land" : "entity.boat.paddle_water", 7);
                 if (sound != null) { Vec3 look = getLook(1); worldObj.playSound(posX+(side == 1 ? -look.zCoord : look.zCoord), posY, posZ+(side == 1 ? look.xCoord : -look.xCoord), sound, 1, .8F+rand.nextFloat()*.4F, false); }
             }
-            paddleTime[side] = (float)(paddleTime[side] + (protocol >= 335 ? (double).3926991F : .01));
+            paddleTime[side] = (float)(paddleTime[side] + (behavior.enabled(com.viaversion.viaforge.common.compatibility.ClientRule.FAST_PADDLE_CYCLE) ? (double).3926991F : .01));
         }
         for (Entity entity : worldObj.getEntitiesWithinAABBExcludingEntity(this, getEntityBoundingBox().expand(.2, -.01, .2))) {
             if (contains(entity) || entity.ridingEntity == this || !entity.canBePushed()) continue;
@@ -156,8 +157,8 @@ public final class ServerBoat extends Entity {
         if (forward) thrust += .04F; if (back) thrust -= .005F;
         motionX += MathHelper.sin(-rotationYaw * (float)Math.PI/180) * thrust;
         motionZ += MathHelper.cos(rotationYaw * (float)Math.PI/180) * thrust;
-        paddles[0] = (right && (protocol < 315 || !left)) || forward;
-        paddles[1] = (left && (protocol < 315 || !right)) || forward;
+        paddles[0] = (right && (!behavior.enabled(com.viaversion.viaforge.common.compatibility.ClientRule.EXCLUSIVE_TURN_PADDLES) || !left)) || forward;
+        paddles[1] = (left && (!behavior.enabled(com.viaversion.viaforge.common.compatibility.ClientRule.EXCLUSIVE_TURN_PADDLES) || !right)) || forward;
     }
     public void physics() {
         double gravity = noGravity ? 0 : (double)-.04F, buoyancy = 0; float friction = .05F;

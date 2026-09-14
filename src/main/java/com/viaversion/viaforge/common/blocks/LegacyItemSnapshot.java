@@ -1,6 +1,7 @@
 package com.viaversion.viaforge.common.blocks;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.viaforge.common.compatibility.*;
 import com.viaversion.viaforge.items.ClientItems;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -10,8 +11,8 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 public final class LegacyItemSnapshot {
     private static final String KEY = "ViaForge|originalItem";
     public static void capture(UserConnection user, Item item, Object boundary) {
-        BlockVersionProfile profile = BlockVersionProfile.forProtocol(user.getProtocolInfo().getServerProtocolVersion());
-        if (item == null || profile == null) return;
+        CompatibilityProfile profile = CompatibilityRegistry.forUser(user);
+        if (item == null || !profile.has(ClientFeature.ITEMS)) return;
         // At this boundary the item is in this layer's server format. Undo the higher layers
         // on a probe to determine whether our native registry can display it.
         Item probe = item.copy(); boolean higher = false;
@@ -19,9 +20,10 @@ public final class LegacyItemSnapshot {
             if (pipe.getItemRewriter() == boundary) { higher = true; continue; }
             if (higher && pipe.getItemRewriter() != null) probe = pipe.getItemRewriter().handleItemToServer(user, probe);
         }
+        probe=profile.adapter().items().toClientData(probe);
         if (probe == null) return;
         LegacyItemDefinition definition = ClientItems.serverItem(ClientItems.localItem(probe.identifier(), probe.data()));
-        if ((definition == null || profile.protocol() < definition.itemProtocol()) && !LegacyBlockItemBridge.nativeEnchantments(probe, profile)) return;
+        if ((definition == null || !profile.rules().contentSince(definition.itemProtocol())) && !LegacyBlockItemBridge.nativeEnchantments(probe, profile)) return;
         CompoundTag snapshot = new CompoundTag(); snapshot.putInt("id", item.identifier()); snapshot.putShort("data", item.data());
         if (item.tag() != null) {
             CompoundTag original = item.tag().copy(); original.remove(KEY);

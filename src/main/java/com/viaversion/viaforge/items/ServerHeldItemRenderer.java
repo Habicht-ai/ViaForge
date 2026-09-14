@@ -20,10 +20,12 @@ public final class ServerHeldItemRenderer {
     public static void render(ModelBiped model, EntityLivingBase entity, ItemStack stack, boolean otherHand) {
         if (stack == null) return;
         ServerEntityViews.View view = ServerEntityViews.get(entity.getEntityId());
-        boolean leftSide = otherHand ^ (entity instanceof com.viaversion.viaforge.mobs.ServerMob
-                ? ((com.viaversion.viaforge.mobs.ServerMob)entity).state.leftHanded() : view != null && view.leftHanded);
+        boolean leftSide = otherHand ^ com.viaversion.viaforge.hands.Offhand.mainLeft(entity);
         EntityLivingBase oldOwner = owner; boolean oldOffhand = offhand, oldLeft = left;
         owner = entity; offhand = otherHand; left = leftSide;
+        ItemStack previousModel = com.viaversion.viaforge.hands.HandModels.current;
+        boolean previousLeft = com.viaversion.viaforge.hands.HandModels.left;
+        if(com.viaversion.viaforge.hands.Offhand.active()){com.viaversion.viaforge.hands.HandModels.current=stack;com.viaversion.viaforge.hands.HandModels.left=leftSide;}
         GlStateManager.pushMatrix();
         try {
             if (model.isChild) { GlStateManager.translate(0, .75F, 0); GlStateManager.scale(.5F, .5F, .5F); }
@@ -36,7 +38,7 @@ public final class ServerHeldItemRenderer {
             GlStateManager.rotate(-90, 1, 0, 0); GlStateManager.rotate(180, 0, 1, 0);
             GlStateManager.translate((leftSide ? -1 : 1) / 16F, .125F, -.625F);
             Minecraft.getMinecraft().getItemRenderer().renderItem(entity, stack, ItemCameraTransforms.TransformType.THIRD_PERSON);
-        } finally { GlStateManager.popMatrix(); owner = oldOwner; offhand = oldOffhand; left = oldLeft; }
+        } finally { GlStateManager.popMatrix(); owner = oldOwner; offhand = oldOffhand; left = oldLeft; com.viaversion.viaforge.hands.HandModels.current=previousModel;com.viaversion.viaforge.hands.HandModels.left=previousLeft; }
     }
     private ServerHeldItemRenderer() { }
 }

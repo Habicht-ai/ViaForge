@@ -1,12 +1,12 @@
 package com.viaversion.viaforge.items;
 
-import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.compatibility.ServerSession;
 import com.viaversion.viaforge.common.blocks.*;
 import net.minecraft.creativetab.CreativeTabs;
 
 /** Vanilla category assignments; blocks without a tab remain obtainable through server commands. */
 public final class ServerCreativeTabs {
-    public static CreativeTabs materials() { return ServerBlockSession.supportsProtocol(335) ? CreativeTabs.tabMisc : CreativeTabs.tabMaterials; }
+    public static CreativeTabs materials() { return ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.MERGED_MATERIALS_TAB) ? CreativeTabs.tabMisc : CreativeTabs.tabMaterials; }
     public static CreativeTabs block(LegacyBlockCatalog.Definition block) {
         switch (block.kind) {
             case ROD: case CHORUS: case FLOWER: case SHULKER: case GLAZED: case BED: return CreativeTabs.tabDecorations;

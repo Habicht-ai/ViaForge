@@ -1,4 +1,5 @@
 package com.viaversion.viaforge.blocks;
+import com.viaversion.viaforge.compatibility.ServerSession;
 
 import com.viaversion.viaforge.common.blocks.LegacyBlockCatalog;
 import com.viaversion.viaforge.common.blocks.LegacyBlockCatalog.Definition;
@@ -76,7 +77,7 @@ public final class ClientBlocks {
     public static Definition serverItem(int localId) { return SERVER_ITEMS.get(localId); }
     public static ItemStack pick(Block block) {
         Definition definition = DEFINITIONS.get(block);
-        if (definition == null || !ServerBlockSession.supportsItem(definition)) return null;
+        if (definition == null || !ServerSession.supportsItem(definition)) return null;
         int itemId = definition.kind == Kind.DOUBLE_SLAB ? 205 : definition.itemId();
         Item item = ITEMS.get(itemId << 16 | definition.itemData());
         return item == null ? null : new ItemStack(item);
@@ -97,11 +98,11 @@ public final class ClientBlocks {
         public ServerItemBlock(Block block) { super(block); if (definition(block).kind == Kind.SHULKER) setMaxStackSize(1); }
         @Override public String getItemStackDisplayName(ItemStack stack) { return displayName(definition(block)); }
         @Override public void getSubItems(Item item, CreativeTabs tab, java.util.List<ItemStack> items) {
-            if (ServerBlockSession.supportsItem(definition(block))) items.add(new ItemStack(item));
+            if (ServerSession.supportsItem(definition(block))) items.add(new ItemStack(item));
         }
         @Override public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos,
                 EnumFacing side, float hitX, float hitY, float hitZ) {
-            if (!ServerBlockSession.supportsItem(definition(block)) || stack.stackSize <= 0) return false;
+            if (!ServerSession.supportsItem(definition(block)) || stack.stackSize <= 0) return false;
             if (definition(block).kind == Kind.SLAB) {
                 IBlockState state = world.getBlockState(pos);
                 boolean upper = state.getBlock() == block && block.getMetaFromState(state) == 8;
@@ -131,11 +132,11 @@ public final class ClientBlocks {
         @Override public CreativeTabs getCreativeTab() { return com.viaversion.viaforge.items.ServerCreativeTabs.materials(); }
         @Override public String getItemStackDisplayName(ItemStack stack) { return "Beetroot Seeds"; }
         @Override public void getSubItems(Item item, CreativeTabs tab, java.util.List<ItemStack> items) {
-            if (ServerBlockSession.supports(definition(crop))) items.add(new ItemStack(item));
+            if (ServerSession.supports(definition(crop))) items.add(new ItemStack(item));
         }
         @Override public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos,
                 EnumFacing side, float x, float y, float z) {
-            return ServerBlockSession.supports(definition(crop)) && super.onItemUse(stack, player, world, pos, side, x, y, z);
+            return ServerSession.supports(definition(crop)) && super.onItemUse(stack, player, world, pos, side, x, y, z);
         }
     }
 
@@ -144,13 +145,13 @@ public final class ClientBlocks {
         ServerBedItem(Block bed) { this.bed = bed; setMaxStackSize(1); setUnlocalizedName("viaforge." + definition(bed).name); }
         @Override public String getItemStackDisplayName(ItemStack stack) { return displayName(definition(bed)); }
         @Override public void getSubItems(Item item, CreativeTabs tab, java.util.List<ItemStack> items) {
-            if (ServerBlockSession.supportsItem(definition(bed))) items.add(new ItemStack(item));
+            if (ServerSession.supportsItem(definition(bed))) items.add(new ItemStack(item));
         }
         @Override public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos,
                 EnumFacing side, float x, float y, float z) {
             // Like vanilla ItemBed, acknowledge client use and let the server place
             // both halves. Never execute 1.8's server code, which places Blocks.bed.
-            return world.isRemote && stack.stackSize > 0 && ServerBlockSession.supportsItem(definition(bed));
+            return world.isRemote && stack.stackSize > 0 && ServerSession.supportsItem(definition(bed));
         }
     }
 }

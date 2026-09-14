@@ -1,6 +1,6 @@
 package com.viaversion.viaforge.items;
 
-import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.compatibility.ServerSession;
 import java.util.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.*;
@@ -20,8 +20,8 @@ public final class ServerCombatModels {
             }
         }
     }
-    public static boolean active(ItemStack stack) { return stack != null && ServerBlockSession.supportsProtocol(107) && MODELS.containsKey(stack.getItem()); }
-    public static boolean imported(ItemStack stack) { return stack != null && (ClientItems.serverItem(Item.getIdFromItem(stack.getItem())) != null || active(stack)); }
+    public static boolean active(ItemStack stack) { return stack != null && ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.COMBAT) && MODELS.containsKey(stack.getItem()); }
+    public static boolean imported(ItemStack stack) { return stack != null && (com.viaversion.viaforge.hands.HandModels.current==stack || ClientItems.serverItem(Item.getIdFromItem(stack.getItem())) != null || active(stack)); }
     public static IBakedModel model(ItemStack stack) { return Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getModelManager().getModel(MODELS.get(stack.getItem())); }
     private ServerCombatModels() { }
 }

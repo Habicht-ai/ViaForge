@@ -21,7 +21,7 @@ covers modern blocks and additional interaction mechanics.
 | 338 | 1.12.1 | 1.12.1 |
 | 340 | 1.12.2 | 1.12.2 |
 
-`LegacyBlockCatalog` covers every new vanilla block ID in the range: 198–252 and
+`LegacyBlockCatalog` covers every new vanilla block ID in the range: 198â€“252 and
 255, including all color variants. End rods, connected chorus plants and flowers,
 purpur pillars/stairs/slabs, end bricks, beetroot crops, grass paths, frosted ice,
 command blocks, gateways and structure blocks begin in 1.9. Magma, wart blocks,
@@ -39,7 +39,9 @@ an exact patch-resource override is a possible later enhancement.
 
 ## Data flow
 
-`BlockPreservingDecodeHandler` subclasses Via's decoder. This keeps capture after
+`CompatibilityDecodeHandler` subclasses Via's decoder and delegates wire details
+to the selected `PacketAdapter`. See [COMPATIBILITY.md](COMPATIBILITY.md) for the
+shared registry, inherited rules, data formats and resource lifecycle. This keeps capture after
 decryption/decompression even when the existing compression handler reorders Via.
 It retains Via's sharable-handler contract so Netty permits removing and reinserting
 the same instance during compression setup. `handlerAdded` still enforces ownership

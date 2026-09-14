@@ -24,7 +24,7 @@ import com.viaversion.viaforge.common.platform.ViaForgeProtocolBase;
 import com.viaversion.viaforge.platform.ViaForgeGameProfileFetcher;
 import com.viaversion.viaforge.platform.ViaForgeProtocol;
 import com.viaversion.viaforge.blocks.ClientBlocks;
-import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.compatibility.ServerSession;
 import java.io.File;
 import net.minecraft.client.Minecraft;
 import net.minecraft.realms.RealmsSharedConstants;
@@ -41,11 +41,12 @@ public class ViaForge implements ViaForgePlatform {
     public void onPreInit(FMLPreInitializationEvent event) {
         ClientBlocks.register();
         com.viaversion.viaforge.items.ClientItems.register();
-        ServerBlockSession.initialize();
+        ServerSession.initialize();
     }
 
     @Mod.EventHandler
     public void onInit(FMLInitializationEvent event) {
+        com.viaversion.viaforge.hands.Offhand.register();
         net.minecraftforge.fml.client.registry.RenderingRegistry.registerEntityRenderingHandler(
                 com.viaversion.viaforge.boats.ServerBoat.class,
                 new com.viaversion.viaforge.boats.ServerBoatRenderer(Minecraft.getMinecraft().getRenderManager()));

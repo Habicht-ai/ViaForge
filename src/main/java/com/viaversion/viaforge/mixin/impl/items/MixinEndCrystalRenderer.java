@@ -1,6 +1,6 @@
 package com.viaversion.viaforge.mixin.impl.items;
 
-import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.compatibility.ServerSession;
 import com.viaversion.viaforge.items.ServerCrystalVisuals;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.culling.ICamera;
@@ -22,7 +22,7 @@ public abstract class MixinEndCrystalRenderer extends Render<EntityEnderCrystal>
     }
     @ModifyArg(method = "doRender(Lnet/minecraft/entity/item/EntityEnderCrystal;DDDFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/tileentity/RenderEnderCrystal;bindTexture(Lnet/minecraft/util/ResourceLocation;)V"))
     private ResourceLocation texture(ResourceLocation original) {
-        return ServerBlockSession.supportsProtocol(107) ? new ResourceLocation("viaforge:textures/entity/endercrystal/endercrystal.png") : original;
+        return ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.ENTITY_VISUALS) ? new ResourceLocation("viaforge:textures/entity/endercrystal/endercrystal.png") : original;
     }
     @Inject(method = "doRender(Lnet/minecraft/entity/item/EntityEnderCrystal;DDDFF)V", at = @At("RETURN"))
     private void beam(EntityEnderCrystal entity, double x, double y, double z, float yaw, float partial, CallbackInfo ci) { ServerCrystalVisuals.beam(entity, x, y, z, partial); }

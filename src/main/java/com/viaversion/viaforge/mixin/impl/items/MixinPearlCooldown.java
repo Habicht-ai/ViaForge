@@ -1,6 +1,6 @@
 package com.viaversion.viaforge.mixin.impl.items;
 
-import com.viaversion.viaforge.blocks.ServerBlockSession;
+import com.viaversion.viaforge.compatibility.ServerSession;
 import com.viaversion.viaforge.items.ServerItemCooldowns;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.*;
@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinPearlCooldown {
     @Inject(method = "onItemRightClick", at = @At("HEAD"), cancellable = true)
     private void modernPearl(ItemStack stack, World world, EntityPlayer player, CallbackInfoReturnable<ItemStack> ci) {
-        if (!world.isRemote || !ServerBlockSession.supportsProtocol(107)) return;
+        if (!world.isRemote || !ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.COOLDOWNS)) return;
         if (!ServerItemCooldowns.cooling(stack)) {
             if (!player.capabilities.isCreativeMode) stack.stackSize--;
             String sound = com.viaversion.viaforge.mobs.ServerMobSounds.key("entity.enderpearl.throw", 7);

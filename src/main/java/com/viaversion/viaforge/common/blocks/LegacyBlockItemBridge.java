@@ -24,7 +24,7 @@ public final class LegacyBlockItemBridge {
         for (Protocol pipe : user.getProtocolInfo().getPipeline().pipes()) {
             if (eligible(pipe)) original = pipe.getItemRewriter().handleItemToServer(user, original);
         }
-        original=profile.adapter().items().toClientData(original);
+        original=profile.adapter().items().toClientData(user, original);
         if (original == null) return fallback;
         int localId = localItem.applyAsInt(original.identifier(), original.data());
         LegacyItemDefinition block = localId < 0 ? null : serverItem.apply(localId);
@@ -46,7 +46,7 @@ public final class LegacyBlockItemBridge {
             fallback.setIdentifier(block.itemId());
             if (!block.preservesDamage()) fallback.setData((short) block.itemData());
         }
-        fallback=profile.adapter().items().toServerData(fallback);
+        fallback=profile.adapter().items().toServerData(user, fallback);
         if(fallback==null)return null;
         List<Protocol> pipes = user.getProtocolInfo().getPipeline().pipes();
         for (int i = pipes.size() - 1; i >= 0; i--) {

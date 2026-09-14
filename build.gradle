@@ -247,6 +247,25 @@ tasks.register('verifyDevelopmentJar') {
     }
 }
 
+// The Forge smoke runner closes Minecraft normally even after an assertion.
+// Require this invocation's report so a successful Java exit cannot hide FAIL
+// or accidentally reuse an older PASS. Ordinary client launches are unaffected.
+tasks.matching { it.name == 'runClient' }.configureEach {
+    def reportPath = providers.environmentVariable('VIAFORGE_BLOCK_SMOKE_TEST').orNull
+    if (reportPath) {
+        def smokeReport = file(reportPath)
+        long started = 0
+        doFirst { started = System.currentTimeMillis() }
+        doLast {
+            if (!smokeReport.isFile() || smokeReport.lastModified() < started
+                    || smokeReport.withReader('UTF-8') { it.readLine() } != 'PASS') {
+                throw new GradleException("Forge smoke did not produce a fresh PASS: ${smokeReport}")
+            }
+            logger.lifecycle("Forge smoke report verified: PASS (${smokeReport})")
+        }
+    }
+}
+
 tasks.named('check') { dependsOn tasks.named('verifyReleaseJar'), tasks.named('verifyDevelopmentJar') }
 
 tasks.register('sourceArchive', Zip) {

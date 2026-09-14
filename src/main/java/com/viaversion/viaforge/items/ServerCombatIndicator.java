@@ -20,6 +20,8 @@ public final class ServerCombatIndicator extends Gui {
         draw(event.resolution.getScaledWidth(), event.resolution.getScaledHeight());
     }
     public void draw(int width, int height) {
+        // A session becomes active before its asynchronous target pack arrives.
+        if (ServerSession.getLoadedResourceVersion() == null) return;
         Minecraft mc = Minecraft.getMinecraft(); float strength = ServerCombatState.strength(0);
         // The ready-to-sweep icon and the one-pixel centering correction arrived in 1.11.1.
         boolean modernIcon = com.viaversion.viaforge.compatibility.ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.MODERN_ATTACK_ICON);

@@ -17,6 +17,7 @@ public class CompatibilityDecodeHandler extends ViaDecodeHandler {
     private boolean disabled;
     public CompatibilityDecodeHandler(UserConnection user,PacketAdapter adapter,Runnable onJoin,Runnable onClose) {
         super(user);this.adapter=adapter;this.onJoin=onJoin;this.onClose=onClose;
+        if (adapter instanceof FlattenedProtocolAdapter) user.put((FlattenedProtocolAdapter) adapter);
     }
     @Override public void handlerAdded(ChannelHandlerContext ctx)throws Exception {
         if(ctx.channel()!=connection.getChannel())throw new IllegalArgumentException("Compatibility decoder belongs to a different connection");
@@ -38,7 +39,7 @@ public class CompatibilityDecodeHandler extends ViaDecodeHandler {
         }catch(Exception error){disable(error);}
         int start=output.size();
         try {
-            if(event==null)super.decode(ctx,input,output);
+            if(event==null && !(play && adapter instanceof FlattenedProtocolAdapter))super.decode(ctx,input,output);
             else {
                 if(!connection.checkIncomingPacket(input.readableBytes()))throw CancelDecoderException.generate(null);
                 ByteBuf translated=ctx.alloc().buffer(input.readableBytes());
@@ -48,7 +49,13 @@ public class CompatibilityDecodeHandler extends ViaDecodeHandler {
                     catch(CancelDecoderException cancelled) { /* The retained event survives Via cancellation. */ }
                 }finally{translated.release();}
             }
-        }catch(Exception failure){if(event!=null)event.release();throw failure;}
+        }catch(CancelDecoderException cancelled){
+            // Recipe books, advancements and other unrepresented packets are
+            // routinely cancelled by Via. They must not discard the loaded
+            // columns or boat tracking needed by later placement confirmations.
+            if(event!=null)event.release();
+            return;
+        }catch(Exception failure){if(event!=null)event.release();disable(failure);throw failure;}
         if(event!=null)output.add(event);
         if(!play||disabled)return;
         if(joined)onJoin.run();
@@ -57,7 +64,7 @@ public class CompatibilityDecodeHandler extends ViaDecodeHandler {
                 ByteBuf translated=(ByteBuf)output.get(i),restored=adapter.restore(translated);
                 if(restored!=null){output.set(i,restored);translated.release();}
             }
-            if(output.size()>start)output.addAll(adapter.afterTranslation(input));
+            if(output.size()>start || adapter instanceof FlattenedProtocolAdapter)output.addAll(adapter.afterTranslation(input));
         }catch(Exception error){disable(error);}
     }
     private void disable(Exception error){disabled=true;adapter.clear();LOGGER.log(Level.WARNING,"Original-data adapter failed; retaining Via output for this connection",error);}

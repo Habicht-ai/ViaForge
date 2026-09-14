@@ -19,7 +19,9 @@ public final class LlamaInventoryScreen extends GuiContainer {
         fontRendererObj.drawString(player.getDisplayName().getUnformattedText(), 8, ySize - 94, 0x404040);
     }
     @Override protected void drawGuiContainerBackgroundLayer(float partial, int mouseX, int mouseY) {
-        GlStateManager.color(1, 1, 1, 1); mc.getTextureManager().bindTexture(TEXTURE);
+        GlStateManager.color(1, 1, 1, 1);
+        mc.getTextureManager().bindTexture(com.viaversion.viaforge.compatibility.ServerSession.getLoadedResourceVersion()==null
+                ? new ResourceLocation("textures/gui/container/horse.png") : TEXTURE);
         int x = (width - xSize) / 2, y = (height - ySize) / 2;
         drawTexturedModalRect(x, y, 0, 0, xSize, ySize);
         if (container.columns > 0) drawTexturedModalRect(x + 79, y + 17, 0, ySize, container.columns * 18, 54);

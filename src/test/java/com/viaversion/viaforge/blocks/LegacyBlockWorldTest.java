@@ -45,4 +45,17 @@ public class LegacyBlockWorldTest {
         world.clear();
         assertEquals(0, world.chunkCount());
     }
+    @Test public void explicitlyUnrepresentedUpdateInvalidatesAPreviouslySupportedBlock() {
+        LegacyBlockWorld world = new LegacyBlockWorld();
+        world.replaceChunk(-1, -2, true, new char[16][]);
+        world.set(-3, 70, -17, 201 << 4);
+        world.set(-2, 70, -17, 219 << 4 | 1);
+        world.set(-3, 70, -17, 65535);
+        assertEquals(LegacyBlockWorld.UNKNOWN, world.get(-3, 70, -17));
+        assertEquals(219 << 4 | 1, world.get(-2, 70, -17));
+        world.set(-3, 70, -17, 205 << 4 | 8);
+        assertEquals(205 << 4 | 8, world.get(-3, 70, -17));
+        world.set(32, 70, 32, 65535);
+        assertEquals(1, world.chunkCount());
+    }
 }

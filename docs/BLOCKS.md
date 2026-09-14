@@ -1,7 +1,7 @@
 # Versioned server blocks
 
 The implementation targets Forge 1.8.9 connecting to vanilla-protocol
-servers from 1.9 through 1.12.2. This is an incremental block backport, not complete
+servers from 1.9 through 1.14.4, retaining the catalog implemented through 1.12.2. This is an incremental block backport, not complete
 client emulation. Block items and the standalone items introduced through 1.12.2
 are included; see [item implementation and limits](ITEMS.md). The longer-term design
 covers modern blocks and additional interaction mechanics.
@@ -20,6 +20,17 @@ covers modern blocks and additional interaction mechanics.
 | 335 | 1.12 | 1.12 |
 | 338 | 1.12.1 | 1.12.1 |
 | 340 | 1.12.2 | 1.12.2 |
+| 393 | 1.13 | 1.13 |
+| 401 | 1.13.1 | 1.13.1 |
+| 404 | 1.13.2 | 1.13.2 |
+| 477 | 1.14 | 1.14 |
+| 480 | 1.14.1 | 1.14.1 |
+| 485 | 1.14.2 | 1.14.2 |
+| 490 | 1.14.3 | 1.14.3 |
+| 498 | 1.14.4 | 1.14.4 |
+
+For the added flattened families, see [data conversion, coverage and limits](FLATTENED.md).
+New aquatic/village blocks are not added to the inherited native catalog.
 
 `LegacyBlockCatalog` covers every new vanilla block ID in the range: 198â€“252 and
 255, including all color variants. End rods, connected chorus plants and flowers,
@@ -60,6 +71,19 @@ Missing sections of a partial chunk remain unknown. Unloaded chunks, dimension
 changes and channel closure discard the relevant state. Stray block updates do
 not allocate new columns. A decoder error logs a warning and disables restoration
 for that connection, retaining Via's output.
+
+Normal Via packet cancellation is not a decoder error. In particular, 1.12's
+recipe and advancement packets may be discarded between chunk loading and block
+placement confirmations. Clearing the state store here caused Purpur to turn into
+quartz and shulkers to use Via's replacement blocks after placement. The decoder
+now retains the store on cancellation. Regression fixtures insert actual cancelled
+recipe traffic before single and multi-block updates and cover all inherited
+Purpur states and all 16 shulker colors/facings on their supported profiles.
+
+The target attack-indicator and empty-offhand icons wait for the current resource
+pack before binding their textures. This avoids missing textures during the
+asynchronous join/rejoin interval; the llama inventory uses the native horse
+background until its target resource arrives.
 
 Block IDs inside the source store normally use **server ID << 4 | metadata**.
 Colored beds use a private range `4096 + (color << 4) + metadata` after merging
@@ -130,7 +154,22 @@ system for registered block items, avoiding 1.8's additional rotation/half-scale
 Vanilla items retain their original rendering path.
 `MixinItemRenderer` uses the newer first-person placement and swing transform
 for these items, so 1.8 does not apply a second `.4` scale to imported hand models.
-Generated shulker/fallback models supply their own block hand transform as well.
+Shulker items keep their generated entity-textured geometry while inheriting the
+original target item's complete `display` section, including parent models such
+as `item/shulker_box` and `item/template_shulker_box`. This preserves the original
+third-person scale of `.375`, first-person scale of `.4`, GUI scale of `.625`,
+ground scale of `.25`, and their rotations/translations for all 16 colors. The
+rotation conversion runs once, after resolving inheritance. World block geometry
+is independent of these item transforms.
+`MixinDroppedServerItem` removes 1.8's extra ground half-scale and compensates
+the item renderer's geometry half-scale after applying the target display
+transform. Otherwise dropped imported items become four times too small, and
+their display translations are also reduced. This applies only to imported
+items in an extended server session; native stone and disconnected rendering
+retain the original 1.8 scale.
+For Forge-generated flat items, the bobbing height reads the perspective model's
+actual scale rather than its empty legacy camera fields. Dropped Purpur, seeds,
+shields and swords are compared with original target transforms on all profiles.
 
 `VersionBlockPack` overlays `minecraft:textures/blocks/` so existing blocks use
 the target textures, while new block models and their dependencies use the
@@ -199,6 +238,15 @@ Renderer previews are saved under `build/logs/screenshots/`, including
 `block-hand-preview-1.12.2.png` with identical FOV for each held item.
 `beds-preview-1.12.2.png` compares all 16 bed world and inventory models.
 `block-editors-preview-1.12.2.png` shows the command and structure editor screens.
+`ShulkerItemRenderSmokeTest` checks all 16 colors against the unconverted original
+item JSON and its inherited display transforms for every registered target with
+shulkers (1.11 through 1.14.4). It compares actual Forge renderer matrices for both
+third-person hands, normal/slim arms, sneaking, both first-person model transforms,
+GUI, fixed model transforms, and dropped item entities. Native stone is checked
+before joining, during extended sessions and after disconnect. Review images
+`shulker-items-<version>.png` show actual player-held and inventory models for
+1.11, 1.12.2, 1.13.2 and 1.14.4.
+
 `shulker-boxes-<version>.png` shows closed, half-open and fully open boxes in all
 six orientations for profiles from 1.11 onward. A pixel comparison verifies that
 their interior faces remain visible regardless of the preceding renderer's face

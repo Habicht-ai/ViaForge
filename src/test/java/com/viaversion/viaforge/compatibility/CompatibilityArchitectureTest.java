@@ -28,7 +28,7 @@ public class CompatibilityArchitectureTest {
         }
     }
     @Test public void newerUnknownAndNativeTargetsNeverPretendToBeLegacyWire(){
-        for(int protocol:new int[]{47,106,111,341,393,404,763,767,Integer.MAX_VALUE}){
+        for(int protocol:new int[]{47,106,111,341,394,402,405,763,767,Integer.MAX_VALUE}){
             CompatibilityProfile p=CompatibilityRegistry.DEFAULT.resolve(protocol);
             assertEquals(protocol,p.serverProtocol());assertFalse(p.extended());assertNull(p.adapter());assertNull(p.resources());assertFalse(p.has(ClientFeature.TWO_HANDS));
         }

@@ -110,7 +110,26 @@ final class BlockPipelineSmokeTest {
                 }
             }
 
-            for (int raw : new int[]{203 << 4 | 7, 0}) {
+            if (profile.protocol() >= 335) {
+                // Real servers send recipe/advancement traffic between chunks and
+                // placement confirmations. Via intentionally cancels this packet.
+                ByteBuf recipe = packet(profile.protocol() == 335
+                        ? com.viaversion.viaversion.protocols.v1_11_1to1_12.packet.ClientboundPackets1_12.RECIPE.getId()
+                        : com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ClientboundPackets1_12_1.RECIPE.getId());
+                Types.VAR_INT.writePrimitive(recipe, 0);
+                recipe.writeBoolean(false).writeBoolean(false);
+                Types.VAR_INT_ARRAY_PRIMITIVE.write(recipe, new int[0]);
+                Types.VAR_INT_ARRAY_PRIMITIVE.write(recipe, new int[0]);
+                receiveCompressed(channel, serverCompression, recipe);
+                if (channel.readInbound() != null) throw new AssertionError("Recipe packet should be cancelled by Via");
+            }
+            List<Integer> placementStates = new ArrayList<>();
+            for (int raw : originals) {
+                int block = raw >> 4;
+                if (block >= 201 && block <= 205 || block >= 219 && block <= 234) placementStates.add(raw);
+            }
+            placementStates.add(0);
+            for (int raw : placementStates) {
                 // Reordering must retain the decoder's captured chunk states.
                 enableCompression(channel);
                 ByteBuf update = packet(0x0b);
@@ -123,8 +142,24 @@ final class BlockPipelineSmokeTest {
                 finally { restored.release(); }
                 int actual = Block.BLOCK_STATE_IDS.get(nativeUpdate.getBlockState());
                 int expected = raw == 0 ? 0 : ClientBlocks.localState(raw);
-                if (actual != expected) throw new AssertionError("Via -> Minecraft block update mismatch for " + profile);
+                if (actual != expected) throw new AssertionError("Placement confirmation changed block after cancelled traffic for " + profile + ": server=" + raw + ", expected local=" + expected + ", actual=" + actual);
             }
+            // Servers also confirm batches (including neighbor changes) using
+            // multi-block updates. Exercise every supported color/orientation.
+            com.viaversion.viaversion.api.minecraft.BlockChangeRecord[] records = new com.viaversion.viaversion.api.minecraft.BlockChangeRecord[placementStates.size()];
+            for (int i=0;i<records.length;i++)records[i]=new com.viaversion.viaversion.api.minecraft.BlockChangeRecord1_8(i&15,160+(i>>8),(i>>4)&15,placementStates.get(i));
+            ByteBuf multi=packet(0x10);multi.writeInt(0).writeInt(0);Types.BLOCK_CHANGE_ARRAY.write(multi,records);
+            receiveCompressed(channel,serverCompression,multi);
+            ByteBuf changes=take(channel,0x22);
+            try {
+                if(changes.readInt()!=0||changes.readInt()!=0)throw new AssertionError("Placement batch chunk coordinates");
+                com.viaversion.viaversion.api.minecraft.BlockChangeRecord[] received=Types.BLOCK_CHANGE_ARRAY.read(changes);
+                if(received.length!=records.length)throw new AssertionError("Placement batch length");
+                for(int i=0;i<records.length;i++) {
+                    int raw=placementStates.get(i),expected=raw==0?0:ClientBlocks.localState(raw);
+                    if(received[i].getBlockId()!=expected)throw new AssertionError("Placement batch changed state "+raw+" for "+profile);
+                }
+            }finally{changes.release();}
             BlockItemPipelineSmokeTest.verify(profile, channel, serverCompression, world);
             ServerItemSmokeTest.pipeline(profile, channel, serverCompression);
             ServerEntitySmokeTest.pipeline(profile, channel, serverCompression, world);

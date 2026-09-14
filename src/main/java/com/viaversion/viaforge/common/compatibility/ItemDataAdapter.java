@@ -9,6 +9,8 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 public interface ItemDataAdapter {
     Item toClientData(Item serverItem);
     Item toServerData(Item clientItem);
+    default Item toClientData(com.viaversion.viaversion.api.connection.UserConnection user, Item item) { return toClientData(item); }
+    default Item toServerData(com.viaversion.viaversion.api.connection.UserConnection user, Item item) { return toServerData(item); }
     ItemDataAdapter LEGACY = new ItemDataAdapter() {
         public Item toClientData(Item item) { return item==null?null:item.copy(); }
         public Item toServerData(Item item) { return item==null?null:item.copy(); }

@@ -38,7 +38,10 @@ public final class LegacyBlockWorld {
     }
 
     public void set(int x, int y, int z, int state) {
-        if (y < 0 || y > 255 || state < 0 || state >= UNKNOWN_STATE) return;
+        // Flattened adapters explicitly send UNKNOWN_STATE when a new server
+        // block has no native equivalent. Invalidate any previously stored
+        // Purpur/shulker/etc. instead of restoring it over Via's new fallback.
+        if (y < 0 || y > 255 || state < 0 || state > UNKNOWN_STATE) return;
         // Ignore changes outside loaded chunks instead of retaining unbounded stray updates.
         Column column = columns.get(key(x >> 4, z >> 4));
         if (column == null) return;

@@ -63,7 +63,7 @@ is included. The Minecraft client itself always remains on version 1.8.9.
 
 ## Versioned blocks and block items
 
-Multiplayer connections using **1.9 through 1.12.2** now retain original server
+Multiplayer connections using **1.9 through 1.14.4** retain the inherited original server
 block states before Via converts them. The catalog covers all new block IDs in
 this range (198â€“252 and 255), with each family enabled from its own release:
 
@@ -121,19 +121,20 @@ over the vanilla texture profile.
 
 Singleplayer and native 1.8 connections use their normal block textures. The
 profile and creative entries are cleared when leaving a server.
-**1.13+, including 1.21, is a later milestone**; existing
-protocol connectivity remains available, but this block extension is not enabled
-for those versions yet. This is not complete 1.12 client emulation: gateway
-beams/portal effects and exact
-server-specific interaction behavior still need dedicated work and gameplay testing.
+**1.13?1.13.2 and 1.14?1.14.4 now have actual adapters** for the existing
+1.9?1.12.2 features and catalog, with original target textures and models.
+New content from the aquatic/village updates is not fully implemented. Versions
+1.15 through 26.2 retain ordinary Via translation; their extended native feature
+adapters remain unregistered. See [verified scope and remaining gaps](docs/FLATTENED.md).
+
 
 Several patch releases share a protocol and cannot be distinguished by the
 protocol selector. Their default resource profiles use the last patch in that
 group (for example 1.9.4 for 1.9.3/1.9.4, and 1.10.2 for 1.10.x).
 The shared [compatibility pipeline](docs/COMPATIBILITY.md) separates exact packet
 codecs, inherited client behavior and target resources. New version families can
-reuse existing features through explicit adapters; the architecture refactor alone
-does not add 1.13+ support.
+reuse existing features through explicit adapters. The flattened families observe
+real Via translation boundaries without replaying stateful protocols.
 
 See [the block implementation notes](docs/BLOCKS.md) for the exact profile table,
 architecture, verification and next steps.

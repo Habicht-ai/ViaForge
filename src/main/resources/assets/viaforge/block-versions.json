@@ -48,5 +48,45 @@
                    "sha1":  "0f275bc1547d01fa5f56ba34bdc87d981ee12daf",
                    "size":  10180113,
                    "url":  "https://piston-data.mojang.com/v1/objects/0f275bc1547d01fa5f56ba34bdc87d981ee12daf/client.jar"
-               }
+               },
+    "1.13": {
+        "sha1": "c0b970952cdd279912da384cdbfc0c26e6c6090b",
+        "size": 16033625,
+        "url": "https://piston-data.mojang.com/v1/objects/c0b970952cdd279912da384cdbfc0c26e6c6090b/client.jar"
+    },
+    "1.13.1": {
+        "sha1": "8de235e5ec3a7fce168056ea395d21cbdec18d7c",
+        "size": 16088559,
+        "url": "https://piston-data.mojang.com/v1/objects/8de235e5ec3a7fce168056ea395d21cbdec18d7c/client.jar"
+    },
+    "1.13.2": {
+        "sha1": "30bfe37a8db404db11c7edf02cb5165817afb4d9",
+        "size": 16089640,
+        "url": "https://piston-data.mojang.com/v1/objects/30bfe37a8db404db11c7edf02cb5165817afb4d9/client.jar"
+    },
+    "1.14": {
+        "sha1": "7a762a59345c13af7d87111207a93f5a8607f6c0",
+        "size": 18796546,
+        "url": "https://piston-data.mojang.com/v1/objects/7a762a59345c13af7d87111207a93f5a8607f6c0/client.jar"
+    },
+    "1.14.1": {
+        "sha1": "55ba86ddcbc3579397f41910463ffd4056e1e523",
+        "size": 18814947,
+        "url": "https://piston-data.mojang.com/v1/objects/55ba86ddcbc3579397f41910463ffd4056e1e523/client.jar"
+    },
+    "1.14.2": {
+        "sha1": "ca6c5a139045967229975c0c0b7f93e78b4314c2",
+        "size": 18794327,
+        "url": "https://piston-data.mojang.com/v1/objects/ca6c5a139045967229975c0c0b7f93e78b4314c2/client.jar"
+    },
+    "1.14.3": {
+        "sha1": "af100b34ec7ef2b8b9cf7775b544d21d690dddec",
+        "size": 18813147,
+        "url": "https://piston-data.mojang.com/v1/objects/af100b34ec7ef2b8b9cf7775b544d21d690dddec/client.jar"
+    },
+    "1.14.4": {
+        "sha1": "8c325a0c5bd674dd747d6ebaa4c791fd363ad8a9",
+        "size": 25191691,
+        "url": "https://piston-data.mojang.com/v1/objects/8c325a0c5bd674dd747d6ebaa4c791fd363ad8a9/client.jar"
+    }
 }

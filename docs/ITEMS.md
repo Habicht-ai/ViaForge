@@ -189,8 +189,9 @@ its recipe list to the server; the 1.8 client has no recipe-book UI. The worn El
 model covers standing/sneaking and server-reported wing spread, not full player flight rendering.
 Enchanted shield glint remains a visual follow-up. This is not complete 1.12 client emulation.
 
-Versions 1.13 and later are a separate milestone. Existing Via connectivity is
-unchanged, but this native item registry is only enabled for the supported profiles.
+The existing native item registry is also connected to 1.13?1.13.2 and
+1.14?1.14.4 through bidirectional flattened item adapters. New aquatic/village
+items still use Via fallbacks. See [flattened validation and limits](FLATTENED.md).
 
 ## Verification
 

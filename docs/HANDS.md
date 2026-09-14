@@ -1,4 +1,4 @@
-# Two hands on 1.9â€“1.12.2 servers
+# Two hands on 1.9â€“1.14.4 servers
 
 Supported multiplayer resource/protocol profiles now expose the original offhand
 inventory slot, item use and rendering. Native 1.8 connections and singleplayer
@@ -71,3 +71,10 @@ are written to `build/logs/screenshots/offhand-<version>.png` and
 These automated fixtures do not replace a live two-player server test of latency,
 plugins or anti-cheat. Original model and GUI assets come from the verified
 Mojang client archives; no downloaded client code is executed.
+
+The eight 1.13?1.14.4 profiles also route real flattened inventory/equipment data
+and both hand directions through these implementations. Their additional smoke
+fixtures check modern item IDs, Damage, namespaced enchantments, JSON names/Lore,
+slot 45/direct slot 40/full inventories, remote player active-hand metadata and
+1.14's reordered block-use fields. Full GUI/pose fixtures remain the ten legacy
+profiles; see [flattened validation limits](FLATTENED.md).

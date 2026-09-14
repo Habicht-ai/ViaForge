@@ -20,7 +20,7 @@ public final class LegacyItemSnapshot {
             if (pipe.getItemRewriter() == boundary) { higher = true; continue; }
             if (higher && pipe.getItemRewriter() != null) probe = pipe.getItemRewriter().handleItemToServer(user, probe);
         }
-        probe=profile.adapter().items().toClientData(probe);
+        probe=profile.adapter().items().toClientData(user, probe);
         if (probe == null) return;
         LegacyItemDefinition definition = ClientItems.serverItem(ClientItems.localItem(probe.identifier(), probe.data()));
         if ((definition == null || !profile.rules().contentSince(definition.itemProtocol())) && !LegacyBlockItemBridge.nativeEnchantments(probe, profile)) return;

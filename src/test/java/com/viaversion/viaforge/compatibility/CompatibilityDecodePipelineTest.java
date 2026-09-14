@@ -34,6 +34,15 @@ public class CompatibilityDecodePipelineTest {
             assertEquals(26,ClientEventEnvelope.read(event).operation);assertEquals(11,event.readUnsignedByte());event.release();after.release();assertNull(fixture.channel.readInbound());assertEquals(0,input.refCnt());
         }finally{fixture.close();}
     }
+    @Test public void cancelledPacketWithoutRetainedEventDoesNotClearConnectionState(){
+        Probe codec=new Probe(){@Override public ByteBuf event(ByteBuf input){return null;}};
+        Fixture fixture=new Fixture(codec,true,true);
+        try {
+            ByteBuf input=Unpooled.buffer().writeByte(42).writeByte(11);fixture.channel.writeInbound(input);
+            assertNull(fixture.channel.readInbound());assertEquals(0,input.refCnt());assertEquals(1,fixture.translations);
+            assertEquals("Via cancellation is normal traffic, not a world reset",0,codec.clears);
+        }finally{fixture.close();}
+    }
     @Test public void failedAdapterIsDisabledWhileViaKeepsTranslating(){
         Probe codec=new Probe(){@Override public ByteBuf event(ByteBuf input){throw new IllegalArgumentException("synthetic corrupt payload");}};Fixture fixture=new Fixture(codec,false,true);
         try{

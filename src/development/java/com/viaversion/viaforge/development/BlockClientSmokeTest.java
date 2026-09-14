@@ -32,6 +32,7 @@ public final class BlockClientSmokeTest {
     private final Path report;
     private final List<String> checks = new ArrayList<>();
     private final BlockVersionProfile[] profiles = BlockVersionProfile.values();
+    private final int[] flattened = {393,401,404,477,480,485,490,498};
     private Object connection;
     private int profileIndex = -1;
     private long started;
@@ -54,20 +55,30 @@ public final class BlockClientSmokeTest {
                 Files.createDirectories(report.toAbsolutePath().getParent());
                 Files.write(report, java.util.Collections.singletonList("RUNNING"), StandardCharsets.UTF_8);
                 checkFallbackModels();
+                checkViaPaths();
                 next();
-            } else if (profiles[profileIndex].resourceVersion().equals(ServerBlockSession.getLoadedResourceVersion())) {
-                verify(profiles[profileIndex]);
-                if (profileIndex + 1 < profiles.length) next();
+            } else if (target().resources().version().equals(ServerBlockSession.getLoadedResourceVersion())) {
+                if(profileIndex<profiles.length)verify(profiles[profileIndex]);
+                else {
+                    WorldClient world=new WorldClient(null,new WorldSettings(0,WorldSettings.GameType.CREATIVE,false,false,WorldType.DEFAULT),0,EnumDifficulty.PEACEFUL,new Profiler());
+                    world.doPreChunk(0,0,true);
+                    checks.add(FlattenedPipelineSmokeTest.verify(target(),world,report.toAbsolutePath().getParent()));
+                }
+                ShulkerItemRenderSmokeTest.verify(target(), report.toAbsolutePath().getParent());
+                if (target().serverProtocol() >= 315) checks.add(target().resources().version()
+                        + ": all 16 shulker item colors; original target matrices for third person (both hands, slim/normal arms, sneaking), first person, GUI, fixed and dropped items PASS");
+                if (profileIndex + 1 < profiles.length + flattened.length) next();
                 else {
                     ServerBlockSession.unload();
                     require(ServerBlockSession.getLoadedResourceVersion() == null, "Resources cleared on unload");
                     require(!Minecraft.getMinecraft().getResourceManager().getResource(new net.minecraft.util.ResourceLocation("minecraft:textures/blocks/stone.png"))
                             .getResourcePackName().equals("ViaForge versioned blocks"), "Vanilla block textures restored");
                     checkFallbackModels();
+                    checks.add("All profiles: original dropped Purpur/seed/shield/sword matrices and native stone scale; pending resource HUD avoids missing-texture caching; native resources restored after disconnect");
                     finish(null);
                 }
             } else if (System.currentTimeMillis() - started > 180000) {
-                throw new AssertionError("Timed out loading " + profiles[profileIndex].resourceVersion());
+                throw new AssertionError("Timed out loading " + target().resources().version());
             }
         } catch (Throwable failure) {
             finish(failure);
@@ -79,8 +90,23 @@ public final class BlockClientSmokeTest {
         connection = new Object();
         profileIndex++;
         started = System.currentTimeMillis();
-        ServerBlockSession.join(connection, profiles[profileIndex]);
+        com.viaversion.viaforge.compatibility.ServerSession.join(connection, target());
+        PendingResourceSmokeTest.verify();
         if (oldConnection != null) ServerBlockSession.leave(oldConnection); // delayed close must not reset the next session
+    }
+
+    private com.viaversion.viaforge.common.compatibility.CompatibilityProfile target() {
+        return com.viaversion.viaforge.common.compatibility.CompatibilityRegistry.DEFAULT.resolve(profileIndex<profiles.length?profiles[profileIndex].protocol():flattened[profileIndex-profiles.length]);
+    }
+    private void checkViaPaths() {
+        java.util.List<String> supported=new java.util.ArrayList<>();
+        for(com.viaversion.viaversion.api.protocol.version.ProtocolVersion version:com.viaversion.viaversion.api.protocol.version.ProtocolVersion.getProtocols()) {
+            if(version.getVersion()<393||version.getVersion()>776||version.isSnapshot())continue;
+            java.util.List<com.viaversion.viaversion.api.protocol.ProtocolPathEntry> path=com.viaversion.viaversion.api.Via.getManager().getProtocolManager().getProtocolPath(com.viaversion.viaversion.api.protocol.version.ProtocolVersion.v1_8,version);
+            require(path!=null,"Bundled Via path to "+version.getName());supported.add(version.getName()+" ("+version.getVersion()+", "+path.size()+" layers)");
+        }
+        require(com.viaversion.viaversion.api.protocol.version.ProtocolVersion.v26_2.getVersion()==776,"Bundled 26.2 protocol identifier");
+        checks.add("Bundled ViaVersion/ViaBackwards 5.11.0 + ViaRewind 4.1.3 paths (connectivity only, not client feature certification): "+supported);
     }
 
     private void verify(BlockVersionProfile profile) throws Exception {
@@ -159,7 +185,7 @@ public final class BlockClientSmokeTest {
         world.doPreChunk(0, 0, false);
         require(Minecraft.getMinecraft().getResourceManager().getResource(new net.minecraft.util.ResourceLocation("minecraft:textures/blocks/stone.png"))
                 .getResourcePackName().equals("ViaForge versioned blocks"), "Existing block texture overlay");
-        checks.add(profile.resourceVersion() + ": compressed Via pipeline/repeated decoder reordering/native chunk+updates, " + states + " server states, all block/item models, first-person scale/position/swing, right-click/air-use packets, shulker container cycle where available, inventory/creative/click/NBT round trips, rod/slab/path/crop/64 chorus shapes, 24 stair collision shapes, vanilla texture overlay OK"
+        checks.add(profile.resourceVersion() + ": compressed Via pipeline/repeated decoder reordering/native chunk+updates, " + states + " server states" + (profile.protocol() >= 335 ? ", state retained after cancelled recipe traffic" : "") + ", Purpur/shulker placement confirmations in all colors/orientations and multi-block batches, all block/item models, first-person scale/position/swing, right-click/air-use packets, shulker container cycle where available, inventory/creative/click/NBT round trips, rod/slab/path/crop/64 chorus shapes, 24 stair collision shapes, vanilla texture overlay OK"
                 + "; all available standalone item/potion/egg/book variants, durability/NBT/creative/click round trips, target item models, hand transforms, eating/drinking/shield/bow/equip actions OK"
                 + "; original projectile/cloud/offhand packets, cloud RGB/radius/destroy/respawn, shield matrices for both hands/poses/skin widths, target creative categories/order/search OK"
                 + "; 37 potion impact types/custom RGB without duplicate fallback effects, tipped/spectral arrow spawn/velocity/metadata/flight/ground/expiration/destroy, version-gated Totem particles/40-tick animation/original sound OK"
@@ -177,6 +203,7 @@ public final class BlockClientSmokeTest {
     }
 
     private static void checkFallbackModels() {
+        ShulkerItemRenderSmokeTest.disconnected();
         require(!com.viaversion.viaforge.hands.Offhand.active()&&com.viaversion.viaforge.hands.Offhand.get()==null&&!com.viaversion.viaforge.hands.HandRenderer.needed(),"Native/disconnected sessions do not enable two hands");
         BoatSmokeTest.disconnected();
         CreativeCategorySmokeTest.disconnected();
@@ -210,7 +237,7 @@ public final class BlockClientSmokeTest {
         return model;
     }
 
-    private static void checkFaceTextures(IBakedModel model, String name) {
+    static void checkFaceTextures(IBakedModel model, String name) {
         net.minecraft.client.renderer.texture.TextureAtlasSprite missing = Minecraft.getMinecraft().getTextureMapBlocks().getMissingSprite();
         java.util.List<net.minecraft.client.renderer.block.model.BakedQuad> quads = new ArrayList<>(model.getGeneralQuads());
         for (net.minecraft.util.EnumFacing face : net.minecraft.util.EnumFacing.values()) quads.addAll(model.getFaceQuads(face));

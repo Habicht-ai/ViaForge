@@ -1,9 +1,11 @@
 # Compatibility pipeline
 
 The connection's server version, packet codec, client behavior and resource
-release are now independent. Existing 1.9?1.12.2 implementations run through this
-pipeline. This refactor does **not** register a Minecraft 1.13+ wire codec yet.
+release are independent. Existing 1.9?1.12.2 implementations now also run on
+explicit 1.13?1.13.2 and 1.14?1.14.4 adapters. These registrations restore the
+inherited catalog; they do not implement all content introduced in those releases.
 Unknown targets retain normal Via connectivity without borrowing an older parser.
+See [flattened families and validation limits](FLATTENED.md).
 
 ## Connection and packet flow
 
@@ -100,18 +102,31 @@ Disconnect and server changes invalidate pending work; a late close from an old
 connection cannot clear the new session. World unloading clears the shared client
 entity, item, hand, cooldown and boat state as before.
 
-## Adding the next family
+## Registered flattened families
 
-For 1.13?1.13.2, implement and register exact wire adapters and resource converters,
-normalize flattened block/item identities and changed metadata before lossy Via
-steps, and provide the matching outgoing conversions. Derive the existing client
-rules and override only changes established for those releases. Populate verified
-asset manifests and extend content registrations for additions. The generic
-transport and existing two-hand/boat/render implementations do not need another
-server-version allowlist.
+`FlattenedProtocolAdapter` observes the actual `AbstractProtocol.transform` pass.
+The 1.13 boundary retains original flattened blocks (including bed colors) and
+cloud particles; the subsequent 1.12.2 boundary emits the established internal
+client events after Via has normalized entity/item/metadata/sound IDs. The
+1.14 boundary additionally retains original block identities before approximate
+mappings, using `VillageBlockData`. Chunk light remains owned by Via's original
+translation. No stateful protocol is replayed on a probe connection or packet.
 
-No nearest-version fallback or automatic enabling of an unknown packet format is
-used. The registry stays explicit even when behavior is inherited.
+`FlattenedItemDataAdapter` uses the connection's bidirectional item rewriters on
+copies. `FlattenedItemSnapshot` and the existing legacy snapshots retain original
+NBT and identity across lossy steps. A targeted structure-packet conversion fixes
+the missing mirror/rotation fields in the bundled ViaBackwards version.
+
+Profiles inherit the earlier behavior and select exact verified archives plus
+`FlattenedResourceConverter` or `VillageResourceConverter`. Texture paths, block
+variants, parent/texture references, renamed item models and particle atlases are
+converted from the target's original resources before publication.
+
+The next unregistered family is 1.15. It requires verified original archives,
+changed chest textures/models, chunk biome data and spawn/join formats before
+registration. Later families require their own data-preservation boundaries;
+1.18's heights and 1.20.5's item components cannot be parsed as legacy formats.
+No nearest-version fallback or automatic enabling of unknown formats is used.
 
 ## Verification
 
@@ -124,6 +139,14 @@ ownership, disabled-codec fallback and decoder reordering. These are architectur
 fixtures, not a claim of real 1.13 support.
 
 The existing Forge smoke suite now creates `CompatibilityDecodeHandler` through
-the same registry and adapter factory as production for all ten supported profiles.
+the same registry and adapter factory as production for all ten legacy profiles and eight flattened targets.
 Its actual chunk, item, entity, hand, boat, UI, effect and model checks remain in
 place. Read `build/logs/block-client-smoke-test.txt`: it must begin with `PASS`.
+
+`FlattenedCompatibilityTest` verifies exact registration and non-consuming packet
+observation. `FlattenedPipelineSmokeTest` uses actual compressed target packet
+formats through every installed Via layer, the real Forge mixins and native
+block/item decoders. It checks original archives and baked models, separate 1.14
+light, offhand/player/mob events, both item/hand directions, structure packets,
+block entity NBT, unload and dimension cleanup. See `FLATTENED.md` for the precise
+coverage and the distinction from live server gameplay.

@@ -17,6 +17,14 @@ final class LegacyCompatibility {
             VersionRules rules=wire.protocol()>=335?v112:wire.protocol()>=316?v1111:wire.protocol()>=315?v111:wire.protocol()>=210?v110:v19;
             profiles.add(new CompatibilityProfile(wire.protocol(),rules,ResourceProfile.legacy(wire.resourceVersion()),new LegacyProtocolAdapter.Factory(wire)));
         }
+        int[] flattened={393,401,404};String[] resources={"1.13","1.13.1","1.13.2"};
+        VersionRules v113=v112.derive().build();
+        for(int i=0;i<flattened.length;i++)profiles.add(new CompatibilityProfile(flattened[i],v113,
+                new ResourceProfile(resources[i],com.viaversion.viaforge.blocks.resources.FlattenedResourceConverter::convert),new FlattenedProtocolAdapter.Factory(flattened[i])));
+        int[] village={477,480,485,490,498};String[] villageResources={"1.14","1.14.1","1.14.2","1.14.3","1.14.4"};
+        VersionRules v114=v113.derive().build();
+        for(int i=0;i<village.length;i++)profiles.add(new CompatibilityProfile(village[i],v114,
+                new ResourceProfile(villageResources[i],com.viaversion.viaforge.blocks.resources.VillageResourceConverter::convert),new FlattenedProtocolAdapter.Factory(village[i])));
         return new CompatibilityRegistry(profiles);
     }
     private LegacyCompatibility() { }

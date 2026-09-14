@@ -65,7 +65,17 @@ public final class LegacyBlockModels {
                 String itemName = block.kind == Kind.CROP ? "beetroot_seeds" : block.name;
                 JsonObject item;
                 if (block.kind == Kind.BED) item = bed(block, true, true, assets);
-                else if (block.kind == Kind.SHULKER) item = shulker(block, assets);
+                else if (block.kind == Kind.SHULKER) {
+                    item = shulker(block, assets);
+                    String path = "models/item/" + itemName + ".json";
+                    if (assets.containsKey(path)) {
+                        // Keep our baked geometry, but inherit every display context from
+                        // the target's builtin/entity item model (including its parents).
+                        // flatten already converts rotations into the native 1.8 order.
+                        JsonObject sourceItem = LegacyModelConverter.flatten(path, assets);
+                        if (sourceItem.has("display")) item.add("display", sourceItem.get("display"));
+                    }
+                }
                 else if (block.kind == Kind.VOID && !assets.containsKey("models/item/structure_void.json")) item = cube("minecraft:items/barrier");
                 else if (assets.containsKey("models/item/" + itemName + ".json")) item = qualifyModel(LegacyModelConverter.flatten("models/item/" + itemName + ".json", assets));
                 else if (assets.containsKey("models/block/" + defaultModel(block) + ".json")) item = qualifyModel(LegacyModelConverter.flatten("models/block/" + defaultModel(block) + ".json", assets));

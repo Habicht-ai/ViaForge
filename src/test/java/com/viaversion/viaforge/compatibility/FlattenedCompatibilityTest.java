@@ -14,6 +14,7 @@ public class FlattenedCompatibilityTest {
             CompatibilityProfile profile=CompatibilityRegistry.DEFAULT.resolve(protocols[i]);
             assertEquals(protocols[i],profile.serverProtocol());assertEquals(versions[i],profile.resources().version());
             assertEquals("flattened-"+protocols[i],profile.adapter().id());
+            assertEquals(protocols[i]>=401,profile.rules().enabled(ClientRule.PREDICT_HOTBAR_DROPS));
             assertTrue(profile.adapter().create(profile,x->x) instanceof FlattenedProtocolAdapter);
             for(ClientFeature feature:ClientFeature.values())assertTrue(profile.has(feature));
         }
@@ -21,6 +22,7 @@ public class FlattenedCompatibilityTest {
     @Test public void neighboringUnverifiedTargetsCannotUseTheFlattenedFactory() {
         for(int id:new int[]{392,394,400,402,403,405,476,478,479,481,484,486,489,491,497,499,777}) {
             assertFalse(CompatibilityRegistry.DEFAULT.resolve(id).extended());
+            assertFalse(CompatibilityRegistry.DEFAULT.resolve(id).rules().enabled(ClientRule.PREDICT_HOTBAR_DROPS));
             try{new FlattenedProtocolAdapter.Factory(id);fail("Registered "+id);}catch(IllegalArgumentException expected){}
         }
     }

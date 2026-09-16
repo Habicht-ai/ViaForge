@@ -139,7 +139,7 @@ final class FlattenedPipelineSmokeTest {
     static String verify(CompatibilityProfile target,WorldClient world,Path report)throws Exception {
         FlattenedPipelineSmokeTest test=new FlattenedPipelineSmokeTest(target);
         try {
-            test.join();int count=test.blocks(world);test.heightWindow(world);test.items();test.eggs();test.events();test.boatInput(world);test.hands();test.editors();test.resources(report);MobRenderSmokeTest.modern(target,world,report);test.lifecycle();
+            test.join();int count=test.blocks(world);test.heightWindow(world);test.items();test.eggs();test.drops(world);test.events();test.boatInput(world);test.hands();test.editors();test.resources(report);MobRenderSmokeTest.modern(target,world,report);test.lifecycle();
             return target.resources().version()+": real flattened chunks ("+count+" inherited states), single/multi updates, bed colors without tile NBT, shulker events, falling blocks; all inherited block/item inventory round trips, Damage/enchantments/banner NBT, split counts, fresh Creative picks; 43 egg species: ID-only server items, fresh Creative picks, server echoes/models and click round trips"+(test.sulfur?", typed entity components/hashes and overridden spawn species":"")+"; offhand/full/direct/equipment, boat/player/mob metadata, passengers, boat movement/paddles and all 36 directional/jump/dismount input combinations, cooldowns/particles/Totem, both hand directions; original target resource aliases, particle atlas texels and all inherited block/item models; structure mirror/rotation/flags/seed, command/gateway/structure NBT, chunk unload and dimension cleanup"+(test.village?", separate sky/block light and JSON Lore":"")+(test.bee?", original chest face/UV checks":"")+(test.caves?", 384-height source and 1.17 inventory codec; native Y=0..255 window only":"")+" PASS";
         }finally{test.close();}
     }
@@ -397,6 +397,32 @@ final class FlattenedPipelineSmokeTest {
         Enchantments enchant=new Enchantments(true);enchant.add(tricky?enchantmentIds.get("minecraft:mending"):com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Enchantments1_20_5.keyToId("mending"),1);data.set(spring?StructuredDataKey.ENCHANTMENTS1_21_5:StructuredDataKey.ENCHANTMENTS1_20_5,enchant);data.set(StructuredDataKey.BASE_COLOR,3);
         data.setEmpty(summer?StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_6:spring?StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_5:tricky?StructuredDataKey.ATTRIBUTE_MODIFIERS1_21:StructuredDataKey.ATTRIBUTE_MODIFIERS1_20_5);
         if(winter)data.set(StructuredDataKey.CUSTOM_MODEL_DATA1_21_4,new com.viaversion.viaversion.api.minecraft.item.data.CustomModelData1_21_4(new float[]{1.25F,-2},new boolean[]{true,false},new String[]{"original","layer"},new int[]{0x123456,0xabcdef}));return item;
+    }
+    private void drops(WorldClient world)throws Exception {
+        int id=wireItem(Protocol1_12_2To1_13.MAPPINGS.getNewItemId(442<<4));
+        Item original=components?componentShield(id):new DataItem(id,(byte)1,(short)0,null);
+        Item originalBlocks=target.adapter().items().toServerData(user,new DataItem(201,(byte)1,(short)0,null));
+        net.minecraft.item.ItemStack shield=nativeStack(slot(original,40));
+        DropItemSmokeTest.verify(world,target.serverProtocol()>=401,shield,ServerEntitySmokeTest.stack(201,0),new DropItemSmokeTest.Wire(){
+            public void action(net.minecraft.network.play.client.C07PacketPlayerDigging packet)throws Exception {
+                ByteBuf source=BlockPipelineSmokeTest.packet(7);packet.writePacketData(new PacketBuffer(source));send(source);
+                ByteBuf data=BlockPipelineSmokeTest.take(server,outgoing(ServerboundPackets1_13.PLAYER_ACTION));
+                try{require(Types.VAR_INT.readPrimitive(data)==packet.getStatus().ordinal(),"Target drop action through every Via layer");
+                    require(positionType().read(data).equals(new BlockPosition(0,0,0))&&data.readByte()==0,"Drop origin/direction");
+                    if(wild)require(Types.VAR_INT.readPrimitive(data)==0,"Drop sequence");
+                    require(!data.isReadable()&&server.readInbound()==null,"Exactly one fully consumed drop packet");
+                }finally{data.release();}
+            }
+            public void correct(net.minecraft.client.network.NetHandlerPlayClient handler,net.minecraft.item.ItemStack stack,boolean direct)throws Exception {
+                ByteBuf update;
+                if(bundles&&direct) {update=BlockPipelineSmokeTest.packet(year26?ClientboundPackets26_1.SET_PLAYER_INVENTORY.getId():mounts?ClientboundPackets1_21_11.SET_PLAYER_INVENTORY.getId():copper?ClientboundPackets1_21_9.SET_PLAYER_INVENTORY.getId():summer?ClientboundPackets1_21_6.SET_PLAYER_INVENTORY.getId():spring?ClientboundPackets1_21_5.SET_PLAYER_INVENTORY.getId():ClientboundPackets1_21_2.SET_PLAYER_INVENTORY.getId());Types.VAR_INT.writePrimitive(update,4);}
+                else {update=packet(ClientboundPackets1_13.CONTAINER_SET_SLOT);slotHeader(update,direct?-2:0,direct?4:40);}
+                // Rejection restores the original server-owned shield/component patch.
+                writeItem(update,stack==null?(components?StructuredItem.empty():null):stack.getItem()==shield.getItem()?original.copy():originalBlocks.copy());receive(update);
+                ByteBuf data=take(0x2f);
+                try {S2FPacketSetSlot correction=new S2FPacketSetSlot();correction.readPacketData(new PacketBuffer(data));correction.processPacket(handler);}finally{data.release();}
+            }
+        });
     }
     private void eggs()throws Exception {
         for(com.google.gson.JsonElement entry:ItemVariants.EGGS) {

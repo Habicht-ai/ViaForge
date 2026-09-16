@@ -76,11 +76,13 @@ public final class BlockClientSmokeTest {
                 else {
                     ServerBlockSession.unload();
                     RenderResourceSmokeTest.restored();
+                    DropItemSmokeTest.nativeBehavior();
                     require(ServerBlockSession.getLoadedResourceVersion() == null, "Resources cleared on unload");
                     require(!Minecraft.getMinecraft().getResourceManager().getResource(new net.minecraft.util.ResourceLocation("minecraft:textures/blocks/stone.png"))
                             .getResourcePackName().equals("ViaForge versioned blocks"), "Vanilla block textures restored");
                     checkFallbackModels();
                     checks.add("All profiles: original dropped Purpur/seed/shield/sword matrices and native stone scale; pending resource HUD avoids missing-texture caching; native resources restored after disconnect");
+                    checks.add("Drop regression: actual Q/Ctrl-Q in Survival and Creative, shield and stackable blocks, single/full/empty drops, selected/offhand/adjacent slot isolation, original target action packets and authoritative correction/empty packets; native drop behavior restored on disconnect PASS");
                     checks.add("Render regressions: original 1.13+ aquatic biomes and 1.16+ registry water colors, tall-source biome coordinates, 1.19.4+ biome update packets before Via cancellation, disconnect cleanup; first position packet waits for resources; 26.2 independently decoded RGBA hashes, actual atlas transparency and shield GPU texels, original bed faces/UVs in all 16 colors, 16 distinct rendered banner dyes; native water and texture caches restored PASS");
                     finish(null);
                 }

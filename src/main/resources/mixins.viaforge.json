@@ -76,6 +76,8 @@
     "mobs.MixinRabbitModel",
     "items.MixinElytraCape",
     "items.MixinCombatTick",
+    "items.MixinDropPrediction",
+    "items.MixinDirectInventoryUpdate",
     "items.MinecraftItemTimer",
     "items.MixinItemCooldownUse",
     "items.MixinItemCooldownOverlay",

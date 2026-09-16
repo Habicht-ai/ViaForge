@@ -19,10 +19,11 @@ final class LegacyCompatibility {
         }
         int[] flattened={393,401,404};String[] resources={"1.13","1.13.1","1.13.2"};
         VersionRules v113=v112.derive().rule(BIOME_WATER_COLORS,true).build();
-        for(int i=0;i<flattened.length;i++)profiles.add(new CompatibilityProfile(flattened[i],v113,
+        VersionRules v1131=v113.derive().rule(PREDICT_HOTBAR_DROPS,true).build();
+        for(int i=0;i<flattened.length;i++)profiles.add(new CompatibilityProfile(flattened[i],i==0?v113:v1131,
                 new ResourceProfile(resources[i],com.viaversion.viaforge.blocks.resources.FlattenedResourceConverter::convert),new FlattenedProtocolAdapter.Factory(flattened[i])));
         int[] village={477,480,485,490,498};String[] villageResources={"1.14","1.14.1","1.14.2","1.14.3","1.14.4"};
-        VersionRules v114=v113.derive().build();
+        VersionRules v114=v1131.derive().build();
         for(int i=0;i<village.length;i++)profiles.add(new CompatibilityProfile(village[i],v114,
                 new ResourceProfile(villageResources[i],com.viaversion.viaforge.blocks.resources.VillageResourceConverter::convert),new FlattenedProtocolAdapter.Factory(village[i])));
         int[] buzzy={573,575,578};String[] buzzyResources={"1.15","1.15.1","1.15.2"};

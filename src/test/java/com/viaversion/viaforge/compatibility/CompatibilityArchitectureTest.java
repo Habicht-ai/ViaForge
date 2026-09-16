@@ -24,6 +24,7 @@ public class CompatibilityArchitectureTest {
             assertEquals(legacy.protocol()>=315,p.has(ClientFeature.TOTEM));
             assertEquals(legacy.protocol()>=335,p.rules().enabled(ClientRule.FAST_PADDLE_CYCLE));
             assertEquals(legacy.protocol()>=316,p.rules().enabled(ClientRule.REVERSED_DRAGON_HEAD_ITEM));
+            assertFalse(p.rules().enabled(ClientRule.PREDICT_HOTBAR_DROPS));
             for(LegacyBlockCatalog.Definition block:LegacyBlockCatalog.BLOCKS)assertEquals(legacy.protocol()>=block.protocol,p.rules().contentSince(block.protocol));
         }
     }

@@ -26,6 +26,31 @@ The client predicts arrow consumption; server updates supply bow durability and
 the actual projectile. Inventory changes, effect results, interaction acceptance
 and combat remain server-authoritative.
 
+## Dropping from the hotbar
+
+From 1.13.1 onward, the client removes one selected item for Q, or the entire
+selected stack for Ctrl-Q. The original clients in the verified archives do
+this locally; a modern server can suppress the corresponding slot echo because
+it expects that prediction. Native 1.8 only sends the action, which previously
+left a ghost shield in the hotbar on 26.2.
+
+The inherited `PREDICT_HOTBAR_DROPS` rule enables this local inventory change.
+The existing native method still sends exactly one original action through Via;
+no extra Creative or click packet is sent. Offhand and neighboring slots remain
+untouched, and later server slot updates override the prediction. Native 1.8,
+singleplayer, unknown targets and profiles through 1.13 retain their old behavior.
+
+Direct player-inventory updates normalized by Via to window `-2` now reach the
+native main/armor inventory on supported servers. The 1.8 handler otherwise
+ignores that window. They work even while another container is open; offhand
+index 40 remains owned by its existing captured event.
+
+`DropItemSmokeTest` invokes the real native player drop method in Survival and
+Creative with a component-bearing shield and stackable blocks. The flattened
+pipeline tests cover Q/Ctrl-Q, an empty hand, outbound action fields, server
+rejection/restoration, empty slot updates and the modern direct player-inventory
+packet. The final disconnect check verifies that native drop behavior is restored.
+
 ## Integration
 
 The [shared compatibility pipeline](COMPATIBILITY.md) now selects features,

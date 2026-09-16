@@ -34,10 +34,14 @@ public final class ItemVariants {
     }
     public static JsonObject eggType(ItemStack stack) {
         if (!stack.hasTagCompound()) return null;
-        String name = stack.getTagCompound().getCompoundTag("EntityTag").getString("id");
+        String name = stack.getTagCompound().getString(com.viaversion.viaforge.common.blocks.SpawnEggNames.CLIENT_ID);
+        if (name.isEmpty()) name = stack.getTagCompound().getCompoundTag("EntityTag").getString("id");
+        if (name.startsWith("minecraft:")) name = name.substring(10);
         for (JsonElement element : EGGS) {
             JsonObject egg = element.getAsJsonObject();
-            if (name.equals("minecraft:" + egg.get("name").getAsString()) || name.equals(egg.get("legacy").getAsString())) return egg;
+            String legacy = egg.get("name").getAsString();
+            if (name.equals(legacy) || name.equals(egg.get("legacy").getAsString())
+                    || name.equals(com.viaversion.viaforge.common.blocks.SpawnEggNames.MODERN.get(legacy))) return egg;
         }
         return null;
     }

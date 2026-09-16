@@ -32,8 +32,10 @@ public final class ServerHeldItemRenderer {
             net.minecraft.client.model.ModelRenderer arm = leftSide ? model.bipedLeftArm : model.bipedRightArm;
             float offset = model instanceof net.minecraft.client.model.ModelPlayer
                     && ((com.viaversion.viaforge.mixin.impl.items.ModelPlayerArms)model).viaForge$smallArms() ? (leftSide ? -.5F : .5F) : 0;
+            if(model instanceof com.viaversion.viaforge.mobs.models.SmallVexModel)((com.viaversion.viaforge.mobs.models.SmallVexModel)model).beforeHand();
             arm.rotationPointX += offset;
             try { arm.postRender(.0625F); } finally { arm.rotationPointX -= offset; }
+            if(model instanceof com.viaversion.viaforge.mobs.models.SmallVexModel)((com.viaversion.viaforge.mobs.models.SmallVexModel)model).afterHand(leftSide);
             if (entity.isSneaking()) GlStateManager.translate(0, .2F, 0);
             GlStateManager.rotate(-90, 1, 0, 0); GlStateManager.rotate(180, 0, 1, 0);
             GlStateManager.translate((leftSide ? -1 : 1) / 16F, .125F, -.625F);

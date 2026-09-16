@@ -31,14 +31,19 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 public final class BlockClientSmokeTest {
     private final Path report;
     private final List<String> checks = new ArrayList<>();
-    private final BlockVersionProfile[] profiles = BlockVersionProfile.values();
-    private final int[] flattened = {393,401,404,477,480,485,490,498};
+    private final BlockVersionProfile[] profiles = java.util.Arrays.stream(BlockVersionProfile.values()).filter(p -> selected(p.protocol())).toArray(BlockVersionProfile[]::new);
+    private final int[] flattened = java.util.Arrays.stream(new int[]{393,401,404,477,480,485,490,498,573,575,578,735,736,751,753,754,755,756,757,758,759,760,761,762,763,764,765,766,767,768,769,770,771,772,773,774,775,776}).filter(BlockClientSmokeTest::selected).toArray();
     private Object connection;
     private int profileIndex = -1;
     private long started;
     private boolean finished;
 
-    private BlockClientSmokeTest(Path report) { this.report = report; }
+    private BlockClientSmokeTest(Path report) { this.report = report; if(profiles.length+flattened.length==0)throw new IllegalArgumentException("No smoke profile matches VIAFORGE_SMOKE_PROTOCOL"); }
+
+    private static boolean selected(int protocol) {
+        String filter=System.getenv("VIAFORGE_SMOKE_PROTOCOL");
+        return filter==null||filter.isEmpty()||Integer.parseInt(filter)==protocol;
+    }
 
     public static boolean installIfRequested() {
         String output = System.getenv("VIAFORGE_BLOCK_SMOKE_TEST");
@@ -66,17 +71,21 @@ public final class BlockClientSmokeTest {
                 }
                 ShulkerItemRenderSmokeTest.verify(target(), report.toAbsolutePath().getParent());
                 if (target().serverProtocol() >= 315) checks.add(target().resources().version()
-                        + ": all 16 shulker item colors; original target matrices for third person (both hands, slim/normal arms, sneaking), first person, GUI, fixed and dropped items PASS");
+                        + ": all 16 shulker item colors"+(target().serverProtocol()>=335?" and all 16 bed colors (baked geometry fits a 16px GUI slot)":"")+"; original target matrices for third person (both hands, slim/normal arms, sneaking), first person, GUI, fixed and dropped items PASS");
                 if (profileIndex + 1 < profiles.length + flattened.length) next();
                 else {
                     ServerBlockSession.unload();
+                    RenderResourceSmokeTest.restored();
                     require(ServerBlockSession.getLoadedResourceVersion() == null, "Resources cleared on unload");
                     require(!Minecraft.getMinecraft().getResourceManager().getResource(new net.minecraft.util.ResourceLocation("minecraft:textures/blocks/stone.png"))
                             .getResourcePackName().equals("ViaForge versioned blocks"), "Vanilla block textures restored");
                     checkFallbackModels();
                     checks.add("All profiles: original dropped Purpur/seed/shield/sword matrices and native stone scale; pending resource HUD avoids missing-texture caching; native resources restored after disconnect");
+                    checks.add("Render regressions: original 1.13+ aquatic biomes and 1.16+ registry water colors, tall-source biome coordinates, 1.19.4+ biome update packets before Via cancellation, disconnect cleanup; first position packet waits for resources; 26.2 independently decoded RGBA hashes, actual atlas transparency and shield GPU texels, original bed faces/UVs in all 16 colors, 16 distinct rendered banner dyes; native water and texture caches restored PASS");
                     finish(null);
                 }
+            } else if (com.viaversion.viaforge.compatibility.ServerSession.resourceFailure()!=null) {
+                throw new AssertionError("Target resource conversion failed: "+target().resources().version(),com.viaversion.viaforge.compatibility.ServerSession.resourceFailure());
             } else if (System.currentTimeMillis() - started > 180000) {
                 throw new AssertionError("Timed out loading " + target().resources().version());
             }

@@ -26,7 +26,13 @@ public final class ClientItems {
             GameRegistry.registerItem(item, definition.name);
             ITEMS.put(definition.id, item); DEFINITIONS.put(Item.getIdFromItem(item), definition);
             ModelResourceLocation normal = new ModelResourceLocation("viaforge:" + definition.model, "inventory");
-            if (definition.kind == Kind.ELYTRA || definition.kind == Kind.SHIELD) {
+            if(definition.kind==Kind.EGG) {
+                Map<String,ModelResourceLocation> eggs=new HashMap<>();
+                for(String egg:com.viaversion.viaforge.common.blocks.SpawnEggNames.MODERN.keySet())eggs.put(egg,new ModelResourceLocation("viaforge:egg/"+egg,"inventory"));
+                List<ModelResourceLocation> variants=new ArrayList<>(eggs.values());variants.add(normal);
+                net.minecraft.client.resources.model.ModelBakery.registerItemVariants(item,variants.toArray(new ModelResourceLocation[0]));
+                ModelLoader.setCustomMeshDefinition(item,stack->{com.google.gson.JsonObject egg=ItemVariants.eggType(stack);return ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.INDIVIDUAL_EGG_MODELS)&&egg!=null?eggs.get(egg.get("name").getAsString()):normal;});
+            } else if (definition.kind == Kind.ELYTRA || definition.kind == Kind.SHIELD) {
                 ModelResourceLocation alternate = new ModelResourceLocation("viaforge:" + (definition.kind == Kind.ELYTRA ? "broken_elytra" : "shield_blocking"), "inventory");
                 ModelResourceLocation left = new ModelResourceLocation("viaforge:shield_left", "inventory");
                 ModelResourceLocation leftBlocking = new ModelResourceLocation("viaforge:shield_blocking_left", "inventory");

@@ -19,9 +19,14 @@ public final class FlattenedBlockData {
     private final Map<Integer,String> names = new HashMap<>();
     private final Map<Integer,Integer> eventBlocks = new HashMap<>();
     private int dimension;
+    final WaterColors waterColors;
     boolean overworld() { return dimension == 0; }
     int eventBlock(int id) { return eventBlocks.getOrDefault(id,4095); }
     public FlattenedBlockData() {
+        this(new WaterColors());
+    }
+    public FlattenedBlockData(WaterColors waterColors) {
+        this.waterColors = waterColors;
         final String[] last = {""}; final int[] block = {-1};
         BlockStates1_13.forEach(MappingDataLoader.INSTANCE.loadNBT("blockstates-1.13.nbt"), (key,id) -> {
             names.put(id,key);
@@ -75,6 +80,7 @@ public final class FlattenedBlockData {
                 case "RESPAWN":dimension=input.getInt(input.readerIndex());break;
                 case "LEVEL_CHUNK": {
                     Chunk chunk=new ChunkType1_13(dimension==0).read(input);
+                    waterColors.capture(chunk,0);
                     for(ChunkSection section:chunk.getSections()) if(section!=null) {
                         DataPalette palette=section.palette(PaletteType.BLOCKS);
                         for(int i=0;i<palette.size();i++)palette.setIdByIndex(i,state(palette.idByIndex(i)));

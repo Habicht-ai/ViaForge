@@ -55,7 +55,7 @@ public class ServerItem extends Item {
     }
     @Override public int getColorFromItemStack(ItemStack stack, int pass) {
         if (potion()) return pass == 0 ? ItemVariants.potionColor(stack) : 0xffffff;
-        if (definition.kind == Kind.EGG) { JsonObject egg = ItemVariants.eggType(stack); if (egg != null) return egg.get(pass == 0 ? "base" : "overlay").getAsInt(); }
+        if (definition.kind == Kind.EGG) { if(ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.INDIVIDUAL_EGG_MODELS))return 0xffffff;JsonObject egg = ItemVariants.eggType(stack); if (egg != null) return egg.get(pass == 0 ? "base" : "overlay").getAsInt(); }
         return 0xffffff;
     }
     @Override public boolean hasEffect(ItemStack stack) { return super.hasEffect(stack) || potion() && definition.kind != Kind.TIPPED_ARROW && !ItemVariants.effects(stack).isEmpty(); }

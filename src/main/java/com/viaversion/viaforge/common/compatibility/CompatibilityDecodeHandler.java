@@ -24,6 +24,8 @@ public class CompatibilityDecodeHandler extends ViaDecodeHandler {
         super.handlerAdded(ctx);
     }
     @Override protected void decode(ChannelHandlerContext ctx,ByteBuf input,List<Object> output)throws Exception {
+        if (!disabled && connection.shouldTransformPacket() && adapter instanceof FlattenedProtocolAdapter)
+            ((FlattenedProtocolAdapter)adapter).waterColors.observe(input,connection);
         boolean play=!disabled&&connection.shouldTransformPacket()&&connection.getProtocolInfo().getServerState()==State.PLAY;
         boolean joined=false;ByteBuf event=null;
         if(play)try {
@@ -58,6 +60,10 @@ public class CompatibilityDecodeHandler extends ViaDecodeHandler {
         }catch(Exception failure){if(event!=null)event.release();disable(failure);throw failure;}
         if(event!=null)output.add(event);
         if(!play||disabled)return;
+        if(adapter instanceof FlattenedProtocolAdapter&&((FlattenedProtocolAdapter)adapter).observedJoin())joined=true;
+        if(adapter instanceof FlattenedProtocolAdapter)for(int i=start;i<output.size();i++) {
+            if(com.viaversion.viaversion.api.type.Types.VAR_INT.readPrimitive(((ByteBuf)output.get(i)).duplicate())==1)joined=true;
+        }
         if(joined)onJoin.run();
         try {
             for(int i=start;i<output.size();i++) {

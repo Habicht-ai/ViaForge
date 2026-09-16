@@ -54,7 +54,9 @@ final class LegacyServerboundPackets {
             PacketWrapper modern=PacketWrapper.create(type,wrapper.user());
             if(operation==0) { modern.write(Types.DOUBLE,wrapper.read(Types.DOUBLE)); modern.write(Types.DOUBLE,wrapper.read(Types.DOUBLE)); modern.write(Types.DOUBLE,wrapper.read(Types.DOUBLE)); modern.write(Types.FLOAT,wrapper.read(Types.FLOAT)); modern.write(Types.FLOAT,wrapper.read(Types.FLOAT)); }
             else if(operation==1) { modern.write(Types.BOOLEAN,wrapper.read(Types.BOOLEAN)); modern.write(Types.BOOLEAN,wrapper.read(Types.BOOLEAN)); }
-            else if(operation==2) { modern.write(Types.FLOAT,wrapper.read(Types.FLOAT)); modern.write(Types.FLOAT,wrapper.read(Types.FLOAT)); modern.write(Types.UNSIGNED_BYTE,wrapper.read(Types.UNSIGNED_BYTE)); }
+            // PacketWrapper's in-memory fields are typed. Later Via layers read BYTE,
+            // so UNSIGNED_BYTE fails despite having the same one-byte wire encoding.
+            else if(operation==2) { modern.write(Types.FLOAT,wrapper.read(Types.FLOAT)); modern.write(Types.FLOAT,wrapper.read(Types.FLOAT)); modern.write(Types.BYTE,wrapper.read(Types.BYTE)); }
             else return;
             modern.sendToServer(Protocol1_9To1_8.class,true);
     }

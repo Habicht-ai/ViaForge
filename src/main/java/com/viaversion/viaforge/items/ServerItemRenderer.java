@@ -34,6 +34,7 @@ public final class ServerItemRenderer {
         JAW = new ModelRenderer(DRAGON, 176, 65); JAW.addBox(-6, 0, -16, 12, 4, 16); JAW.setRotationPoint(0, 4, -8); HEAD.addChild(JAW);
     }
     public static boolean special(ItemStack stack) { return ClientItems.is(stack, Kind.SHIELD) || ClientItems.is(stack, Kind.HEAD); }
+    public static void clearPatterns() { PATTERNS.clear(); }
     public static void render(ItemStack stack) {
         GlStateManager.pushMatrix();
         try {

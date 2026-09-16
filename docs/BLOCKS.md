@@ -1,7 +1,7 @@
 # Versioned server blocks
 
 The implementation targets Forge 1.8.9 connecting to vanilla-protocol
-servers from 1.9 through 1.14.4, retaining the catalog implemented through 1.12.2. This is an incremental block backport, not complete
+servers with the explicit profiles below and in [MODERN.md](MODERN.md), retaining the catalog implemented through 1.12.2. This is an incremental block backport, not complete
 client emulation. Block items and the standalone items introduced through 1.12.2
 are included; see [item implementation and limits](ITEMS.md). The longer-term design
 covers modern blocks and additional interaction mechanics.
@@ -29,7 +29,8 @@ covers modern blocks and additional interaction mechanics.
 | 490 | 1.14.3 | 1.14.3 |
 | 498 | 1.14.4 | 1.14.4 |
 
-For the added flattened families, see [data conversion, coverage and limits](FLATTENED.md).
+For 1.13/1.14 see [flattened data conversion](FLATTENED.md). Later registrations,
+verification status and the Y=0..255 native height limit are in [MODERN.md](MODERN.md).
 New aquatic/village blocks are not added to the inherited native catalog.
 
 `LegacyBlockCatalog` covers every new vanilla block ID in the range: 198â€“252 and
@@ -129,7 +130,7 @@ the same wire width but fails the following protocol's typed read.
 
 ## Resources and lifetime
 
-`ServerBlockSession` owns resource activation on Minecraft's main thread. Download
+`ServerSession` owns resource activation on Minecraft's main thread. Download
 completion and delayed channel closure are checked against the active connection
 identity, so an old connection cannot replace or clear a new connection's pack.
 World unload clears the active resources, including pending download activation.
@@ -137,6 +138,15 @@ Profile changes rebuild block models, the texture atlas and its render consumers
 after draining existing chunk compilation, without restarting the sound engine.
 Native resource-pack reloads still use
 Minecraft's normal reload flow.
+
+Target resources are prepared during connection setup and cached for reconnects.
+The loading screen waits for the final atlas, so the world is not exposed with
+temporary textures. Modern PNG transparency is normalized for Java 8 before atlas
+baking. Shield/banner bases moved in 26.x; 26.2 beds now use their original block
+models and composite item placement instead of the removed bed entity atlas.
+Water tint uses original biome colors from 1.13 onward. See
+[resource lifecycle and water retention](COMPATIBILITY.md#resources-and-lifecycle)
+and [render regression coverage](MODERN.md#validation).
 
 `BlockAssetCache` downloads only the pinned Mojang client URLs listed in
 `assets/viaforge/block-versions.json`. Size and SHA-1 are checked before use;
@@ -293,8 +303,9 @@ profile. Renderer comparisons are saved as `end-crystals-<version>.png`,
 1. Verify real-server interactions and third-party rendering compatibility. Chorus
    multipart conversion selects a deterministic variant from weighted decorative
    alternatives, so small surface details may differ from native random choices.
-2. Add 1.13+ state registries and packet adapters, preserving the same separation
-   between server states, local representations and resource profiles.
+2. Expand the explicitly registered 1.13-26.2 adapters beyond the inherited
+   catalog, preserving the separation between server states, local
+   representations and resource profiles.
 3. Extend world storage/rendering/light/position handling for modern dimension
    heights. Via's legacy height clipping must be addressed before claiming
    complete 1.18+ world support.

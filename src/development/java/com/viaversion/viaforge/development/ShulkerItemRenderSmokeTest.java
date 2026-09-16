@@ -87,12 +87,15 @@ final class ShulkerItemRenderSmokeTest {
                 dropped(world, recorder, item, originalDisplay(zip, "item/" + models[i], 0),
                         target.resources().version() + " " + models[i]);
             }
-            for (int color = 0; color < (target.serverProtocol() >= 315 ? 16 : 0); color++) {
+            for (int variant = 0; variant < (target.serverProtocol() >= 335 ? 32 : target.serverProtocol() >= 315 ? 16 : 0); variant++) {
+                boolean bed = variant >= 16; int color = variant & 15;
                 String name = LegacyBlockCatalog.COLORS[color];
                 if (target.serverProtocol() >= 393 && color == 8) name = "light_gray";
-                JsonObject display = originalDisplay(zip, "item/" + name + "_shulker_box", 0);
-                String label = target.resources().version() + " " + name + " shulker";
-                ItemStack stack = stack(color);
+                String path = "item/" + name + (bed ? "_bed" : "_shulker_box");
+                if (bed && zip.getEntry("assets/minecraft/models/" + path + ".json") == null && target.serverProtocol() < 393) path = "item/bed";
+                JsonObject display = originalDisplay(zip, path, 0);
+                String label = target.resources().version() + " " + name + (bed ? " bed" : " shulker");
+                ItemStack stack = bed ? ServerEntitySmokeTest.stack(355, color) : stack(color);
                 for (boolean slim : new boolean[]{false, true}) {
                     RenderPlayer renderer = new RenderPlayer(mc.getRenderManager(), slim);
                     ModelBiped model = renderer.getMainModel(); model.isChild = false;
@@ -130,6 +133,7 @@ final class ShulkerItemRenderSmokeTest {
                 GlStateManager.loadIdentity(); GlStateManager.translate(8, 8, 100); GlStateManager.scale(16, -16, 16);
                 originalTransform(display, "gui", false); GlStateManager.scale(2, 2, 2);
                 compare(recorder.matrix, label + " inventory");
+                if (bed) inventoryBounds(mc.getRenderItem().getItemModelMesher().getItemModel(stack), recorder.matrix, label);
                 GlStateManager.loadIdentity(); recorder.matrix = null;
                 recorder.renderItemModelForEntity(stack, remote, TransformType.FIXED);
                 GlStateManager.loadIdentity(); originalTransform(display, "fixed", false); GlStateManager.scale(2, 2, 2);
@@ -139,7 +143,7 @@ final class ShulkerItemRenderSmokeTest {
             remote.setSneaking(false); view.offhand = null;
             field.set(mc.getItemRenderer(), original);
             String version = target.resources().version();
-            if (version.equals("1.11") || version.equals("1.12.2") || version.equals("1.13.2") || version.equals("1.14.4"))
+            if (version.equals("1.11") || version.equals("1.12.2") || version.equals("1.13.2") || version.equals("1.14.4") || version.equals("26.2"))
                 preview(version, directory, remote, view);
         } finally {
             field.set(mc.getItemRenderer(), original); GlStateManager.popMatrix();
@@ -148,6 +152,26 @@ final class ShulkerItemRenderSmokeTest {
         }
     }
 
+    /** Check actual baked geometry after the native renderer's final half-scale
+     * and centering, not just display JSON: both bed halves must fit a 16px slot. */
+    private static void inventoryBounds(IBakedModel model, float[] transform, String label) {
+        java.util.List<net.minecraft.client.renderer.block.model.BakedQuad> quads=new java.util.ArrayList<>(model.getGeneralQuads());
+        for(net.minecraft.util.EnumFacing face:net.minecraft.util.EnumFacing.values())quads.addAll(model.getFaceQuads(face));
+        require(!quads.isEmpty(),label+" has baked item geometry");
+        float minX=Float.POSITIVE_INFINITY,maxX=Float.NEGATIVE_INFINITY,minY=minX,maxY=maxX;
+        for(net.minecraft.client.renderer.block.model.BakedQuad quad:quads) {
+            int[] vertices=quad.getVertexData();int stride=vertices.length/4;
+            for(int i=0;i<4;i++) {
+                float x=(Float.intBitsToFloat(vertices[i*stride])-.5F)*.5F;
+                float y=(Float.intBitsToFloat(vertices[i*stride+1])-.5F)*.5F;
+                float z=(Float.intBitsToFloat(vertices[i*stride+2])-.5F)*.5F;
+                float screenX=transform[0]*x+transform[4]*y+transform[8]*z+transform[12];
+                float screenY=transform[1]*x+transform[5]*y+transform[9]*z+transform[13];
+                minX=Math.min(minX,screenX);maxX=Math.max(maxX,screenX);minY=Math.min(minY,screenY);maxY=Math.max(maxY,screenY);
+            }
+        }
+        require(minX>=0&&maxX<=16&&minY>=0&&maxY<=16,label+" fits its inventory slot: "+minX+","+minY+" .. "+maxX+","+maxY);
+    }
     private static void dropped(WorldClient world, Recorder recorder, ItemStack stack, JsonObject display, String label) {
         EntityItem entity = new EntityItem(world, 0, 0, 0, stack); entity.hoverStart = 0;
         RenderEntityItem renderer = new RenderEntityItem(Minecraft.getMinecraft().getRenderManager(), recorder) {
@@ -186,7 +210,19 @@ final class ShulkerItemRenderSmokeTest {
     private static JsonObject originalDisplay(ZipFile zip, String model, int depth) throws IOException {
         require(depth < 16, "Original shulker model parent depth");
         JsonObject json;
-        try (Reader reader = new InputStreamReader(zip.getInputStream(zip.getEntry("assets/minecraft/models/" + model + ".json")), "UTF-8")) {
+        java.util.zip.ZipEntry entry=zip.getEntry("assets/minecraft/models/"+model+".json");
+        if(entry==null&&model.startsWith("item/")) {
+            java.util.zip.ZipEntry definition=zip.getEntry("assets/minecraft/items/"+model.substring(5)+".json");
+            require(definition!=null,"Original item definition "+model);
+            try(Reader reader=new InputStreamReader(zip.getInputStream(definition),"UTF-8")) {
+                JsonObject node=new JsonParser().parse(reader).getAsJsonObject().getAsJsonObject("model");
+                if(node.get("type").getAsString().equals("minecraft:composite")) node=node.getAsJsonArray("models").get(0).getAsJsonObject();
+                require(node.get("type").getAsString().equals("minecraft:model"),"Original direct model reference "+model);
+                return originalDisplay(zip,node.get("model").getAsString().replace("minecraft:",""),depth+1);
+            }
+        }
+        require(entry!=null,"Original model "+model);
+        try (Reader reader = new InputStreamReader(zip.getInputStream(entry), "UTF-8")) {
             json = new JsonParser().parse(reader).getAsJsonObject();
         }
         JsonObject display = new JsonObject();
@@ -194,8 +230,8 @@ final class ShulkerItemRenderSmokeTest {
             String parent = json.get("parent").getAsString().replace("minecraft:", "");
             if (!parent.startsWith("builtin/")) display = originalDisplay(zip, parent, depth + 1);
         }
-        if (json.has("display")) for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject("display").entrySet())
-            display.add(entry.getKey(), entry.getValue());
+        if (json.has("display")) for (Map.Entry<String, JsonElement> transform : json.getAsJsonObject("display").entrySet())
+            display.add(transform.getKey(), transform.getValue());
         return display;
     }
 

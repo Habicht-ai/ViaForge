@@ -41,6 +41,8 @@ public class MixinGuiConnecting_1 {
             version = ViaForgeCommon.getManager().getTargetVersion();
         }
         VersionTracker.storeServerProtocolVersion(address, version);
+        com.viaversion.viaforge.compatibility.ServerSession.prefetch(
+                com.viaversion.viaforge.common.compatibility.CompatibilityRegistry.DEFAULT.resolve(version.getVersion()));
         return address;
     }
 

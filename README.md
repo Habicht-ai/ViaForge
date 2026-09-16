@@ -63,9 +63,10 @@ is included. The Minecraft client itself always remains on version 1.8.9.
 
 ## Versioned blocks and block items
 
-Multiplayer connections using **1.9 through 1.14.4** retain the inherited original server
-block states before Via converts them. The catalog covers all new block IDs in
-this range (198â€“252 and 255), with each family enabled from its own release:
+Multiplayer connections using explicit server profiles retain the inherited original
+block states before Via converts them. See [modern adapters and verification limits](docs/MODERN.md)
+for the additional families through 26.2. The catalog covers the new block IDs
+introduced through 1.12.2 (198â€“252 and 255), with each family enabled from its own release:
 
 - **1.9+**: end rods, chorus plants/flowers, purpur blocks/pillars/stairs/slabs,
   end stone bricks, beetroots, grass paths, frosted ice and the new command,

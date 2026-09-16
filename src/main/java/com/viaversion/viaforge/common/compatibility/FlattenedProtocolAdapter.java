@@ -18,17 +18,20 @@ public final class FlattenedProtocolAdapter implements PacketAdapter, StorableOb
     private final LegacyBlockPackets blocks=new LegacyBlockPackets(BlockVersionProfile.V1_12_2);
     private final LegacyEntityPackets entities=new LegacyEntityPackets(BlockVersionProfile.V1_12_2);
     private final IntUnaryOperator mapper;
+    public final WaterColors waterColors = new WaterColors();
     private FlattenedBlockData flattened;
     private VillageBlockData village;
+    private final Map<Class<?>,VillageBlockData> modernFamilies=new HashMap<>();
     private final List<ByteBuf> pending=new ArrayList<>();
     private final Set<PacketWrapper> captured=Collections.newSetFromMap(new IdentityHashMap<>());
     private final Set<PacketWrapper> replaced=Collections.newSetFromMap(new IdentityHashMap<>());
-    private boolean active,failed;
+    private boolean active,failed,observedJoin;
     public FlattenedProtocolAdapter(IntUnaryOperator mapper){this.mapper=mapper;}
     public List<ByteBuf> replace(ByteBuf original){return null;}
     public boolean capture(ByteBuf original){
         active=!failed;
-        return Types.VAR_INT.readPrimitive(original.duplicate())==ClientboundPackets1_13.LOGIN.getId();
+        observedJoin=false;
+        return false; // Join IDs vary by target; the decoder recognizes normalized native LOGIN.
     }
     public ByteBuf event(ByteBuf original){return null;}
     /** Called only at declared boundaries by the mixin in AbstractProtocol. */
@@ -37,19 +40,27 @@ public final class FlattenedProtocolAdapter implements PacketAdapter, StorableOb
         boolean original=protocol instanceof Protocol1_13To1_12_2;
         boolean modern=protocol instanceof com.viaversion.viabackwards.protocol.v1_14to1_13_2.Protocol1_14To1_13_2;
         boolean legacy=protocol instanceof Protocol1_12_2To1_12_1;
-        if(!original&&!legacy&&!modern)return false;
+        if(flattened==null)flattened=new FlattenedBlockData(waterColors);
+        Class<?> type=protocol.getClass();
+        if(!modernFamilies.containsKey(type))modernFamilies.put(type,ModernBlockFamilies.create(protocol,flattened,packet.user()));
+        VillageBlockData family=modernFamilies.get(type);
+        if(!original&&!legacy&&!modern&&family==null)return false;
         ByteBuf snapshot=null,normalized=null;
         try {
             snapshot=snapshot(packet);
-            if(modern) {
+            if(family!=null) {
+                normalized=captured.contains(packet)?null:family.normalize(snapshot);
+                if(normalized!=null){captureBlocks(packet,normalized);captured.add(packet);}
+            }else if(modern) {
                 if(flattened==null)flattened=new FlattenedBlockData();
                 if(village==null)village=new VillageBlockData(flattened);
-                normalized=village.normalize(snapshot);
+                normalized=captured.contains(packet)?null:village.normalize(snapshot);
                 if(normalized!=null){captureBlocks(packet,normalized);captured.add(packet);}
             }else if(original) {
                 if(flattened==null)flattened=new FlattenedBlockData();
                 captureCloudParticle(snapshot,(Protocol1_13To1_12_2)protocol);
                 normalized=captured.contains(packet)?null:flattened.normalize(snapshot);
+                if(Types.VAR_INT.readPrimitive(snapshot.duplicate())==ClientboundPackets1_13.LOGIN.getId())observedJoin=true;
                 if(normalized!=null){captureBlocks(packet,normalized);captured.add(packet);}
             }else {
                 if(!captured.remove(packet))captureBlocks(packet,snapshot);
@@ -104,14 +115,15 @@ public final class FlattenedProtocolAdapter implements PacketAdapter, StorableOb
         finally{if(tail!=null)tail.readerIndex(reader);packet.resetReader();}
     }
     public ByteBuf restore(ByteBuf translated)throws Exception{return failed?null:blocks.restore(translated,mapper);}
+    public boolean observedJoin(){return observedJoin;}
     public List<ByteBuf> afterTranslation(ByteBuf original){
         active=false;captured.clear();replaced.clear();
         List<ByteBuf> result=new ArrayList<>(pending);pending.clear();return result;
     }
-    public void clear(){active=false;blocks.world().clear();entities.clear();captured.clear();replaced.clear();for(ByteBuf packet:pending)packet.release();pending.clear();}
+    public void clear(){active=false;waterColors.clear();blocks.world().clear();entities.clear();captured.clear();replaced.clear();for(ByteBuf packet:pending)packet.release();pending.clear();}
     public static final class Factory implements ProtocolAdapterFactory {
         private final int protocol;
-        public Factory(int protocol){if(protocol!=393&&protocol!=401&&protocol!=404&&protocol!=477&&protocol!=480&&protocol!=485&&protocol!=490&&protocol!=498)throw new IllegalArgumentException("Unverified flattened target "+protocol);this.protocol=protocol;}
+        public Factory(int protocol){if(protocol!=393&&protocol!=401&&protocol!=404&&protocol!=477&&protocol!=480&&protocol!=485&&protocol!=490&&protocol!=498&&protocol!=573&&protocol!=575&&protocol!=578&&protocol!=735&&protocol!=736&&protocol!=751&&protocol!=753&&protocol!=754&&protocol!=755&&protocol!=756&&protocol!=757&&protocol!=758&&protocol!=759&&protocol!=760&&protocol!=761&&protocol!=762&&protocol!=763&&protocol!=764&&protocol!=765&&protocol!=766&&protocol!=767&&protocol!=768&&protocol!=769&&protocol!=770&&protocol!=771&&protocol!=772&&protocol!=773&&protocol!=774&&protocol!=775&&protocol!=776)throw new IllegalArgumentException("Unverified flattened target "+protocol);this.protocol=protocol;}
         public String id(){return "flattened-"+protocol;}
         public Set<ClientFeature> capabilities(){return Collections.unmodifiableSet(EnumSet.allOf(ClientFeature.class));}
         public PacketAdapter create(CompatibilityProfile target,IntUnaryOperator mapper){if(target.serverProtocol()!=protocol)throw new IllegalArgumentException("Wrong target");return new FlattenedProtocolAdapter(mapper);}

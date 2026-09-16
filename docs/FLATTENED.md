@@ -101,7 +101,7 @@ begin with `PASS`. `runClient` now also rejects a missing, stale or failed repor
 when `VIAFORGE_BLOCK_SMOKE_TEST` is set. Live multiplayer, latency, server plugins and anti-cheat have
 not been certified by these checks.
 
-## Remaining families through 26.2
+## Later families through 26.2
 
 The bundled ViaVersion/ViaBackwards 5.11.0 and ViaRewind 4.1.3 provide actual
 translation paths from protocol 47 through 26.2 (776). The Forge smoke reports
@@ -110,10 +110,10 @@ This establishes available protocol translation, not complete client emulation.
 The upstream [ViaVersion release](https://github.com/ViaVersion/ViaVersion/releases/tag/5.11.0)
 also documents 26.2 handling.
 
-Extended feature profiles for 1.15 through 26.2 remain unregistered. Work still
-includes family-specific preservation and target assets, changed chest layouts,
-new chunk biomes and world heights, later metadata/entity registries, inventory
-transactions and item components. New aquatic/village content, swimming and
-waterlogging behavior, modern villager geometry and other later gameplay also
-need dedicated implementations. No unknown target is exposed as 1.12.2 or
-enabled solely because a Via path exists.
+The subsequent adapter implementation is documented in [MODERN.md](MODERN.md),
+including its exact protocols, current verification status and original resource
+conversion. It preserves the inherited catalog across later chunk, registry,
+metadata and item-component boundaries. It does not supply full modern world
+heights, new aquatic/village content, swimming/waterlogging, all modern mob
+geometry or every later gameplay mechanic. No unknown target is exposed as
+1.12.2 or enabled solely because a Via path exists.

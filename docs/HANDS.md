@@ -1,9 +1,9 @@
-# Two hands on 1.9â€“1.14.4 servers
+# Two hands on supported server profiles
 
 Supported multiplayer resource/protocol profiles now expose the original offhand
 inventory slot, item use and rendering. Native 1.8 connections and singleplayer
-retain their original inventory and controls. The profile table in [BLOCKS.md](BLOCKS.md)
-also applies here; protocol-identical patch releases share a resource profile.
+retain their original inventory and controls. The profile tables in [BLOCKS.md](BLOCKS.md) and [MODERN.md](MODERN.md)
+also apply here; protocol-identical patch releases share a resource profile.
 
 ## Controls and behavior
 

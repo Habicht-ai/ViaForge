@@ -22,9 +22,10 @@ public final class LegacyBlockItemBridge {
         // Undo those transformations on a copy to recover the untouched server item.
         Item original = fallback.copy();
         for (Protocol pipe : user.getProtocolInfo().getPipeline().pipes()) {
+            if(flattened(profile)&&flatteningBoundary(pipe))break;
             if (eligible(pipe)) original = pipe.getItemRewriter().handleItemToServer(user, original);
         }
-        original=profile.adapter().items().toClientData(user, original);
+        if(!flattened(profile))original=profile.adapter().items().toClientData(user, original);
         if (original == null) return fallback;
         int localId = localItem.applyAsInt(original.identifier(), original.data());
         LegacyItemDefinition block = localId < 0 ? null : serverItem.apply(localId);
@@ -46,16 +47,22 @@ public final class LegacyBlockItemBridge {
             fallback.setIdentifier(block.itemId());
             if (!block.preservesDamage()) fallback.setData((short) block.itemData());
         }
-        fallback=profile.adapter().items().toServerData(user, fallback);
+        if(!flattened(profile))fallback=profile.adapter().items().toServerData(user, fallback);
         if(fallback==null)return null;
         List<Protocol> pipes = user.getProtocolInfo().getPipeline().pipes();
-        for (int i = pipes.size() - 1; i >= 0; i--) {
+        int end=pipes.size();
+        if(flattened(profile))for(int i=0;i<pipes.size();i++)if(flatteningBoundary(pipes.get(i))){end=i;break;}
+        for (int i = end - 1; i >= 0; i--) {
             Protocol pipe = pipes.get(i);
             if (eligible(pipe)) fallback = pipe.getItemRewriter().handleItemToClient(user, fallback);
         }
         // The ordinary serverbound pipeline now restores this to the server item.
         return fallback;
     }
+    // The native bridge only needs the internal 1.12 identity. Replaying newer
+    // item codecs discards inventory hash records and can mutate registry caches.
+    static boolean flattened(CompatibilityProfile profile){return profile.adapter() instanceof FlattenedProtocolAdapter.Factory;}
+    static boolean flatteningBoundary(Protocol pipe){return pipe instanceof com.viaversion.viabackwards.protocol.v1_13to1_12_2.Protocol1_13To1_12_2;}
     private boolean eligible(Protocol pipe) {
         return pipe.getItemRewriter() != null && !(pipe.getItemRewriter() instanceof ClientBlockItemRewriter);
     }

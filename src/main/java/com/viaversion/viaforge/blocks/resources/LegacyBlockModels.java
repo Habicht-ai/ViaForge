@@ -230,6 +230,9 @@ public final class LegacyBlockModels {
     }
 
     private static JsonObject bed(Definition block, boolean head, boolean item, Map<String, byte[]> assets) throws IOException {
+        String modernName = block.name.replace("silver", "light_gray");
+        if (assets.containsKey("models/block/" + modernName + "_head.json"))
+            return modelBed(modernName, head, item, assets);
         String texture = "textures/entity/bed/" + LegacyBlockCatalog.COLORS[block.color] + ".png";
         JsonObject model = cube(assets.containsKey(texture) ? "viaforge:" + texture.substring(9, texture.length() - 4) : "minecraft:blocks/planks_oak");
         JsonArray elements = new JsonArray();
@@ -239,11 +242,37 @@ public final class LegacyBlockModels {
         if (item) addBedHalf(elements, false, true, -16);
         model.add("elements", elements);
         if (item) {
-            JsonObject source = read(assets, "models/item/bed.json");
+            String path = "models/item/" + block.name + ".json";
+            if (!assets.containsKey(path)) path = "models/item/bed.json";
+            JsonObject source = assets.containsKey(path) ? LegacyModelConverter.flatten(path, assets) : null;
             if (source != null && source.has("display")) {
-                LegacyModelConverter.adaptDisplayTransforms(source);
                 model.add("display", source.get("display"));
             }
+        }
+        return model;
+    }
+
+    /** 26.2 beds are ordinary block models; the item combines head and translated
+     * foot. Use their actual faces/UVs instead of stretching planks onto a lost atlas. */
+    private static JsonObject modelBed(String name, boolean head, boolean item, Map<String, byte[]> assets) throws IOException {
+        JsonObject model = qualifyModel(LegacyModelConverter.flatten("models/block/" + name + (head ? "_head.json" : "_foot.json"), assets));
+        if (!item) return model;
+        JsonObject foot = qualifyModel(LegacyModelConverter.flatten("models/block/" + name + "_foot.json", assets));
+        JsonObject textures = model.getAsJsonObject("textures");
+        for (Map.Entry<String, JsonElement> texture : foot.getAsJsonObject("textures").entrySet())
+            textures.add("foot_" + texture.getKey(), texture.getValue());
+        for (JsonElement element : foot.getAsJsonArray("elements")) {
+            JsonObject box = element.getAsJsonObject();
+            for (String bound : new String[]{"from", "to"}) {
+                double[] point = vector(box.getAsJsonArray(bound));
+                box.add(bound, numbers(point[0], point[1], point[2] + 16));
+            }
+            for (Map.Entry<String, JsonElement> face : box.getAsJsonObject("faces").entrySet()) {
+                JsonObject value = face.getValue().getAsJsonObject();
+                value.addProperty("texture", "#foot_" + value.get("texture").getAsString().substring(1));
+                value.remove("cullface");
+            }
+            model.getAsJsonArray("elements").add(box);
         }
         return model;
     }

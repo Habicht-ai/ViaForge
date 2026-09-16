@@ -54,7 +54,7 @@ public final class BlockAssetCache {
         }
         Map<String, byte[]> assets = new HashMap<>(readAssets(jar));
         assets.putAll(MobSoundAssets.load(cache,version));
-        if (version.startsWith("1.11") || version.startsWith("1.12") || version.startsWith("1.13") || version.startsWith("1.14")) {
+        if (!version.startsWith("1.9") && !version.startsWith("1.10")) {
             // The 1.11 and 1.12 Mojang asset indexes reference this identical recording.
             String soundHash = "e7f0337931cdb05c4234d2a9bc1f38ead675db26";
             Path sound = cache.resolve(soundHash + ".ogg");
@@ -83,7 +83,7 @@ public final class BlockAssetCache {
                 String path = name.substring("assets/minecraft/".length());
                 if (!(path.startsWith("textures/blocks/") || path.startsWith("textures/block/") || path.startsWith("textures/item/") || path.startsWith("models/block/") || path.startsWith("blockstates/")
                         || path.startsWith("textures/entity/") || path.startsWith("textures/models/armor/") || path.equals("sounds.json")
-                        || path.startsWith("models/item/") || path.startsWith("textures/entity/shulker/") || path.startsWith("textures/entity/bed/")
+                        || path.startsWith("items/") || path.startsWith("models/item/") || path.startsWith("textures/entity/shulker/") || path.startsWith("textures/entity/bed/")
                         || path.equals("textures/entity/end_portal.png") || path.equals("textures/environment/end_sky.png")
                         || path.startsWith("textures/items/") || path.startsWith("textures/entity/shield/")
                         || path.equals("textures/entity/shield_base.png") || path.equals("textures/entity/shield_base_nopattern.png")
@@ -91,6 +91,7 @@ public final class BlockAssetCache {
                         || path.startsWith("textures/entity/projectiles/") || path.startsWith("textures/particle/") || path.startsWith("particles/")
                         || path.equals("textures/entity/sweep.png") || path.equals("textures/gui/icons.png") || path.equals("textures/gui/container/horse.png")
                         || path.equals("textures/gui/container/inventory.png") || path.equals("textures/gui/container/creative_inventory/tab_inventory.png") || path.equals("textures/gui/widgets.png")
+                        || path.startsWith("textures/gui/sprites/")
                         || path.equals("textures/entity/end_gateway_beam.png") || path.startsWith("textures/entity/endercrystal/"))) continue;
                 try (InputStream input = zip.getInputStream(entry)) {
                     byte[] data = readBounded(input, 2 * 1024 * 1024);

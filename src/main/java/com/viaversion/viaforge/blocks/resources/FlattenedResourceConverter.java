@@ -25,6 +25,9 @@ public final class FlattenedResourceConverter {
             JsonObject aliases=new JsonParser().parse(new InputStreamReader(stream,StandardCharsets.UTF_8)).getAsJsonObject();
             for(Map.Entry<String,JsonElement> alias:aliases.entrySet()) {
                 String target=alias.getValue().getAsString();
+                // Removed in 1.17, and never referenced by a vanilla item/model.
+                if((target.equals("textures/item/spawn_egg.png")||target.equals("textures/item/spawn_egg_overlay.png"))&&source.containsKey("models/item/egg/bat.json"))continue;
+                if(target.equals("textures/item/ruby.png")&&!source.containsKey(target))continue;
                 if(!source.containsKey(target))throw new IllegalArgumentException("Missing target texture "+target);
                 result.put(alias.getKey(),source.get(target));
                 if(source.containsKey(target+".mcmeta"))result.put(alias.getKey()+".mcmeta",source.get(target+".mcmeta"));

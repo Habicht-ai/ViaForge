@@ -1,0 +1,510 @@
+{
+  "icons": [
+    {
+      "sprite": "hud/food_empty",
+      "x": 16,
+      "y": 27,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/full_blinking",
+      "x": 70,
+      "y": 0,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/absorbing_hardcore_full",
+      "x": 160,
+      "y": 45,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/absorbing_hardcore_half_blinking",
+      "x": 169,
+      "y": 45,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/half",
+      "x": 61,
+      "y": 0,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/absorbing_half",
+      "x": 169,
+      "y": 0,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/poisoned_half_blinking",
+      "x": 115,
+      "y": 0,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/half_blinking",
+      "x": 79,
+      "y": 0,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/withered_full_blinking",
+      "x": 142,
+      "y": 0,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/container_blinking",
+      "x": 25,
+      "y": 0,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/hardcore_full",
+      "x": 52,
+      "y": 45,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/withered_hardcore_full_blinking",
+      "x": 142,
+      "y": 45,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/poisoned_hardcore_half",
+      "x": 97,
+      "y": 45,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/withered_full",
+      "x": 124,
+      "y": 0,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/frozen_full_blinking",
+      "x": 178,
+      "y": 0,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/withered_half_blinking",
+      "x": 151,
+      "y": 0,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/container_hardcore",
+      "x": 16,
+      "y": 0,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/frozen_hardcore_half",
+      "x": 187,
+      "y": 45,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/frozen_hardcore_full",
+      "x": 178,
+      "y": 45,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/poisoned_full_blinking",
+      "x": 106,
+      "y": 0,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/frozen_half",
+      "x": 187,
+      "y": 0,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/withered_hardcore_half_blinking",
+      "x": 151,
+      "y": 45,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/poisoned_hardcore_half_blinking",
+      "x": 115,
+      "y": 45,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/poisoned_full",
+      "x": 88,
+      "y": 0,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/vehicle_half",
+      "x": 97,
+      "y": 9,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/hardcore_half_blinking",
+      "x": 79,
+      "y": 45,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/full",
+      "x": 52,
+      "y": 0,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/withered_half",
+      "x": 133,
+      "y": 0,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/vehicle_full",
+      "x": 88,
+      "y": 9,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/poisoned_hardcore_full_blinking",
+      "x": 106,
+      "y": 45,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/absorbing_full_blinking",
+      "x": 160,
+      "y": 0,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/poisoned_hardcore_full",
+      "x": 88,
+      "y": 45,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/withered_hardcore_full",
+      "x": 124,
+      "y": 45,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/poisoned_half",
+      "x": 97,
+      "y": 0,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/withered_hardcore_half",
+      "x": 133,
+      "y": 45,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/hardcore_full_blinking",
+      "x": 70,
+      "y": 45,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/heart/hardcore_half",
+      "x": 61,
+      "y": 45,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/crosshair_attack_indicator_progress",
+      "x": 52,
+      "y": 94,
+      "w": 16,
+      "h": 4
+    },
+    {
+      "sprite": "hud/food_empty_hunger",
+      "x": 133,
+      "y": 27,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/food_half_hunger",
+      "x": 97,
+      "y": 27,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/experience_bar_progress",
+      "x": 0,
+      "y": 69,
+      "w": 182,
+      "h": 5
+    },
+    {
+      "sprite": "hud/crosshair_attack_indicator_full",
+      "x": 68,
+      "y": 94,
+      "w": 16,
+      "h": 16
+    },
+    {
+      "sprite": "hud/armor_empty",
+      "x": 16,
+      "y": 9,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/jump_bar_cooldown",
+      "x": 0,
+      "y": 74,
+      "w": 182,
+      "h": 5
+    },
+    {
+      "sprite": "hud/food_full_hunger",
+      "x": 88,
+      "y": 27,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/armor_full",
+      "x": 34,
+      "y": 9,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/food_full",
+      "x": 52,
+      "y": 27,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/jump_bar_progress",
+      "x": 0,
+      "y": 89,
+      "w": 182,
+      "h": 5
+    },
+    {
+      "sprite": "hud/hotbar_attack_indicator_progress",
+      "x": 18,
+      "y": 94,
+      "w": 18,
+      "h": 18
+    },
+    {
+      "sprite": "hud/crosshair_attack_indicator_background",
+      "x": 36,
+      "y": 94,
+      "w": 16,
+      "h": 4
+    },
+    {
+      "sprite": "hud/hotbar_attack_indicator_background",
+      "x": 0,
+      "y": 94,
+      "w": 18,
+      "h": 18
+    },
+    {
+      "sprite": "hud/jump_bar_background",
+      "x": 0,
+      "y": 84,
+      "w": 182,
+      "h": 5
+    },
+    {
+      "sprite": "hud/food_half",
+      "x": 61,
+      "y": 27,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/air_bursting",
+      "x": 25,
+      "y": 18,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/armor_half",
+      "x": 25,
+      "y": 9,
+      "w": 9,
+      "h": 9
+    },
+    {
+      "sprite": "hud/crosshair",
+      "x": 0,
+      "y": 0,
+      "w": 15,
+      "h": 15
+    },
+    {
+      "sprite": "hud/experience_bar_background",
+      "x": 0,
+      "y": 64,
+      "w": 182,
+      "h": 5
+    },
+    {
+      "sprite": "hud/air",
+      "x": 16,
+      "y": 18,
+      "w": 9,
+      "h": 9
+    }
+  ],
+  "widgets": [
+    {
+      "sprite": "hud/hotbar",
+      "x": 0,
+      "y": 0,
+      "w": 182,
+      "h": 22
+    },
+    {
+      "sprite": "hud/hotbar_selection",
+      "x": 0,
+      "y": 22,
+      "w": 24,
+      "h": 23
+    },
+    {
+      "sprite": "hud/hotbar_offhand_right",
+      "x": 53,
+      "y": 22,
+      "w": 29,
+      "h": 24
+    },
+    {
+      "sprite": "hud/crosshair",
+      "x": 240,
+      "y": 0,
+      "w": 15,
+      "h": 15
+    },
+    {
+      "sprite": "hud/hotbar_offhand_left",
+      "x": 24,
+      "y": 22,
+      "w": 29,
+      "h": 24
+    },
+    {
+      "sprite": "widget/locked_button",
+      "x": 0,
+      "y": 146,
+      "w": 20,
+      "h": 20
+    },
+    {
+      "sprite": "widget/locked_button_disabled",
+      "x": 0,
+      "y": 186,
+      "w": 20,
+      "h": 20
+    },
+    {
+      "sprite": "widget/slider",
+      "x": 0,
+      "y": 46,
+      "w": 200,
+      "h": 20
+    },
+    {
+      "sprite": "widget/button",
+      "x": 0,
+      "y": 66,
+      "w": 200,
+      "h": 20
+    },
+    {
+      "sprite": "widget/button_highlighted",
+      "x": 0,
+      "y": 86,
+      "w": 200,
+      "h": 20
+    },
+    {
+      "sprite": "widget/locked_button_highlighted",
+      "x": 0,
+      "y": 166,
+      "w": 20,
+      "h": 20
+    },
+    {
+      "sprite": "widget/unlocked_button_highlighted",
+      "x": 20,
+      "y": 166,
+      "w": 20,
+      "h": 20
+    },
+    {
+      "sprite": "widget/unlocked_button",
+      "x": 20,
+      "y": 146,
+      "w": 20,
+      "h": 20
+    },
+    {
+      "sprite": "widget/unlocked_button_disabled",
+      "x": 20,
+      "y": 186,
+      "w": 20,
+      "h": 20
+    }
+  ]
+}

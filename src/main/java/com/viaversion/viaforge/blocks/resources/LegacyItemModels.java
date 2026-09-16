@@ -11,6 +11,7 @@ public final class LegacyItemModels {
     public static Map<String, byte[]> generate(Map<String, byte[]> assets) throws IOException {
         Map<String, byte[]> models = new HashMap<>();
         Set<String> names = new HashSet<>(Arrays.asList("shield_blocking", "broken_elytra"));
+        for(String egg:com.viaversion.viaforge.common.blocks.SpawnEggNames.MODERN.keySet())names.add("egg/"+egg);
         for (LegacyItemCatalog.Definition item : LegacyItemCatalog.ITEMS) names.add(item.model);
         for (String material : new String[]{"wooden", "stone", "iron", "diamond", "golden"}) {
             for (String tool : new String[]{"sword", "axe", "pickaxe", "shovel", "hoe"}) names.add(material + "_" + tool);

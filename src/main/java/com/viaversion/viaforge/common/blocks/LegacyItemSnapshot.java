@@ -17,10 +17,11 @@ public final class LegacyItemSnapshot {
         // on a probe to determine whether our native registry can display it.
         Item probe = item.copy(); boolean higher = false;
         for (Protocol pipe : user.getProtocolInfo().getPipeline().pipes()) {
+            if(LegacyBlockItemBridge.flattened(profile)&&LegacyBlockItemBridge.flatteningBoundary(pipe))break;
             if (pipe.getItemRewriter() == boundary) { higher = true; continue; }
             if (higher && pipe.getItemRewriter() != null) probe = pipe.getItemRewriter().handleItemToServer(user, probe);
         }
-        probe=profile.adapter().items().toClientData(user, probe);
+        if(!LegacyBlockItemBridge.flattened(profile))probe=profile.adapter().items().toClientData(user, probe);
         if (probe == null) return;
         LegacyItemDefinition definition = ClientItems.serverItem(ClientItems.localItem(probe.identifier(), probe.data()));
         if ((definition == null || !profile.rules().contentSince(definition.itemProtocol())) && !LegacyBlockItemBridge.nativeEnchantments(probe, profile)) return;

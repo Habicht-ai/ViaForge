@@ -1,11 +1,11 @@
 # Compatibility pipeline
 
 The connection's server version, packet codec, client behavior and resource
-release are independent. Existing 1.9?1.12.2 implementations now also run on
-explicit 1.13?1.13.2 and 1.14?1.14.4 adapters. These registrations restore the
-inherited catalog; they do not implement all content introduced in those releases.
-Unknown targets retain normal Via connectivity without borrowing an older parser.
-See [flattened families and validation limits](FLATTENED.md).
+release are independent. Existing implementations through 1.12.2 are reused by
+explicit later adapters. These registrations retain the inherited catalog; they
+do not implement every later release's content. Unknown targets keep normal Via
+connectivity without borrowing an older parser. See [flattened families](FLATTENED.md)
+and [modern families, validation status and limits](MODERN.md).
 
 ## Connection and packet flow
 
@@ -96,11 +96,31 @@ not imposed by the generic PacketAdapter interface.
 Resources are converted into the renderer's expected layout before publication.
 They are selected explicitly for each target, independently of inherited behavior.
 The original verified download/cache machinery remains in use.
+Server address resolution starts preparation early. PNG conversion and generated
+models run off the render thread; the last two prepared releases are cached for
+reconnects. The first position packet keeps a cancellable loading screen open until
+the target atlas is ready, while network processing continues. First-time asset
+downloads still take time. A failed preparation reports an error instead of silently
+showing fallback textures. Native/unsupported targets do not use this loading gate.
 `SessionEpoch` issues a fresh ticket for every join, even on the same connection.
 A background resource completion is applied only if its exact ticket is current.
 Disconnect and server changes invalidate pending work; a late close from an old
 connection cannot clear the new session. World unloading clears the shared client
 entity, item, hand, cooldown and boat state as before.
+
+PNG grayscale samples and grayscale/RGB color-key transparency are expanded to
+RGBA before any converter decodes images: Java 8 otherwise loses transparency or
+changes gray brightness. Banner/shield masks and bases also become RGBA because
+the native layered texture renderer skips other image types. Resource publication
+invalidates both the GL textures and their banner/shield design caches.
+
+`WaterColors` retains original 1.13+ biome colors before Via collapses biome IDs.
+It reads numeric and hexadecimal registry colors, keeps the visible Y=0..255
+window aligned with negative source heights, and handles later biome update
+packets even when Via cancels their native translation. Immutable columns are
+read by chunk render workers; the main thread schedules affected chunk rebuilds.
+Unload, respawn and connection closure discard the columns. `BIOME_WATER_COLORS`
+is inherited from 1.13; native 1.8 and legacy targets retain their original tint.
 
 ## Registered flattened families
 
@@ -122,10 +142,16 @@ Profiles inherit the earlier behavior and select exact verified archives plus
 variants, parent/texture references, renamed item models and particle atlases are
 converted from the target's original resources before publication.
 
-The next unregistered family is 1.15. It requires verified original archives,
-changed chest textures/models, chunk biome data and spawn/join formats before
-registration. Later families require their own data-preservation boundaries;
-1.18's heights and 1.20.5's item components cannot be parsed as legacy formats.
+ModernBlockFamilies adds explicit preservation boundaries through 26.2 with the
+source chunk codec, inverse forward mappings and metadata/block-entity layout.
+ComponentItemSnapshot retains original component patches across structured item
+changes, including Via's original hashes for inventory clicks. The native item
+bridge only reverses the lower layers to recover the internal 1.12 identity;
+modern item translations remain in the actual packet pipeline.
+
+Resource converters compose chest UV conversion, renamed block/item paths,
+GUI sprite atlases, equipment, item definitions and individual spawn eggs.
+See MODERN.md for exact protocols, test status and the native world-height limit.
 No nearest-version fallback or automatic enabling of unknown formats is used.
 
 ## Verification
@@ -139,7 +165,7 @@ ownership, disabled-codec fallback and decoder reordering. These are architectur
 fixtures, not a claim of real 1.13 support.
 
 The existing Forge smoke suite now creates `CompatibilityDecodeHandler` through
-the same registry and adapter factory as production for all ten legacy profiles and eight flattened targets.
+the same registry and adapter factory as production for all ten legacy profiles and 38 flattened/modern targets.
 Its actual chunk, item, entity, hand, boat, UI, effect and model checks remain in
 place. Read `build/logs/block-client-smoke-test.txt`: it must begin with `PASS`.
 
@@ -148,5 +174,15 @@ observation. `FlattenedPipelineSmokeTest` uses actual compressed target packet
 formats through every installed Via layer, the real Forge mixins and native
 block/item decoders. It checks original archives and baked models, separate 1.14
 light, offhand/player/mob events, both item/hand directions, structure packets,
-block entity NBT, unload and dimension cleanup. See `FLATTENED.md` for the precise
+block entity NBT, unload and dimension cleanup. See `FLATTENED.md` and `MODERN.md` for the precise
 coverage and the distinction from live server gameplay.
+
+The vehicle regressions send the native `VF|boat` payload through every target
+pipeline, including movement, both paddles and all 36 direction/jump/dismount
+combinations. The 1.9 `PLAYER_INPUT` flags must be a typed `BYTE`: an
+`UNSIGNED_BYTE` has identical wire width but fails Via's in-memory typed read at
+the 1.21.2 boundary. The test reproduced the reported 26.2 encoder exception.
+
+For a focused Forge regression run, optionally set `VIAFORGE_SMOKE_PROTOCOL`
+to an exact registered protocol (for example `776`). Omit it for the required
+full 48-profile run; a focused PASS does not certify the other profiles.

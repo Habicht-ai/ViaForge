@@ -29,6 +29,8 @@ final class PendingResourceSmokeTest {
         Minecraft mc=Minecraft.getMinecraft();
         require(ServerSession.getLoadedResourceVersion()==null,"Test precedes target resource publication");
         EntityPlayerSP previous=mc.thePlayer;
+        WorldClient previousWorld=mc.theWorld;
+        net.minecraft.client.gui.GuiScreen previousScreen=mc.currentScreen;
         WorldClient world=new WorldClient(null,new WorldSettings(0,WorldSettings.GameType.CREATIVE,false,false,WorldType.DEFAULT),0,EnumDifficulty.NORMAL,new Profiler());
         NetHandlerPlayClient handler=new NetHandlerPlayClient(mc,null,new NetworkManager(EnumPacketDirection.CLIENTBOUND),new GameProfile(new UUID(0,17),"PendingResources"));
         Map<ResourceLocation,ITextureObject> textures=((VersionTextureCache)mc.getTextureManager()).viaForge$textures();
@@ -37,12 +39,17 @@ final class PendingResourceSmokeTest {
         require(!textures.containsKey(icons)&&!textures.containsKey(shield),"Old target HUD textures were evicted on join");
         try {
             mc.thePlayer=new EntityPlayerSP(mc,world,handler,new StatFileWriter());
+            mc.theWorld=world;
+            handler.handlePlayerPosLook(new net.minecraft.network.play.server.S08PacketPlayerPosLook(8,64,8,0,0,
+                    java.util.EnumSet.noneOf(net.minecraft.network.play.server.S08PacketPlayerPosLook.EnumFlags.class)));
+            require(mc.currentScreen instanceof com.viaversion.viaforge.compatibility.ResourceLoadingScreen,
+                    "Actual first position packet keeps the loading screen until target assets are ready");
             ServerCombatState.attack();
             require(ServerCombatState.strength(0)<1,"Attack indicator would draw while pack is pending");
             new ServerCombatIndicator().draw(320,240);
             HandGui.emptySlot(0,0);
             require(!textures.containsKey(icons)&&!textures.containsKey(shield),"Pending HUD assets must not be cached as missing textures");
-        }finally{mc.thePlayer=previous;ServerCombatState.clear();}
+        }finally{mc.thePlayer=previous;mc.theWorld=previousWorld;mc.displayGuiScreen(previousScreen);ServerCombatState.clear();}
     }
     private PendingResourceSmokeTest(){}
 }

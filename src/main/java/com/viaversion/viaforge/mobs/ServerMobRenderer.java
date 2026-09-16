@@ -17,6 +17,7 @@ public final class ServerMobRenderer extends RenderLiving<ServerMob> {
     private final QuadrupedMobModel carpet = new QuadrupedMobModel(true, .5F);
     private final BipedMobModel strayClothes = new BipedMobModel(MobKind.STRAY, .25F, true);
     private final ModelBiped illagerGrip = new ModelBiped();
+    private final SmallVexModel smallVex = new SmallVexModel();
     public ServerMobRenderer(RenderManager manager) {
         super(manager, new ShulkerModel(), .5F);
         for (MobKind kind : MobKind.values()) if (kind.custom()) {
@@ -30,9 +31,9 @@ public final class ServerMobRenderer extends RenderLiving<ServerMob> {
         }
         addLayer(new DetailLayer()); addLayer(new ArmorLayer(this));
     }
-    public ModelBase model(MobKind kind) { return models.get(kind); }
+    public ModelBase model(MobKind kind) { return kind==MobKind.VEX&&com.viaversion.viaforge.compatibility.ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.SMALL_VEX_MODEL)?smallVex:models.get(kind); }
     @Override public void doRender(ServerMob mob, double x, double y, double z, float yaw, float partial) {
-        mainModel = models.get(mob.kind());
+        mainModel = model(mob.kind());
         shadowSize = mob.kind() == MobKind.SHULKER ? 0 : mob.kind() == MobKind.PARROT || mob.kind() == MobKind.VEX ? .3F : mob.kind() == MobKind.POLAR_BEAR || mob.kind() == MobKind.LLAMA ? .7F : .5F;
         if (mob.kind() == MobKind.SHULKER && mob.teleportTicks > 0 && mob.attachment != null && mob.oldAttachment != null) {
             double progress = (mob.teleportTicks - partial) / 6; progress *= progress;
@@ -81,6 +82,7 @@ public final class ServerMobRenderer extends RenderLiving<ServerMob> {
     @Override protected void preRenderCallback(ServerMob mob, float partial) {
         float scale = mob.kind() == MobKind.SHULKER ? .999F : mob.kind() == MobKind.POLAR_BEAR ? 1.2F : mob.kind() == MobKind.VEX ? .4F
                 : mob.kind() == MobKind.HUSK ? 1.0625F : mob.kind() == MobKind.WITHER_SKELETON ? 1.2F : mob.kind().illager() ? .9375F : 1;
+        if(mainModel instanceof SmallVexModel)scale=1;
         GlStateManager.scale(scale,scale,scale);
     }
     @Override protected float handleRotationFloat(ServerMob mob, float partial) {
@@ -127,7 +129,7 @@ public final class ServerMobRenderer extends RenderLiving<ServerMob> {
             if (mainModel instanceof ModelBiped) {
                 ServerHeldItemRenderer.render((ModelBiped)mainModel,mob,mob.getHeldItem(),false);
                 ServerHeldItemRenderer.render((ModelBiped)mainModel,mob,mob.offhand,true);
-                new LayerCustomHead(((ModelBiped)mainModel).bipedHead).doRenderLayer(mob,limb,amount,partial,age,yaw,pitch,scale);
+                if(!(mainModel instanceof SmallVexModel))new LayerCustomHead(((ModelBiped)mainModel).bipedHead).doRenderLayer(mob,limb,amount,partial,age,yaw,pitch,scale);
             } else if (mainModel instanceof IllagerModel && (mob.state.spell() != 0 || mob.state.armsRaised())) {
                 IllagerModel model = (IllagerModel)mainModel;
                 illagerGrip.bipedRightArm = model.rightArm; illagerGrip.bipedLeftArm = model.leftArm; illagerGrip.isChild = false;

@@ -28,12 +28,18 @@ public final class VersionBlockPack implements IResourcePack {
     }
 
     public void setAssets(Map<String, byte[]> assets) {
+        install(prepare(assets));
+    }
+    public static final class Prepared {
+        private final Map<String, byte[]> assets, models;
+        private Prepared(Map<String, byte[]> assets, Map<String, byte[]> models) { this.assets=assets;this.models=models; }
+    }
+    public static Prepared prepare(Map<String, byte[]> assets) {
         try {
-            Map<String, byte[]> models = generate(assets);
-            this.assets = assets;
-            this.generated = models;
+            return new Prepared(assets, generate(assets));
         } catch (IOException error) { throw new IllegalArgumentException("Could not convert server block models", error); }
     }
+    public void install(Prepared prepared) { assets=prepared.assets;generated=prepared.models; }
 
     @Override
     public boolean resourceExists(ResourceLocation location) {

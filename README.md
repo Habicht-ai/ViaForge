@@ -8,6 +8,9 @@ Developer launches include account management adapted from [Vibe](https://codebe
 
 - **`run.bat`** launches Minecraft with ViaForge and the developer account manager.
 - **`build.bat`** runs checks and builds the mod JAR without the account manager.
+- Double-click **`Testserver.vbs`** (or **`Testserver.bat`**) to open the local web
+  dashboard for 48 Vanilla test servers: live status, start/stop, favorites and
+  searchable block, item and mob catalogs. See the [test laboratory guide](docs/TESTSERVERS.md).
 - Output: **`build/libs/ViaForge-1.8.9-4.4.0-client.1.jar`**.
 - For a standard Forge 1.8.9 installation, place the JAR in the `mods` folder.
   It is a Forge mod and cannot be launched directly by double-clicking it.

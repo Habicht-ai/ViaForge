@@ -39,3 +39,7 @@ accounts.key
 accounts.vault
 ViaForge/accounts/
 ViaForge/cookies/
+
+# Local test-server tooling caches
+tools/test-servers/__pycache__/
+logs/

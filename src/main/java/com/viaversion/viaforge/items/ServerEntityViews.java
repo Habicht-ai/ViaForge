@@ -27,7 +27,7 @@ public final class ServerEntityViews {
     }
     private static WorldClient world;
     private static final Map<Integer, View> VIEWS = new HashMap<>();
-    public static void clear() { VIEWS.clear(); world = null; ServerTotemAnimation.clear(); ServerCombatState.clear(); ServerItemCooldowns.clear(); com.viaversion.viaforge.hands.Offhand.clear(); com.viaversion.viaforge.mobs.ServerMobs.clear(); com.viaversion.viaforge.boats.ServerBoats.clear(); }
+    public static void clear() { VIEWS.clear(); world = null; com.viaversion.viaforge.blocks.ServerEditorPermissions.clear(); ServerTotemAnimation.clear(); ServerCombatState.clear(); ServerItemCooldowns.clear(); com.viaversion.viaforge.hands.Offhand.clear(); com.viaversion.viaforge.mobs.ServerMobs.clear(); com.viaversion.viaforge.boats.ServerBoats.clear(); }
     public static View get(int id) { return world == Minecraft.getMinecraft().theWorld ? VIEWS.get(id) : null; }
     public static boolean blocking(EntityLivingBase entity, boolean offhand, ItemStack stack) {
         if (!ClientItems.is(stack, com.viaversion.viaforge.common.blocks.LegacyItemCatalog.Kind.SHIELD)) return false;
@@ -40,9 +40,10 @@ public final class ServerEntityViews {
         int protocol=envelope.format.revision(),operation=envelope.operation; // Internal layout only; behavior comes from ServerSession.
         if(!ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientEventEnvelope.feature(operation))
                 && !(operation==13&&ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.BOATS)))return;
-        if (!ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.ENTITY_VISUALS)) return;
         WorldClient current = Minecraft.getMinecraft().theWorld;
         if (world != current || operation == 0) { clear(); world = current; }
+        if (operation == 28) { com.viaversion.viaforge.blocks.ServerEditorPermissions.accept(input); return; }
+        if (!ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.ENTITY_VISUALS)) return;
         if (operation == 6) ServerItemCooldowns.clear();
         // A same-dimension respawn retains the native world and its tracked entities.
         if (world == null || operation == 0 || operation == 6) return;

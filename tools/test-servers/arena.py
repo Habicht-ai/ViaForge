@@ -19,6 +19,8 @@ class Arena:
         self.legacy = self.p < 393
         self.catalog = lab.catalog(row)
         self.commands = []
+        self.signs = {}
+        self.button_commands = []
         self.index = {"version": row["version"], "revision": REVISION, "blocks": [], "items": [], "mobs": [], "stations": []}
         self.names = {b["name"].removeprefix("minecraft:") for b in self.catalog["blocks"]}
 
@@ -47,6 +49,7 @@ class Arena:
         if not self.legacy:
             name += "[rotation=8]"
         self.block(x, y, z, name, 8, nbt)
+        self.signs[(x, y, z)] = dict(position=[x, y, z], lines=lines, command=self.commands[-1])
 
     def labelled(self, x, y, z, name, subtitle=""):
         words = name.removeprefix("minecraft:").split("_")
@@ -58,9 +61,13 @@ class Arena:
         self.sign(x, y, z, lines[:3] + [subtitle])
 
     def button(self, x, y, z, title, command):
+        offset = len(self.commands)
+        # Standing labels need a real support; otherwise a neighbour update removes them.
+        self.block(x, y, z - 1, "quartz_block")
         self.block(x, y, z, "command_block", nbt="{Command:" + quoted(command) + ",TrackOutput:0b}")
         self.block(x, y + 1, z, "stone_button" if self.legacy else "stone_button[face=floor]", 5)
         self.sign(x, y + 1, z - 1, title)
+        self.button_commands.extend(self.commands[offset:])
 
     def rules(self):
         wanted = [("doDaylightCycle", "advance_time", "false"), ("doWeatherCycle", "advance_weather", "false"),
@@ -164,33 +171,28 @@ class Arena:
             self.index["blocks"].append({"name": block["name"], "metadata": meta, "position": [x, y, z + 1], "state": state})
 
     def items(self):
-        items = []
-        block_variants = {b["name"]: b.get("metadata", [0]) for b in self.catalog["blocks"]}
-        for entry in self.catalog["items"]:
-            if entry["name"] == "minecraft:air":
-                continue
-            for meta in block_variants.get(entry["name"], [0]) if self.legacy else [0]:
-                items.append((entry["name"], meta, ""))
-        if self.legacy:
-            items += [("minecraft:spawn_egg", 0, "{EntityTag:{id:" + quoted(mob) + "}}")
-                      for mob in self.catalog["mobs"] if "dragon" not in mob.lower() and "wither" != mob.lower()]
+        from inventory_catalog import stacks as inventory_stacks
+        items = inventory_stacks(self.row, self.catalog)
         for i in range(0, len(items), 27):
             number = i // 27
             x, y, z = -72 + number % 24 * 6, 88, -65 + number // 24 * 7
             stacks = []
-            for slot, (name, meta, tag) in enumerate(items[i:i + 27]):
-                stack = "{Slot:" + str(slot) + "b,id:" + quoted(name)
-                stack += ",count:1" if self.p >= 766 else ",Count:1b"
+            for slot, entry in enumerate(items[i:i + 27]):
                 if self.legacy:
-                    stack += ",Damage:" + str(meta) + "s"
-                if tag:
-                    stack += ",tag:" + tag
-                stacks.append(stack + "}")
-                self.index["items"].append({"name": name, "metadata": meta, "chest": [x, y, z], "slot": slot})
+                    stack = "{Slot:" + str(slot) + "b," + entry["snbt"][1:]
+                else:
+                    stack = "{Slot:" + str(slot) + "b,id:" + quoted(entry["name"])
+                    stack += (",count:1" if self.p >= 766 else ",Count:1b") + "}"
+                stacks.append(stack)
+                indexed = dict(name=entry["name"], metadata=entry["metadata"], chest=[x, y, z], slot=slot)
+                variant = re.search(r'(?:EntityTag:\{id:|Potion:)("[^"]+")', entry.get("snbt", ""))
+                if variant:
+                    indexed["variant"] = json.loads(variant[1]).removeprefix("minecraft:")
+                self.index["items"].append(indexed)
             # /setblock on an existing identical chest clears its inventory before rejecting the
             # unchanged state in some releases. Replace the block explicitly before restoring NBT.
             self.block(x, y, z, "chest", 2, "{Items:[" + ",".join(stacks) + "]}")
-            self.sign(x, y, z - 1, ["ITEMKATALOG", f"Kiste {number + 1}", f"{i + 1} - {min(i + 27, len(items))}", "alle Items"])
+            self.sign(x, y, z - 1, ["ITEMKATALOG", f"Kiste {number + 1}", f"{i + 1} - {min(i + 27, len(items))}", "Inventar-Items"])
         self.sign(-70, 88, -73, ["Inventartests", "Q / Strg+Q", "Shift / Ziehen", "Offhand / Stapel"])
 
     def mobs(self):
@@ -228,6 +230,7 @@ class Arena:
         self.index["stations"].append({"name": "water_boats", "position": [20, 64, -95], "items": boats})
         self.button(-15, 64, -87, ["Survival", "Schild-Q-Test"], "gamemode survival @p" if not self.legacy else "gamemode 0 @p")
         self.button(-10, 64, -87, ["Creative"], "gamemode creative @p" if not self.legacy else "gamemode 1 @p")
+        self.button(-20, 64, -87, ["Adventure", "Ausstellung sicher"], "gamemode adventure @p" if not self.legacy else "gamemode 2 @p")
         self.button(-5, 64, -87, ["Schild geben"], "give @p minecraft:shield 1")
         self.button(0, 64, -87, ["Boot geben"], "give @p " + (boats[0] if boats else "minecraft:boat") + " 1")
         for i, block in enumerate(["glass", "stained_glass" if self.legacy else "red_stained_glass", "leaves" if self.legacy else "oak_leaves", "grass" if self.legacy else "grass_block", "ice", "packed_ice"]):
@@ -373,7 +376,7 @@ def build(row):
         errors.extend(error_lines(output))
         if offset % 800 == 0:
             print(row["version"], f"Testgelände {offset}/{len(commands)}", flush=True)
-    save_output = lab.batch(row, (["forceload remove all"] if row["protocol"] >= 401 else []) + ["save-all flush"])
+    save_output = lab.batch(row, lab.release_chunks(row) + ["save-all flush"])
     errors.extend(error_lines(save_output))
     lab.save(folder / "arena-build-results.json", {"version": row["version"], "commands": len(commands), "errors": errors})
     if errors:
@@ -404,7 +407,7 @@ def upgrade(row):
     if errors:
         lab.save(folder / "fixtures-errors.json", errors)
         raise RuntimeError("Fehler bei Teststationen: " + row["version"])
-    save_output = lab.batch(row, (["forceload remove all"] if row["protocol"] >= 401 else []) + ["save-all flush"])
+    save_output = lab.batch(row, lab.release_chunks(row) + ["save-all flush"])
     if error_lines(save_output):
         raise RuntimeError("Speichern der Teststationen fehlgeschlagen: " + row["version"])
     lab.save(folder / "arena-index.json", index)
@@ -454,7 +457,7 @@ def upgrade_controls(row):
     errors = []
     for offset in range(0, len(commands), 80):
         errors.extend(error_lines(lab.batch(row, commands[offset:offset+80])))
-    errors.extend(error_lines(lab.batch(row, ["save-all flush"] + (["forceload remove all"] if row["protocol"] >= 401 else []))))
+    errors.extend(error_lines(lab.batch(row, ["save-all flush"] + lab.release_chunks(row))))
     if errors:
         raise RuntimeError("Steuerknoepfe/Schilder: " + str(errors[:5]))
     lab.save(folder / "control-checks.json", checks)
@@ -480,7 +483,7 @@ def upgrade_heights(row):
     instance.button(10, 64, -87, ["Hoehe 300", "ab 1.18"], "tp @p 50 301 0")
     lab.batch(row, ["forceload add -80 -112 95 111"])
     time.sleep(2)
-    errors = error_lines(lab.batch(row, instance.commands + ["save-all flush", "forceload remove all"]))
+    errors = error_lines(lab.batch(row, instance.commands + ["save-all flush"] + lab.release_chunks(row)))
     if errors:
         raise RuntimeError("Hoehenstationen: " + str(errors))
     report["height_station_revision"] = 1
@@ -532,7 +535,10 @@ def verify(row):
         selector = "@e[tag=" + mob["tag"] + "]"
         commands.append(f"testfor {selector}" if row["protocol"] < 393 else f"execute if entity {selector} run say VFLAB_MOB_OK")
     # Validate every catalog chest, including original item IDs, stack counts and legacy damage/NBT.
-    for command in (folder / "arena-commands.txt").read_text(encoding="utf-8").splitlines():
+    chest_source = folder / "inventory-commands.txt"
+    if not chest_source.exists():
+        chest_source = folder / "arena-commands.txt"
+    for command in chest_source.read_text(encoding="utf-8").splitlines():
         if not re.match(r"setblock -?\d+ 88 -?\d+ chest", command):
             continue
         _, x, y, z, *rest = command.split(" ", 4)
@@ -550,7 +556,7 @@ def verify(row):
     output = lab.batch(row, commands)
     matches = len(re.findall(r"Successfully found the block|Found .+|VFLAB_BLOCK_OK|VFLAB_MOB_OK|VFLAB_CHEST_OK|VFLAB_CONTROL_OK", output))
     if row["protocol"] >= 401:
-        lab.batch(row, ["forceload remove all"])
+        lab.batch(row, lab.release_chunks(row))
     result = {"version": row["version"], "protocol": found["version"]["protocol"], "checks": len(commands),
               "passed": matches, "success": matches == len(commands), "output": output, "time": time.time(), "schema": 2}
     if row["protocol"] >= 393:

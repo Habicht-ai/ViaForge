@@ -89,6 +89,12 @@ public final class LegacyEntityPackets {
         int id = Types.VAR_INT.readPrimitive(input);
         if (id < 0 || id >= packets.length) return null;
         String name = packets[id].getName();
+        if (name.equals("ENTITY_EVENT")) {
+            int status = input.getUnsignedByte(input.readerIndex() + 4);
+            // ViaRewind removes statuses >23. Keep server permission levels for
+            // command/structure editors independently of mob visual support.
+            if (status >= 24 && status <= 28) return message(source, input, 28);
+        }
         if(name.equals("ANIMATE")){
             ByteBuf animation=input.duplicate();Types.VAR_INT.readPrimitive(animation);int kind=animation.readUnsignedByte();
             if(kind==0||kind==3)return message(source,input,27);

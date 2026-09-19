@@ -25,9 +25,10 @@ PORT = 8765
 APP_ID = "viaforge-testlabor-web-v1"
 ASSETS = Path(__file__).with_name("web")
 ROWS = {r["version"]: r for r in lab.VERSIONS}
-ACTIONS = {"start", "stop", "verify", "inspect", "kit", "op"}
+ACTIONS = {"start", "stop", "verify", "inspect", "restore", "kit", "op"}
 TITLES = {"start": "Starten", "stop": "Speichern und stoppen", "verify": "Welt prüfen",
-          "kit": "Testpaket geben", "op": "Operator vergeben", "inspect": "Gespeicherte Exponate prüfen"}
+          "kit": "Testpaket geben", "op": "Operator vergeben", "inspect": "Gespeicherte Exponate prüfen",
+          "restore": "Ausstellung wiederherstellen"}
 
 
 def read_json(path, default=None):
@@ -73,7 +74,8 @@ def inspect_server(row):
                 blocks=report.get("block_types", 0), items=report.get("item_stacks", 0),
                 mobs=report.get("living_types", 0), variants=report.get("legacy_mob_variants", 0),
                 verified=check.get("success"), checks=check.get("passed", 0), checked_at=check.get("time"),
-                exhibit_issues=len(issues) if audit else None, exhibit_checked_at=audit.get("time"),
+                exhibit_issues=len(issues) + len(audit.get("sign_issues", [])) if audit else None,
+                exhibit_checked_at=audit.get("time"), gallery_protection=report.get("gallery_protection", False),
                 started=record.get("started") if managed else None)
 
 
@@ -202,6 +204,8 @@ class App:
                 argv = [sys.executable, "-u", str(lab.HERE / "lab.py"), job["action"], ",".join(job["versions"])]
                 if job["action"] == "inspect":
                     argv = [sys.executable, "-u", str(lab.HERE / "world_audit.py"), ",".join(job["versions"])]
+                if job["action"] == "restore":
+                    argv = [sys.executable, "-u", str(lab.HERE / "exhibition.py"), ",".join(job["versions"]), "--restore"]
                 if job["player"]:
                     argv.append(job["player"])
                 env = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1")

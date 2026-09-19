@@ -27,6 +27,7 @@ class TestLab(unittest.TestCase):
             lab.properties(row)
             directory = Path(tmp) / row["version"]
             self.assertIn("eula=false", (directory / "eula.txt").read_text())
+            self.assertIn("view-distance=16", (directory / "server.properties").read_text())
             lab.assert_local(row)
             before = (directory / "control.json").read_text()
             (directory / "server.properties").write_text("custom=true\n")

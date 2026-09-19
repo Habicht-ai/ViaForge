@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaforge.blocks.ClientBlocks;
 import com.viaversion.viaforge.blocks.EditorBlockEntity;
+import com.viaversion.viaforge.blocks.ServerEditorPermissions;
 import com.viaversion.viaforge.blocks.StructureBlockRenderer;
 import com.viaversion.viaforge.blocks.gui.*;
 import com.viaversion.viaforge.common.blocks.BlockVersionProfile;
@@ -56,7 +57,9 @@ final class BlockEditorSmokeTest {
         };
         mc.theWorld = world;
         mc.thePlayer = new EntityPlayerSP(mc, world, handler, new StatFileWriter());
+        mc.thePlayer.setEntityId(7);
         mc.thePlayer.capabilities.isCreativeMode = true; mc.thePlayer.capabilities.allowEdit = true;
+        ServerEditorPermissions.clear();
         try {
             int count = profile.protocol() >= 210 ? 4 : 3;
             ChunkSection[] sections = new ChunkSection[16]; sections[7] = new ChunkSectionImpl(true);
@@ -82,6 +85,7 @@ final class BlockEditorSmokeTest {
                 EditorBlockEntity tile = (EditorBlockEntity) world.getTileEntity(pos(i));
                 require(tile != null && tile.received() == profile.hasChunkBlockEntities(), "Editor tile created with chunk NBT");
                 IBlockState state = world.getBlockState(pos(i));
+                permissions(client, server, world, handler, tile, state, sent);
                 mc.thePlayer.capabilities.isCreativeMode = false;
                 require(!activate(world, state, pos(i)), "Creative-only editor activation");
                 mc.thePlayer.capabilities.isCreativeMode = true;
@@ -105,12 +109,64 @@ final class BlockEditorSmokeTest {
             world.setBlockToAir(pos(0));
             require(world.getTileEntity(pos(0)) == null, "Removed editor data does not survive its block");
         } finally {
+            ServerEditorPermissions.clear();
             for (C17PacketCustomPayload packet : sent) packet.getBufferData().release();
             if (mc.currentScreen instanceof BlockEditorScreen) mc.currentScreen.onGuiClosed();
             mc.currentScreen = previousScreen; mc.thePlayer = previousPlayer; mc.theWorld = previousWorld;
             mc.setRenderViewEntity(previousView);
             if (!previousFocus) mc.setIngameNotInFocus();
         }
+    }
+
+    private static void permissions(EmbeddedChannel client, EmbeddedChannel server, WorldClient world,
+            NetHandlerPlayClient handler, EditorBlockEntity tile, IBlockState state, List<C17PacketCustomPayload> sent) throws Exception {
+        Minecraft mc = Minecraft.getMinecraft();
+        mc.displayGuiScreen(null);
+        ServerEditorPermissions.clear();
+        require(!activate(world, state, tile.getPos()), "Unknown permission cannot open an editor, even with cached tile data");
+        for (int level = 0; level <= 4; level++) {
+            permission(client, server, handler, 7, level);
+            boolean allowed = activate(world, state, tile.getPos());
+            require(allowed == (level >= 2), "Editor requires server OP level 2, actual=" + level);
+            if (allowed) click(mc.currentScreen, 1);
+            require(mc.currentScreen == null && sent.isEmpty(), "Denied/cancelled editor sends no update");
+        }
+        permission(client, server, handler, 7, 2);
+        permission(client, server, handler, 8, 0);
+        require(ServerEditorPermissions.canEdit(mc.thePlayer), "Another player's status cannot revoke our permission");
+        mc.thePlayer.capabilities.allowEdit = false;
+        require(!activate(world, state, tile.getPos()), "Editor respects adventure/build restrictions");
+        mc.thePlayer.capabilities.allowEdit = true;
+        for (boolean submitBeforeTick : new boolean[]{true, false}) {
+            require(activate(world, state, tile.getPos()), "Authorized editor opens before de-op");
+            net.minecraft.nbt.NBTTagCompound snapshot = tile.snapshot();
+            if (tile.structure()) snapshot.setString("mode", "SAVE"); else snapshot.setString("Command", "say permission test");
+            tile.accept(snapshot);
+            require(button(mc.currentScreen, 0).enabled, "Received command data enables Save before de-op");
+            permission(client, server, handler, 7, 0);
+            permission(client, server, handler, 8, 4);
+            require(!ServerEditorPermissions.canEdit(mc.thePlayer), "Another player's OP cannot grant us permission");
+            if (submitBeforeTick) click(mc.currentScreen, 0); else mc.currentScreen.updateScreen();
+            require(mc.currentScreen == null && sent.isEmpty(), "De-op closes editor without sending, including before GUI tick");
+            permission(client, server, handler, 7, 2);
+        }
+        EntityPlayerSP original = mc.thePlayer;
+        mc.thePlayer = new EntityPlayerSP(mc, world, handler, new StatFileWriter());
+        mc.thePlayer.setEntityId(7);
+        mc.thePlayer.capabilities.isCreativeMode = true;
+        require(!ServerEditorPermissions.canEdit(mc.thePlayer), "Recreated player does not inherit a stale OP level by entity ID");
+        mc.thePlayer = original;
+        ServerEditorPermissions.clear();
+        require(!ServerEditorPermissions.canEdit(original), "Session cleanup invalidates editor permission");
+        permission(client, server, handler, 7, 2);
+    }
+
+    private static void permission(EmbeddedChannel client, EmbeddedChannel server, NetHandlerPlayClient handler, int entity, int level) throws Exception {
+        // ENTITY_EVENT uses 0x1b throughout the legacy profiles in this fixture.
+        ByteBuf status = BlockPipelineSmokeTest.packet(0x1b);
+        status.writeInt(entity).writeByte(24 + level);
+        BlockPipelineSmokeTest.receiveCompressed(client, server, status);
+        require(apply(client, handler) == 1, "Permission survives ViaRewind cancellation exactly once");
     }
 
     private static void command(BlockVersionProfile profile, EmbeddedChannel client, EmbeddedChannel server, EditorBlockEntity tile,
@@ -200,7 +256,11 @@ final class BlockEditorSmokeTest {
         int count = 0; ByteBuf input;
         while ((input = client.readInbound()) != null) {
             try {
-                if (Types.VAR_INT.readPrimitive(input) != 0x35) continue;
+                int id = Types.VAR_INT.readPrimitive(input);
+                if (id == 0x3f && "VF|entity".equals(Types.STRING.read(input))) {
+                    com.viaversion.viaforge.items.ServerEntityViews.accept(input); count++; continue;
+                }
+                if (id != 0x35) continue;
                 S35PacketUpdateTileEntity packet = new S35PacketUpdateTileEntity(); packet.readPacketData(new PacketBuffer(input));
                 handler.handleUpdateTileEntity(packet); count++;
             } finally { input.release(); }

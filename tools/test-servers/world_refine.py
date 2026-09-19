@@ -187,7 +187,7 @@ def refine(row, remaining_only=False):
         if errors:
             raise RuntimeError(str(errors[:10]))
         time.sleep(3)
-        lab.batch(row, ["save-all flush"] + (["forceload remove all"] if row["protocol"] >= 401 else []))
+        lab.batch(row, ["save-all flush"] + lab.release_chunks(row))
         lab.save(folder / "refinement-checks.json", extra_checks)
         arena.verify(row)
     finally:

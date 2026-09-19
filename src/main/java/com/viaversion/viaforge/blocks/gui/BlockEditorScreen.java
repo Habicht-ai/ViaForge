@@ -2,6 +2,7 @@ package com.viaversion.viaforge.blocks.gui;
 
 import com.viaversion.viaforge.blocks.ClientBlocks;
 import com.viaversion.viaforge.blocks.EditorBlockEntity;
+import com.viaversion.viaforge.blocks.ServerEditorPermissions;
 import com.viaversion.viaforge.compatibility.ServerSession;
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -64,6 +65,8 @@ public abstract class BlockEditorScreen extends GuiScreen {
     @Override protected final void actionPerformed(GuiButton button) throws IOException {
         if (!button.enabled || !button.visible) return;
         if (button.id == 1) { mc.displayGuiScreen(null); return; }
+        // Recheck at the actual action, including a de-op between GUI ticks.
+        if (!canEdit()) { mc.displayGuiScreen(null); return; }
         if (button.id == 0 || button.id >= 20 && button.id <= 22) {
             try {
                 C17PacketCustomPayload packet = packet(button.id == 0 ? 1 : button.id - 18);
@@ -97,9 +100,12 @@ public abstract class BlockEditorScreen extends GuiScreen {
         for (GuiTextField field : fields.values()) if (field.getVisible()) field.mouseClicked(x, y, button);
     }
     @Override public void updateScreen() {
-        if (mc.theWorld != tile.getWorld() || tile.isInvalid() || mc.thePlayer == null || !mc.thePlayer.capabilities.isCreativeMode
-                || !ServerSession.supportsItem(ClientBlocks.definition(tile.getBlockType()))) { mc.displayGuiScreen(null); return; }
+        if (!canEdit()) { mc.displayGuiScreen(null); return; }
         for (GuiTextField field : fields.values()) field.updateCursorCounter();
+    }
+    private boolean canEdit() {
+        return mc.theWorld == tile.getWorld() && !tile.isInvalid() && ServerEditorPermissions.canEdit(mc.thePlayer)
+                && ServerSession.supportsItem(ClientBlocks.definition(tile.getBlockType()));
     }
     @Override public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         drawDefaultBackground();

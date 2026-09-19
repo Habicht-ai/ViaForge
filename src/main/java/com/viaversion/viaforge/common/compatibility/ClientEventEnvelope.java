@@ -9,14 +9,15 @@ public final class ClientEventEnvelope {
     private ClientEventEnvelope(ClientEventFormat format,int operation){this.format=format;this.operation=operation;}
     public static ClientEventEnvelope read(ByteBuf input){
         ClientEventFormat format=ClientEventFormat.legacy(input.readUnsignedShort());int operation=input.readUnsignedByte();
-        if(operation>27)throw new IllegalArgumentException("Unknown client event "+operation);
+        if(operation>28)throw new IllegalArgumentException("Unknown client event "+operation);
         return new ClientEventEnvelope(format,operation);
     }
     public static void write(ByteBuf output,ClientEventFormat format,int operation){
-        if(operation<0||operation>27)throw new IllegalArgumentException("Unknown client event "+operation);
+        if(operation<0||operation>28)throw new IllegalArgumentException("Unknown client event "+operation);
         output.writeShort(format.revision()).writeByte(operation);
     }
     public static ClientFeature feature(int operation){
+        if(operation==28)return ClientFeature.BLOCKS;
         if(operation==26||operation==27)return ClientFeature.TWO_HANDS;
         if(operation==19)return ClientFeature.COOLDOWNS;
         if(operation==8)return ClientFeature.TOTEM;

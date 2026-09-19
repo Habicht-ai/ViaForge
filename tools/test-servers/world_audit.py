@@ -115,6 +115,43 @@ class World:
                 value |= (packed[word + 1] & ((1 << 64) - 1)) << (64 - shift)
         return palette[value & ((1 << bits) - 1)]
 
+    def block_entity(self, x, y, z):
+        chunk = self.chunk(x // 16, z // 16)
+        if "_entities_by_position" not in chunk:
+            chunk["_entities_by_position"] = {(e["x"], e["y"], e["z"]): e
+                for e in chunk.get("block_entities", chunk.get("TileEntities", []))}
+        return chunk["_entities_by_position"].get((x, y, z), {})
+
+
+def component_text(value):
+    if isinstance(value, str):
+        if value.startswith(('{', '[', '"')):
+            try:
+                return component_text(json.loads(value))
+            except (ValueError, TypeError):
+                pass
+        return value
+    if isinstance(value, dict):
+        return value.get("text", "") + "".join(component_text(v) for v in value.get("extra", []))
+    if isinstance(value, list):
+        return "".join(component_text(v) for v in value)
+    return ""
+
+
+def audit_signs(world, manifest):
+    issues = []
+    for sign in manifest:
+        x, y, z = sign["position"]
+        block, entity, below = world.block(x, y, z), world.block_entity(x, y, z), world.block(x, y - 1, z)
+        messages = entity.get("front_text", {}).get("messages", [entity.get("Text" + str(i), "") for i in range(1, 5)])
+        if block.get("legacy_id") != 63 and block.get("Name") not in {"minecraft:sign", "minecraft:oak_sign"}:
+            issues.append(dict(position=[x, y, z], error="missing_sign"))
+        elif [component_text(m) for m in messages] != sign["lines"]:
+            issues.append(dict(position=[x, y, z], error="sign_text", actual=messages, expected=sign["lines"]))
+        elif below.get("legacy_id") == 0 or below.get("Name") in {"minecraft:air", "minecraft:cave_air", "minecraft:void_air"}:
+            issues.append(dict(position=[x, y, z], error="unsupported_sign"))
+    return issues
+
 
 def audit(row):
     folder = lab.ROOT / row["version"]
@@ -123,19 +160,36 @@ def audit(row):
         raise RuntimeError("Gespeicherte Welt nur bei beendetem Server prüfen: " + row["version"])
     world = World(folder)
     index = json.loads((folder / "arena-index.json").read_text(encoding="utf-8"))
+    legacy_ids = {}
+    if row["protocol"] < 393:
+        import inventory_catalog
+        inventory_catalog.stacks(row, lab.catalog(row))
+        legacy_ids = json.loads((folder / "inventory-block-ids.json").read_text())
+    legacy_names = {value: name for name, value in legacy_ids.items()}
+    # These block IDs switch during ordinary scheduled updates; this is not player damage.
+    def stable_name(name):
+        return {"minecraft:lit_redstone_ore": "minecraft:redstone_ore", "minecraft:lit_redstone_lamp": "minecraft:redstone_lamp",
+                "minecraft:powered_repeater": "minecraft:unpowered_repeater", "minecraft:powered_comparator": "minecraft:unpowered_comparator",
+                "minecraft:lit_furnace": "minecraft:furnace", "minecraft:unlit_redstone_torch": "minecraft:redstone_torch"}.get(name, name)
     missing, changed = [], []
     for sample in index["blocks"]:
         actual = world.block(*sample["position"])
+        if "legacy_id" in actual:
+            actual = dict(actual, Name=legacy_names.get(actual["legacy_id"], "unknown:" + str(actual["legacy_id"])))
         absent = actual.get("Name") in {"minecraft:air", "minecraft:cave_air", "minecraft:void_air"} or actual.get("legacy_id") == 0
         if absent and sample["name"] not in {"minecraft:air", "minecraft:cave_air", "minecraft:void_air"}:
             missing.append(dict(sample, actual=actual))
-        elif actual.get("Name", sample["name"]) != sample["name"]:
+        elif stable_name(actual.get("Name", sample["name"])) != stable_name(sample["name"]):
             changed.append(dict(sample, actual=actual))
     result = dict(version=row["version"], time=time.time(), samples=len(index["blocks"]),
                   missing=missing, changed_type=changed,
                   unexpected=sum(unexpected(s) for s in missing + changed),
                   missing_types=dict(Counter(s["name"] for s in missing)),
-                  scope="Saved block presence; modern block identity. Does not validate every property/NBT variant or rendering.")
+                  scope="Saved block identity (normal legacy powered/lit transitions allowed), plus managed sign texts/supports. Does not validate every property/NBT variant or rendering.")
+    manifest = folder / "sign-manifest.json"
+    if manifest.exists():
+        signs = json.loads(manifest.read_text(encoding="utf-8"))
+        result.update(signs_checked=len(signs), sign_issues=audit_signs(world, signs))
     lab.save(folder / "world-audit.json", result)
     print(row["version"], "Blockabgleich:", result["unexpected"], "unerwartete Abweichungen;",
           len(missing) + len(changed) - result["unexpected"], "kurzlebige/gleichwertige Zustaende", flush=True)

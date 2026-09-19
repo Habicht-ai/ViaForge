@@ -99,7 +99,7 @@ zu den Teststationen und zur Navigation. Die Ausstellung ist in Etagen unterteil
 | --- | --- | --- |
 | Navigation und Regressionen | `0 65 -100` | Teleportknöpfe, Creative/Survival, Schild und Boot geben |
 | Blöcke A | `-78 65 -78` | Beschriftete Blocktypen, bei Legacy auch Metadatenzustände |
-| Itemkatalog | `-78 89 -78` | Kisten mit sämtlichen registrierten Nicht-Luft-Items |
+| Itemkatalog | `-78 89 -78` | Kisten mit gültigen Inventar-Items; ohne technische Operator-Werkzeuge |
 | Mobs | `-78 113 -78` | Benannte, persistente, unbewegliche Lebewesen |
 | Blöcke B | `-78 145 -78` | Fortsetzung größerer Kataloge |
 | Boss-Arena | `0 209 80` | Bosse auf Knopfdruck, eigener Knopf zum Entfernen |
@@ -107,8 +107,15 @@ zu den Teststationen und zur Navigation. Die Ausstellung ist in Etagen unterteil
 | Höhenproben ab 1.18 | `50 -59 0`, `50 301 0` | Tatsächliche moderne Serverhöhe; aktuelle Clientgrenzen sichtbar machen |
 
 `arena-index.json` im Versionsordner enthält Namen und genaue Positionen aller
-Exponate sowie Itemkiste und Slot. Die Server starten in Creative. Der
-Survival-Knopf ermöglicht beispielsweise den Schildtest mit Q und Strg+Q.
+Exponate sowie Itemkiste und Slot. Neue Spieler starten in Creative; der gewählte
+Spielmodus bleibt auch in der Ausstellung erhalten. Creative, Survival und
+Adventure sind über die Knöpfe an den Teststationen frei auswählbar. Bestehende
+Spieler behalten ihren gespeicherten Modus und können einmal den Creative-Knopf
+benutzen, falls sie noch in Adventure sind. Der Survival-Knopf ermöglicht
+beispielsweise den Schildtest mit Q und Strg+Q.
+Die Server-Sichtweite beträgt **16 Chunks** (`view-distance=16`). Im Client muss
+die Sichtweite ebenfalls auf mindestens 16 stehen, um diesen Radius darzustellen.
+Die separate Simulationsdistanz bleibt bei 3; sie begrenzt nicht die Sichtweite.
 `kit` gibt einem verbundenen Spieler ein passendes Paket für die bisherigen
 Regressionen, unter anderem Schild, Purpur, Elytren, Betten, Shulkerkiste und
 Boot, soweit in seiner Serverversion vorhanden. `find` sucht im Katalog nach
@@ -195,6 +202,10 @@ Server. Eine laufende Minecraft-Clientinstanz wird nicht beendet.
 - `persistence-check.json`: Prüfung der gespeicherten Welt nach einem echten Serverneustart.
 - `world-audit.json`: zusätzlicher Abgleich der gespeicherten Blockausstellung mit dem Katalog.
 - `refinement.json`: Korrekturen, Wegweiserprüfung und verbleibende Exponatprobleme.
+- `exhibition-maintenance.json`, `sign-manifest.json`: Kisten-/Schildkorrektur und Wiederherstellung.
+- `server-settings-check.json`: geprüfte Entfernung der früheren Modusumschaltung und Sichtweite 16.
+- `inventory-catalog.json`: originale Legacy-Creative-Stacks einschließlich NBT und Quellprüfsummen.
+- `exhibition-probe.json`: tatsächlicher Login-, Schutz- und Reparaturtest auf 1.12.2 und 26.2.
 - `backups/before-refinement-1/`: Sicherung der gesamten Welt vor den Ausstellungskorrekturen.
 - `FINAL-REPORT.md`, `final-report.json`: zusammengefasste Abschlussprüfung aller 48 Versionen.
 - `provision-report.json`: Ergebnisse der Aufbauversuche; ältere Fehler bleiben zur Diagnose erhalten.
@@ -282,6 +293,49 @@ Pflanzen), ein kleiner natürlicher Biom-/Tageslichttest neben der Ausstellung
 und Vergleichsräume mit identischer Szene für verschiedene Versionen. Die
 vorhandenen Testkoordinaten und Spielerbauten bleiben bei dieser Überarbeitung
 erhalten; eine vollständige visuelle Ingame-Abnahme steht weiterhin aus.
+
+## Kisten, Beschriftungen und versehentlich abgebaute Exponate
+
+Die Katalogkisten enthalten Inventar-Items der jeweiligen Version. Bei 1.9–1.12.2
+werden die Creative-Itemstacks direkt aus dem jeweiligen originalen, per SHA-1
+geprüften Client exportiert, einschließlich Farben, zulässiger Metadaten und NBT
+für Spawn-Eier und Tränke. Platzierungszustände (z. B. Treppenrichtungen oder
+Stammachsen) sind keine Itemvarianten. Ab 1.13 stammt die Auswahl aus der echten,
+bereits um experimentelle Inhalte bereinigten Itemregistry. Luft und technische
+Operator-Werkzeuge sind aus den Kisten ausgeschlossen. Das sind Testinventare,
+keine nachgebauten Beutetabellen natürlich generierter Truhen.
+
+Der Spielmodus ist überall frei wählbar. Die frühere automatische Umschaltung
+auf Adventure wurde auf Wunsch entfernt, einschließlich ihrer vier permanenten
+Befehlsblöcke. Creative bleibt auch in der Ausstellung und an der Ankunft aktiv.
+Du kannst dadurch dort bauen und abbauen; bei versehentlichen Änderungen steht
+die gesicherte Wiederherstellung zur Verfügung. Auch sie aktiviert keine
+automatische Modusumschaltung mehr.
+
+Falls etwas fehlt: Auf der Webseite den betreffenden Server **Speichern & stoppen**,
+dann in seinen Details **Ausstellung wiederherstellen** anklicken. Die Aktion
+sichert zuerst die vollständige Welt unter `backups/exhibition-<Zeit>-<Kennung>/`,
+repariert fehlende bzw. durch andere Blocktypen ersetzte Exponate, ergänzt Schilder
+samt Unterlagen, setzt Navigationsknöpfe und die Betten-/Shulker-Modellreihe zurück
+und füllt sämtliche Katalogkisten mit der vorgesehenen Auswahl neu.
+Spielerinventare und Bauten außerhalb der reservierten Exponatplätze bleiben
+erhalten. Entnommene Kataloggegenstände werden dabei bewusst nachgefüllt.
+Der Server wird zur Reparatur kurz gestartet, geprüft, gespeichert und wieder
+beendet; anschließend kannst du ihn normal starten. Laufende Server werden von
+der Wiederherstellungsaktion nicht gestoppt oder verändert.
+
+Die gespeicherte Weltprüfung erkennt nun auch falsche Legacy-Block-IDs sowie
+fehlende Schilder, falsche Schildtexte und fehlende Unterlagen. Normale Wechsel
+zwischen gespeisten und ungespeisten Legacy-Redstone-IDs gelten als gleichwertig.
+Sie prüft weiterhin nicht alle Blockeigenschaften oder die ViaForge-Darstellung.
+Für Entwickler: `py -3 tools/test-servers/exhibition.py all` aktualisiert ältere
+Welten einmalig, `--restore` führt eine erneute Wiederherstellung aus.
+`exhibition_probe.py 1.12.2,26.2` prüft mit echten Offline-Logins die frei gewählten Spielmodi
+und absichtlich beschädigte Exponate; nur auf zuvor gestoppten Testservern benutzen.
+Mit `--modes-only` werden ausschließlich die Spielmodi geprüft. Auf 26.2 prüft der
+Login-Test außerdem die tatsächlich im Login-Paket übertragene Sichtweite.
+`server_settings.py all` stellt bestehende, zuvor gestoppte Welten auf freie
+Spielmodi und 16 Chunks Sichtweite um; vor dem Eingriff wird jede Welt gesichert.
 
 Quellen: [Mojangs Versionsmanifest](https://piston-meta.mojang.com/mc/game/version_manifest_v2.json),
 [offizieller Minecraft-Serverdownload](https://www.minecraft.net/en-us/download/server),

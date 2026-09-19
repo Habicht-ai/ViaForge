@@ -554,6 +554,13 @@ final class FlattenedPipelineSmokeTest {
         ByteBuf meta=packet(ClientboundPackets1_13.SET_ENTITY_DATA);Types.VAR_INT.writePrimitive(meta,80);if(!bundles){meta.writeByte(caves?11:village?10:9).writeByte(1);Types.VAR_INT.writePrimitive(meta,wild4?6:5);}meta.writeByte(bundles?11:caves?12:village?11:10).writeByte(wild3?8:7).writeBoolean(true).writeByte(bundles?12:caves?13:village?12:11).writeByte(wild3?8:7).writeBoolean(false).writeByte(255);receive(meta);data=event(2);
         try{require(Types.VAR_INT.readPrimitive(data)==80,"Boat metadata entity");List<com.viaversion.viaversion.api.minecraft.entitydata.EntityData> list=Types.ENTITY_DATA_LIST1_12.read(data);require(bundles?list.get(0).id()==10&&Boolean.TRUE.equals(list.get(0).value()):list.get(0).id()==9&&((Integer)list.get(0).value())==5&&list.get(1).dataType().typeId()==6,"Modern metadata types normalized");}finally{data.release();}
         ByteBuf cooldown=packet(ClientboundPackets1_13.COOLDOWN);if(bundles)Types.STRING.write(cooldown,"minecraft:shield");else Types.VAR_INT.writePrimitive(cooldown,wireItem(Protocol1_12_2To1_13.MAPPINGS.getNewItemId(442<<4)));Types.VAR_INT.writePrimitive(cooldown,40);receive(cooldown);data=event(19);try{require(Types.VAR_INT.readPrimitive(data)==442&&Types.VAR_INT.readPrimitive(data)==40,"Flattened cooldown identity");}finally{data.release();}
+        for (int permission = 0; permission <= 4; permission++) {
+            ByteBuf status=packet(ClientboundPackets1_13.ENTITY_EVENT);status.writeInt(1).writeByte(24+permission);receive(status);
+            data=event(28);try {
+                require(data.readInt()==1&&data.readUnsignedByte()==24+permission&&!data.isReadable(),"Original editor permission level survives modern Via path");
+            }finally{data.release();}
+            require(client.readInbound()==null,"No duplicate permission fallback");
+        }
         ByteBuf totem=packet(ClientboundPackets1_13.ENTITY_EVENT);totem.writeInt(1).writeByte(35);receive(totem);data=event(8);data.release();require(client.readInbound()==null,"No duplicate Totem fallback");
         ByteBuf swing=packet(ClientboundPackets1_13.ANIMATE);Types.VAR_INT.writePrimitive(swing,1);swing.writeByte(3);receive(swing);data=event(27);data.release();require(client.readInbound()==null,"No duplicate offhand swing");
         for(int[] ids:new int[][]{{8,42},{16,43},{40,45},{41,47},{38,48}}) {

@@ -208,7 +208,7 @@ public final class BlockClientSmokeTest {
                 + "; modern boat models/six woods, original coordinates/metadata, both seats/ticking/transfers, driver-only movement and rowing packets, versioned paddles, water/ice physics, placement in both modes OK"
                 + "; two hands: original slot 45/full/direct updates, NBT, click/creative/swap/use/interact/swing/settings packets, hand priority/continuous shield and food use, both bow hands/ammunition, actual inventory/creative/Forge hotbar pixels and first-person models OK"
                 + (profile.protocol() >= 315 ? "; shulker box interior rendering independent of incoming face culling and support surface draw order, six facings/three lid stages, render state restored OK" : "")
-                + "; command editor activation/NBT/controls/cancel and target packets OK"
+                + "; command/structure editor OP levels 0-4, de-op during editing/save, player/session isolation, activation/NBT/controls/cancel and target packets OK"
                 + (profile.protocol() >= 210 ? "; structure SAVE/LOAD/CORNER/DATA, save/load/detect/cancel, numeric limits and target packets OK" : "")
                 + (profile.protocol() >= 335 ? "; 16 bed colors: every world/item vertex, UV corner and face winding matches native ModelBed in all directions" : ""));
     }

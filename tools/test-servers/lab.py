@@ -98,6 +98,11 @@ def install_runtime(major):
     save(directory / f"java-{major}-source.json", metadata)
 
 
+def creative_property(row):
+    # 1.13 has named /gamemode commands but still parses this property as an integer.
+    return "1" if row["protocol"] < 477 else "creative"
+
+
 def properties(row):
     folder = ROOT / row["version"]
     folder.mkdir(parents=True, exist_ok=True)
@@ -113,9 +118,9 @@ def properties(row):
         "enable-jmx-monitoring": "false", "management-server-enabled": "false",
         "motd": f"ViaForge Testlabor | {row['version']} | Protokoll {row['protocol']}",
         "level-name": "world", "level-seed": "764189", "level-type": "minecraft:flat" if row["protocol"] >= 735 else "FLAT",
-        "generate-structures": "false", "gamemode": "creative" if modern else "1",
+        "generate-structures": "false", "gamemode": creative_property(row),
         "difficulty": "normal" if modern else "2", "force-gamemode": "false", "hardcore": "false",
-        "max-players": "4", "view-distance": "3", "simulation-distance": "3", "spawn-protection": "0",
+        "max-players": "4", "view-distance": "16", "simulation-distance": "3", "spawn-protection": "0",
         "allow-flight": "true", "allow-nether": "true", "spawn-monsters": "true", "spawn-animals": "true",
         "spawn-npcs": "true", "enable-command-block": "true", "max-tick-time": "180000",
         "network-compression-threshold": "256", "pause-when-empty-seconds": "0",
@@ -283,6 +288,12 @@ def experimental_features(row):
         kind, name = line.split("\t")
         excluded[kind].append(name)
     return excluded
+
+
+def release_chunks(row):
+    if row["protocol"] < 401:
+        return []
+    return ["forceload remove -80 -112 95 111"]
 
 
 def read_exact(sock, count):

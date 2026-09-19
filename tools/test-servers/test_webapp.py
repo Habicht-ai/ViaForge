@@ -104,6 +104,14 @@ class WebAppTests(unittest.TestCase):
             self.assertEqual("last line\n", webapp.tail(path, 100))
             self.assertEqual("", webapp.tail(Path(tmp) / "missing"))
 
+    def test_restore_action_is_queued_and_protected_by_same_origin(self):
+        action = {"action": "restore", "versions": ["26.2"]}
+        self.assertEqual(403, self.request("POST", "/api/actions", action, {"Origin": "https://outside.invalid"})[0])
+        code, body, _ = self.request("POST", "/api/actions", action)
+        self.assertEqual(202, code)
+        self.assertEqual("Ausstellung wiederherstellen", json.loads(body)["title"])
+        self.assertEqual("restore", self.app.pending.get_nowait()["action"])
+
     def test_shutdown_queues_after_jobs_and_rejects_new_mutations(self):
         self.app.submit({"action": "start", "versions": ["26.2"]})
         self.assertEqual(403, self.request("POST", "/api/shutdown", {"mode": "all"}, {"X-Lab-Token": "wrong"})[0])

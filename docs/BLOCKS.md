@@ -200,8 +200,13 @@ impulse/repeat/chain mode, conditional execution and redstone/always-active mode
 Structure blocks have SAVE/LOAD/CORNER/DATA editors from 1.10 onward, including
 save/load/detect-size actions, offsets, size, mirror/rotation, entities, integrity,
 seed, custom data, selection boxes and air/structure-void markers. The 1.9 structure
-placeholder has no functional editor. The editors require creative mode; the
-server continues to enforce operator permissions and command-block settings.
+placeholder has no functional editor. The editors require creative mode, build
+permission and server-reported operator level 2 or higher. Permission statuses
+24-28 are retained before ViaRewind cancels them; cached tile data never grants
+access. De-op closes an open editor and blocks pending Save/Load actions, even
+before the next GUI tick. Permission belongs to the current player and is cleared
+on session cleanup. The server continues to enforce permissions and command-block
+settings independently.
 
 Complete type-2/type-7 block-entity updates and chunk NBT reach the client before
 Via can discard editor fields. Controls wait for server data; Cancel sends nothing.

@@ -1,5 +1,7 @@
 # Aktueller Nachtrag: freie Spielmodi und 16 Chunks Sichtweite
 
+Aktuelle Gelände- und Generatorreparatur: [19.09.2026](UPGRADE-26.3.md). Die folgenden Zahlen sind historische Prüfläufe; sie deckten störendes zusätzliches Gelände noch nicht ab.
+
 Auf Wunsch wurde die automatische Adventure-Umschaltung wieder entfernt.
 Creative und Survival bleiben auch innerhalb der Ausstellung und an der
 Ankunftsplattform erhalten. Die vier dafür verwendeten Befehlsblöcke wurden

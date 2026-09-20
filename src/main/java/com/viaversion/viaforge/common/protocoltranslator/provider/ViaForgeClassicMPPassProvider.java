@@ -21,7 +21,7 @@ package com.viaversion.viaforge.common.protocoltranslator.provider;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaforge.common.ViaForgeCommon;
-import net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.provider.ClassicMPPassProvider;
+import net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.provider.ClassicMpPassProvider;
 import net.raphimc.vialegacy.protocol.release.r1_2_4_5tor1_3_1_2.provider.OldAuthProvider;
 import net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.storage.HandshakeStorage;
 
@@ -33,14 +33,14 @@ import java.util.Formatter;
 import java.util.Scanner;
 import java.util.logging.Level;
 
-public class ViaForgeClassicMPPassProvider extends ClassicMPPassProvider {
+public class ViaForgeClassicMPPassProvider extends ClassicMpPassProvider {
 
     @Override
     public String getMpPass(UserConnection user) {
         if (ViaForgeCommon.getManager().getConfig().isAllowBetacraftAuthentication()) {
             final HandshakeStorage handshakeStorage = user.get(HandshakeStorage.class);
 
-            return getBetacraftMpPass(user, user.getProtocolInfo().getUsername(), handshakeStorage.getHostname(), handshakeStorage.getPort());
+            return getBetacraftMpPass(user, user.getProtocolInfo().getUsername(), handshakeStorage.hostname(), handshakeStorage.port());
         }
         return super.getMpPass(user);
     }

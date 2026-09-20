@@ -18,7 +18,6 @@
 
 package com.viaversion.viaforge.common;
 
-import com.viaversion.viaaprilfools.ViaAprilFoolsPlatformImpl;
 import com.viaversion.viabackwards.ViaBackwardsPlatformImpl;
 import com.viaversion.viarewind.ViaRewindPlatformImpl;
 import com.viaversion.viaversion.ViaManagerImpl;
@@ -93,7 +92,7 @@ public class ViaForgeCommon {
                 new ViaBackwardsPlatformImpl();
                 new ViaRewindPlatformImpl();
                 new ViaLegacyPlatformImpl();
-                new ViaAprilFoolsPlatformImpl();
+                new com.viaversion.viaaprilfools.ViaAprilFoolsPlatformImpl();
             }
         );
         manager.config = new ViaForgeConfig(new File(mainFolder, "viaforge.yml"), Via.getPlatform().getLogger());

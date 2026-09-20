@@ -18,6 +18,7 @@ public final class ServerMobSounds {
     private static JsonObject events = new JsonObject();
     private static final Set<String> registered = new HashSet<>();
     public static void reload() {
+        com.viaversion.viaforge.items.ServerElytraSound.clear();
         registered.clear(); events = new JsonObject();
         try (InputStream input = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation("viaforge","mob_sounds.json")).getInputStream()) {
             events = new JsonParser().parse(new InputStreamReader(input,StandardCharsets.UTF_8)).getAsJsonObject();

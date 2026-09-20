@@ -31,6 +31,7 @@ public final class VersionRules {
         public Builder rule(ClientRule rule,boolean enabled) { if(enabled)rules.add(rule);else rules.remove(rule);return this; }
         public VersionRules build() {
             require(ClientFeature.TWO_HANDS,ClientFeature.ITEMS,ClientFeature.ENTITY_VISUALS);
+            require(ClientFeature.ELYTRA,ClientFeature.ITEMS,ClientFeature.ENTITY_VISUALS);
             require(ClientFeature.BOATS,ClientFeature.ITEMS,ClientFeature.ENTITY_VISUALS);
             require(ClientFeature.MOBS,ClientFeature.ENTITY_VISUALS);
             require(ClientFeature.TOTEM,ClientFeature.ITEMS,ClientFeature.ENTITY_VISUALS);

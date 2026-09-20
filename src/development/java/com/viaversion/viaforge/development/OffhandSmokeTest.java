@@ -95,7 +95,7 @@ final class OffhandSmokeTest {
     }
     private static void hold(ItemStack stack){Minecraft mc=Minecraft.getMinecraft();mc.thePlayer.inventory.mainInventory[mc.thePlayer.inventory.currentItem]=stack;}
     interface Read {void accept(ByteBuf b)throws Exception;}
-    private static void wire(BlockVersionProfile p,EmbeddedChannel client,C17PacketCustomPayload packet,String name,Read read)throws Exception{
+    static void wire(BlockVersionProfile p,EmbeddedChannel client,C17PacketCustomPayload packet,String name,Read read)throws Exception{
         ByteBuf old;while((old=client.readOutbound())!=null)old.release();PacketBuffer data=new PacketBuffer(Unpooled.buffer());Types.VAR_INT.writePrimitive(data,0x17);packet.writePacketData(data);
         try{client.writeOutbound(data);}catch(com.viaversion.viaversion.exception.CancelEncoderException expected){}client.runPendingTasks();
         ByteBuf compressed=client.readOutbound();require(compressed!=null,"Missing hand packet "+name);EmbeddedChannel decompress=new EmbeddedChannel(new NettyCompressionDecoder(256));

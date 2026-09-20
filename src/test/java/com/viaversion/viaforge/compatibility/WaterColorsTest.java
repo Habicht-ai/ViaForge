@@ -29,7 +29,7 @@ public class WaterColorsTest {
         assertEquals(0x123456,colors.at(-16,64,32,0));effects.putString("water_color","#a4b5c6");assertEquals(0xA4B5C6,WaterColors.color("custom:river",element));
     }
     @Test public void nativeAndLegacyProfilesKeepTheirExistingWater() {
-        for(int version:new int[]{47,107,340,777})assertFalse(CompatibilityRegistry.DEFAULT.resolve(version).rules().enabled(ClientRule.BIOME_WATER_COLORS));
+        for(int version:new int[]{47,107,340,778})assertFalse(CompatibilityRegistry.DEFAULT.resolve(version).rules().enabled(ClientRule.BIOME_WATER_COLORS));
         for(int version:new int[]{393,404,735,776})assertTrue(CompatibilityRegistry.DEFAULT.resolve(version).rules().enabled(ClientRule.BIOME_WATER_COLORS));
     }
     private static Chunk chunk(int[] biomes){return new BaseChunk(-1,2,true,false,0,new ChunkSection[16],biomes,new ArrayList<>());}

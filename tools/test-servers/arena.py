@@ -112,7 +112,7 @@ class Arena:
         self.fill(-12, 175, -12, 12, 175, 12, "quartz_block")
         self.sign(0, 176, -3, ["VIAFORGE LAB", self.row["version"], "START", "Knopf druecken"])
         self.button(0, 176, 0, ["Teststationen", "und Navigation"], "tp @p 0 65 -100")
-        self.sign(0, 64, -104, ["VIAFORGE LAB", self.row["version"], "48 echte Server", "nur localhost"])
+        self.sign(0, 64, -104, ["VIAFORGE LAB", self.row["version"], f"{len(lab.VERSIONS)} echte Server", "nur localhost"])
         destinations = [("Bloecke A", -78, 65, -78), ("Alle Items", -78, 89, -78),
                         ("Mobs", -78, 113, -78), ("Bloecke B", -78, 145, -78),
                         ("Boot / Wasser", 15, 65, -95), ("Boss-Arena", 0, 209, 80)]
@@ -245,6 +245,26 @@ class Arena:
             self.button(5, 64, -87, ["Hoehe -60", "ab 1.18"], "tp @p 50 -59 0")
             self.button(10, 64, -87, ["Hoehe 300", "ab 1.18"], "tp @p 50 301 0")
 
+    def elytra(self):
+        self.fill(-75, 223, -65, -55, 223, -45, "quartz_block")
+        self.fill(50, 158, -65, 78, 158, -40, "quartz_block")
+        self.fill(50, 159, -65, 78, 160, -40, "glass")
+        self.fill(51, 159, -64, 77, 160, -41, "water")
+        self.button(-70, 224, -62, ["Elytra anziehen"],
+                    "item replace entity @p armor.chest with minecraft:elytra" if self.p >= 755 else
+                    "replaceitem entity @p " + ("slot.armor.chest" if self.legacy else "armor.chest") + " minecraft:elytra 1")
+        self.button(-65, 224, -62, ["Survival", "Flugtest"], "gamemode " + ("0" if self.legacy else "survival") + " @p")
+        self.button(-60, 224, -62, ["Creative"], "gamemode " + ("1" if self.legacy else "creative") + " @p")
+        self.button(-70, 224, -47, ["Zur Navigation"], "tp @p 0 65 -100")
+        self.button(50, 161, -52, ["Zur Startplattform"], "tp @p -58 225 -53 -90 0")
+        self.button(15, 64, -87, ["ELYTRAFLUG", "Startplattform"], "tp @p -58 225 -53 -90 0")
+        self.block(-56, 224, -53, "quartz_block")
+        self.sign(-56, 225, -53, ["NACH OSTEN", "Im Fallen: Sprung", "Blick steuert", "Wasser = Landung"])
+        if self.p >= 316:
+            self.button(-60, 224, -47, ["Feuerwerk", "ab 1.11.1"], "give @p minecraft:" + ("fireworks" if self.legacy else "firework_rocket") + " 32")
+        self.index["stations"].append({"name": "elytra_flight", "position": [-58, 225, -53],
+                                       "landing": [64, 161, -52], "fireworks": self.p >= 316})
+
     def generate(self):
         self.rules()
         self.floors()
@@ -252,6 +272,7 @@ class Arena:
         self.items()
         self.mobs()
         self.stations()
+        self.elytra()
         from world_refine import wayfinding
         wayfinding(self)
         return self.commands

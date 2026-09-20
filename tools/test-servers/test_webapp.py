@@ -41,7 +41,7 @@ class WebAppTests(unittest.TestCase):
         self.assertIn("frame-ancestors 'none'", headers["Content-Security-Policy"])
         code, body, _ = self.request("GET", "/api/state")
         self.assertEqual(200, code)
-        self.assertEqual(48, json.loads(body)["profiles"])
+        self.assertEqual(len(lab.VERSIONS), json.loads(body)["profiles"])
         self.assertNotIn(b"password", body)
 
     def test_mutations_require_token_and_same_origin(self):

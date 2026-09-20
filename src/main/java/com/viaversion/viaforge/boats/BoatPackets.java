@@ -28,7 +28,7 @@ public final class BoatPackets {
     public static void register(ViaForgeProtocol protocol) {
         protocol.registerServerbound(ServerboundPackets1_8.CUSTOM_PAYLOAD, wrapper -> {
             String channel=wrapper.passthrough(Types.STRING);
-            if(CHANNEL.equals(channel)||com.viaversion.viaforge.hands.HandPackets.CHANNEL.equals(channel))
+            if("VF|elytra".equals(channel)||CHANNEL.equals(channel)||com.viaversion.viaforge.hands.HandPackets.CHANNEL.equals(channel))
                 com.viaversion.viaforge.common.compatibility.ExtensionPackets.translate(channel,wrapper);
         });
     }

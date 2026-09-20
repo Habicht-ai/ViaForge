@@ -4,7 +4,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 public final class ExtensionPackets {
     public static void translate(String channel,PacketWrapper packet) {
         packet.cancel();CompatibilityProfile target=CompatibilityRegistry.forUser(packet.user());
-        ClientFeature feature=channel.equals("VF|hands")?ClientFeature.TWO_HANDS:channel.equals("VF|boat")?ClientFeature.BOATS:null;
+        ClientFeature feature=channel.equals("VF|hands")?ClientFeature.TWO_HANDS:channel.equals("VF|boat")?ClientFeature.BOATS:channel.equals("VF|elytra")?ClientFeature.ELYTRA:null;
         if(feature!=null&&target.has(feature))target.adapter().serverbound(channel,packet);
     }
     private ExtensionPackets(){ }

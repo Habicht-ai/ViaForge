@@ -23,12 +23,14 @@ def read_vi(source):
     raise ValueError("Zu langes VarInt")
 
 
-def probe(row, on_join=None, expected_view_distance=None):
-    modern = row["protocol"] == 776
-    if row["protocol"] not in (340, 776):
-        raise ValueError("Dieser Login-Probe ist fuer 1.12.2 und 26.2 implementiert")
+def probe(row, on_join=None, expected_view_distance=None, player_name=None, expected_spawn=(.5,177.,.5)):
+    modern = row["protocol"] in (776, 777)
+    if row["protocol"] not in (340, 776, 777):
+        raise ValueError("Dieser Login-Probe ist fuer 1.12.2, 26.2 und 26.3 implementiert")
     report = json.loads((lab.ROOT / row["version"] / "data/reports/packets.json").read_text()) if modern else None
-    name = "VLab" + str(time.time_ns())[-10:]
+    name = player_name or "VLab" + str(time.time_ns())[-10:]
+    if not re.fullmatch(r'[A-Za-z0-9_]{1,16}', name):
+        raise ValueError('Invalid probe player name')
     phase, compressed = "login", False
     view_distance = None
     with socket.create_connection(("127.0.0.1", row["port"]), timeout=20) as sock:
@@ -99,7 +101,7 @@ def probe(row, on_join=None, expected_view_distance=None):
                     position = [float(n) for n in match.groups()]
                 else:
                     position = list(struct.unpack(">ddd", source.read(24)))
-                if position != [.5, 177., .5]:
+                if expected_spawn is not None and position != list(expected_spawn):
                     raise RuntimeError("Falscher erster Ankunftspunkt: " + repr(position))
                 if modern and expected_view_distance is not None and view_distance != expected_view_distance:
                     raise RuntimeError("Server sendet falsche Sichtweite: " + str(view_distance))

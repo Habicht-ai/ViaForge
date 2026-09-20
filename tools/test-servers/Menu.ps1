@@ -1,8 +1,8 @@
 $ErrorActionPreference = 'Stop'
 Set-Location (Join-Path $PSScriptRoot '../..')
-Write-Host 'ViaForge Testlabor - 48 lokale Vanilla-Server' -ForegroundColor Cyan
-Write-Host 'Auswahl: z.B. 26.2 oder 1.12.2,1.13.2 oder regression / legacy / modern'
-Write-Host 'Alle 48 gleichzeitig benoetigen mehr Arbeitsspeicher als dieser PC hat.'
+Write-Host 'ViaForge Testlabor - registrierte lokale Vanilla-Server' -ForegroundColor Cyan
+Write-Host 'Auswahl: z.B. 26.3 oder 1.12.2,1.13.2 oder regression / legacy / modern'
+Write-Host 'Alle Server gleichzeitig benoetigen mehr Arbeitsspeicher als dieser PC hat.'
 while ($true) {
     Write-Host ''
     $action = Read-Host 'start / stop / status / build / verify / op / kit / find / adressen / ende'

@@ -63,6 +63,7 @@ def inspect_server(row):
     checks = [read_json(folder / name, {}) for name in ("persistence-check.json", "verification.json")]
     check = max(checks, key=lambda value: value.get("time", 0))
     audit = read_json(folder / "world-audit.json", {})
+    ground = read_json(folder / 'terrain-audit.json', {})
     transient = {"minecraft:flowing_water", "minecraft:flowing_lava", "minecraft:frosted_ice"}
     issues = [s for s in audit.get("missing", []) + audit.get("changed_type", []) if s["name"] not in transient
               and not (s["name"].endswith("air") and s.get("actual", {}).get("Name", "").endswith("air"))]
@@ -74,7 +75,8 @@ def inspect_server(row):
                 blocks=report.get("block_types", 0), items=report.get("item_stacks", 0),
                 mobs=report.get("living_types", 0), variants=report.get("legacy_mob_variants", 0),
                 verified=check.get("success"), checks=check.get("passed", 0), checked_at=check.get("time"),
-                exhibit_issues=len(issues) + len(audit.get("sign_issues", [])) if audit else None,
+                exhibit_issues=len(issues) + len(audit.get("sign_issues", [])) + ground.get('intrusions', 0) + (1 if ground and not ground.get('flat') else 0) if audit else None,
+                terrain_intrusions=ground.get('intrusions'), generator_flat=ground.get('flat'),
                 exhibit_checked_at=audit.get("time"), gallery_protection=report.get("gallery_protection", False),
                 started=record.get("started") if managed else None)
 
@@ -172,7 +174,7 @@ class App:
         if not isinstance(data, dict) or data.get("action") not in ACTIONS:
             raise ValueError("Unbekannte Aktion.")
         versions = data.get("versions")
-        if not isinstance(versions, list) or not versions or len(versions) > 48 or any(
+        if not isinstance(versions, list) or not versions or len(versions) > len(lab.VERSIONS) or any(
                 not isinstance(v, str) or v not in ROWS for v in versions) or len(set(versions)) != len(versions):
             raise ValueError("Bitte gültige Server auswählen.")
         player = data.get("player", "")

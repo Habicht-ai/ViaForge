@@ -32,7 +32,7 @@ public final class BlockClientSmokeTest {
     private final Path report;
     private final List<String> checks = new ArrayList<>();
     private final BlockVersionProfile[] profiles = java.util.Arrays.stream(BlockVersionProfile.values()).filter(p -> selected(p.protocol())).toArray(BlockVersionProfile[]::new);
-    private final int[] flattened = java.util.Arrays.stream(new int[]{393,401,404,477,480,485,490,498,573,575,578,735,736,751,753,754,755,756,757,758,759,760,761,762,763,764,765,766,767,768,769,770,771,772,773,774,775,776}).filter(BlockClientSmokeTest::selected).toArray();
+    private final int[] flattened = java.util.Arrays.stream(new int[]{393,401,404,477,480,485,490,498,573,575,578,735,736,751,753,754,755,756,757,758,759,760,761,762,763,764,765,766,767,768,769,770,771,772,773,774,775,776,777}).filter(BlockClientSmokeTest::selected).toArray();
     private Object connection;
     private int profileIndex = -1;
     private long started;
@@ -61,6 +61,8 @@ public final class BlockClientSmokeTest {
                 Files.write(report, java.util.Collections.singletonList("RUNNING"), StandardCharsets.UTF_8);
                 checkFallbackModels();
                 checkViaPaths();
+                ProtocolSelectorSmokeTest.verify();
+                checks.add("Protocol selector: full/simple callbacks run once per press, invisible rows skip font rendering, resize preserves scroll and global selection persists only on close PASS");
                 next();
             } else if (target().resources().version().equals(ServerBlockSession.getLoadedResourceVersion())) {
                 if(profileIndex<profiles.length)verify(profiles[profileIndex]);
@@ -78,10 +80,15 @@ public final class BlockClientSmokeTest {
                     RenderResourceSmokeTest.restored();
                     DropItemSmokeTest.nativeBehavior();
                     require(ServerBlockSession.getLoadedResourceVersion() == null, "Resources cleared on unload");
+                    require(!com.viaversion.viaforge.items.InventoryEntityPreview.enabled(), "Disconnect restores native inventory preview");
                     require(!Minecraft.getMinecraft().getResourceManager().getResource(new net.minecraft.util.ResourceLocation("minecraft:textures/blocks/stone.png"))
                             .getResourcePackName().equals("ViaForge versioned blocks"), "Vanilla block textures restored");
                     checkFallbackModels();
                     checks.add("All profiles: original dropped Purpur/seed/shield/sword matrices and native stone scale; pending resource HUD avoids missing-texture caching; native resources restored after disconnect");
+                    checks.add("Selected profiles: Elytra head/limb poses and walking restoration; versioned wing animation; original Ogg resource and flight sound envelope; original rocket spawn/attachment metadata, invisible model, player/hand trail, offhand side, detach and no duplicate boost PASS");
+                    checks.add("Selected profiles: actual mouse rocket/shield use, both hands/main-hand preferences, Creative/Survival, target use/swing packets, no 26.3 use PUNCH, native/custom equip reset, cooldowns, grounded rejection, actual first-person shield render transitions, original third-person look clamps and sleeves PASS");
+                    checks.add("Selected profiles: neutral first-person arms during crouch/crawl, subsequent third-person pose retained, rocket target model/texture and .68 grip scale through actual first-person entry point with empty/occupied opposite hand PASS; landing confirmation does not become crawling or cancel sprint PASS");
+                    checks.add("Selected profiles: actual Survival/Creative inventory flight and standing previews, original versioned GL matrices, visible pixels and bounded-region isolation, restored player movement/angles/camera/flight state, nested clipping; 26.3 GUI scales 1/2/3 PASS");
                     checks.add("Drop regression: actual Q/Ctrl-Q in Survival and Creative, shield and stackable blocks, single/full/empty drops, selected/offhand/adjacent slot isolation, original target action packets and authoritative correction/empty packets; native drop behavior restored on disconnect PASS");
                     checks.add("Render regressions: original 1.13+ aquatic biomes and 1.16+ registry water colors, tall-source biome coordinates, 1.19.4+ biome update packets before Via cancellation, disconnect cleanup; first position packet waits for resources; 26.2 independently decoded RGBA hashes, actual atlas transparency and shield GPU texels, original bed faces/UVs in all 16 colors, 16 distinct rendered banner dyes; native water and texture caches restored PASS");
                     finish(null);
@@ -112,12 +119,12 @@ public final class BlockClientSmokeTest {
     private void checkViaPaths() {
         java.util.List<String> supported=new java.util.ArrayList<>();
         for(com.viaversion.viaversion.api.protocol.version.ProtocolVersion version:com.viaversion.viaversion.api.protocol.version.ProtocolVersion.getProtocols()) {
-            if(version.getVersion()<393||version.getVersion()>776||version.isSnapshot())continue;
+            if(version.getVersion()<393||version.getVersion()>777||version.isSnapshot())continue;
             java.util.List<com.viaversion.viaversion.api.protocol.ProtocolPathEntry> path=com.viaversion.viaversion.api.Via.getManager().getProtocolManager().getProtocolPath(com.viaversion.viaversion.api.protocol.version.ProtocolVersion.v1_8,version);
             require(path!=null,"Bundled Via path to "+version.getName());supported.add(version.getName()+" ("+version.getVersion()+", "+path.size()+" layers)");
         }
-        require(com.viaversion.viaversion.api.protocol.version.ProtocolVersion.v26_2.getVersion()==776,"Bundled 26.2 protocol identifier");
-        checks.add("Bundled ViaVersion/ViaBackwards 5.11.0 + ViaRewind 4.1.3 paths (connectivity only, not client feature certification): "+supported);
+        require(com.viaversion.viaversion.api.protocol.version.ProtocolVersion.v26_3.getVersion()==777,"Bundled 26.3 protocol identifier");
+        checks.add("Bundled ViaVersion/ViaBackwards 5.12.0 + ViaRewind 4.2.0 paths (connectivity only, not client feature certification): "+supported);
     }
 
     private void verify(BlockVersionProfile profile) throws Exception {

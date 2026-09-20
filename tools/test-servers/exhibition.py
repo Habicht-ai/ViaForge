@@ -12,8 +12,9 @@ import arena
 import lab
 import world_audit
 import world_refine
+import terrain
 
-REVISION = 2
+REVISION = 3
 
 
 def free_play(a):
@@ -58,7 +59,7 @@ def maintain(row, restore=False):
             return old
     if lab.status(row):
         raise RuntimeError("Vor Wiederherstellung bitte diesen Testserver auf der Webseite stoppen: " + row["version"])
-    before = world_audit.audit(row)  # Also rejects a live worker still starting/saving.
+    before = world_audit.audit(row, terrain_check=False)  # Also rejects a live worker still starting/saving.
     index = read(folder / "arena-index.json")
     generated = arena.Arena(row)
     generated.generate()
@@ -68,8 +69,14 @@ def maintain(row, restore=False):
     for position, sign in inventory.signs.items():
         generated.signs[position] = sign
     changes = arena.Arena(row)
+    terrain_before = terrain.inspect(row, generated, index)
+    changes.commands += terrain.boundary_commands(world_audit.World(folder))
+    changes.commands += terrain.removal_commands(terrain_before["positions"])
+    changes.elytra()
+    index["stations"] = [s for s in index["stations"] if s["name"] != "elytra_flight"] + changes.index["stations"]
     world = world_audit.World(folder)
     targets = before["missing"] + before["changed_type"]
+    if terrain_before["intrusions"]: targets = index["blocks"]
     for sample in targets:
         world_refine.repair(changes, sample)
     # Restore the separate bed/shulker model gallery too, without respawning any mobs.
@@ -109,6 +116,8 @@ def maintain(row, restore=False):
                   signs=len(generated.signs))
     lab.save(report_path, result)
     config = (folder / "server.properties").read_text(encoding="utf-8")
+    terrain.fix_generator(row)
+    config = terrain.properties(config, row)
     config = re.sub(r"(?m)^gamemode=.*$", "gamemode=" + lab.creative_property(row), config)
     (folder / "server.properties").write_text(config, encoding="utf-8")
     # Save inspectable commands and expectations before starting; a failure remains explicit/retryable.
@@ -134,8 +143,11 @@ def maintain(row, restore=False):
             raise RuntimeError(str(errors[:5]))
     finally:
         lab.stop([row])
-    after = world_audit.audit(row)
-    result.update(success=after["unexpected"] == 0 and not after.get("sign_issues"),
+    after = world_audit.audit(row, terrain_check=False)
+    terrain_after = terrain.inspect(row)
+    lab.save(folder / "terrain-audit.json", terrain_after)
+    result.update(terrain_removed=terrain_before["intrusions"], terrain_remaining=terrain_after["intrusions"], generator_flat=terrain_after["flat"])
+    result.update(success=after["unexpected"] == 0 and not after.get("sign_issues") and terrain_after["intrusions"] == 0 and terrain_after["flat"],
                   block_issues=after["unexpected"], sign_issues=after.get("sign_issues", []), time=time.time())
     lab.save(report_path, result)
     report = read(folder / "arena-report.json")

@@ -24,7 +24,7 @@ public final class MobSoundAssets {
         JsonObject definitions;
         try (InputStream input = Files.newInputStream(asset(indexes,index.getAsJsonObject("minecraft/sounds.json")))) { definitions = parse(input); }
         Set<String> events = new LinkedHashSet<>();
-        for (Map.Entry<String,JsonElement> event : definitions.entrySet()) if (event.getKey().startsWith("entity.") || event.getKey().equals("enchant.thorns.hit")) events.add(event.getKey());
+        for (Map.Entry<String,JsonElement> event : definitions.entrySet()) if (event.getKey().startsWith("entity.") || event.getKey().equals("enchant.thorns.hit") || event.getKey().equals("item.elytra.flying")) events.add(event.getKey());
         Set<String> files = new LinkedHashSet<>(); JsonObject selected = new JsonObject();
         Deque<String> pending = new ArrayDeque<>(events);
         while (!pending.isEmpty()) {

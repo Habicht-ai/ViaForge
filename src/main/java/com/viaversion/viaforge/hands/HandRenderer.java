@@ -15,7 +15,11 @@ public final class HandRenderer {
     private static final ItemStack[] rendered=new ItemStack[2];
     private static final float[] equipped=new float[2],previous=new float[2];
     public static void clear(){for(int i=0;i<2;i++){rendered[i]=null;equipped[i]=previous[i]=0;}}
-    public static void reset(int hand){equipped[hand]=0;}
+    public static void reset(int hand){
+        equipped[hand]=0;
+        // A right-handed player with no offhand uses the native main-hand renderer.
+        if(hand==0)Minecraft.getMinecraft().getItemRenderer().resetEquippedProgress();
+    }
     public static void tick(){
         for(int hand=0;hand<2;hand++){
             previous[hand]=equipped[hand];ItemStack held=Offhand.stack(hand);
@@ -25,7 +29,12 @@ public final class HandRenderer {
             if(equipped[hand]<.1F)rendered[hand]=held;
         }
     }
-    public static boolean needed(){return Offhand.active()&&(Offhand.get()!=null||rendered[1]!=null||Offhand.mainLeft()&&(Offhand.stack(0)==null||!(Offhand.stack(0).getItem() instanceof ItemMap)));}
+    public static boolean needed(){
+        return Offhand.active() && (Offhand.get()!=null || rendered[1]!=null
+                || rocket(Offhand.stack(0)) || rocket(rendered[0])
+                || Offhand.mainLeft() && (Offhand.stack(0)==null || !(Offhand.stack(0).getItem() instanceof ItemMap)));
+    }
+    private static boolean rocket(ItemStack stack){return stack!=null && stack.getItem()==net.minecraft.init.Items.fireworks;}
     public static void render(ItemRenderer renderer,float partial){
         Minecraft mc=Minecraft.getMinecraft();AbstractClientPlayer player=mc.thePlayer;HandRenderAccess access=(HandRenderAccess)renderer;
         float pitch=player.prevRotationPitch+(player.rotationPitch-player.prevRotationPitch)*partial;

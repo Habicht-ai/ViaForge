@@ -56,6 +56,8 @@ def repair(a, sample):
             a.block(x, y + 1, z, "chorus_flower")
     if name == "bamboo":
         a.block(x, y - 1, z, "dirt")
+    if name == "small_dripleaf":
+        a.block(x, y - 1, z, "clay")
     if name == "big_dripleaf_stem":
         a.block(x, y - 1, z, "clay")
         a.block(x, y + 1, z, "big_dripleaf[facing=" + props.get("facing", "north") + "]")
@@ -66,8 +68,6 @@ def repair(a, sample):
     if name == "twisting_vines_plant":
         a.block(x, y - 1, z, "netherrack")
         a.block(x, y + 1, z, "twisting_vines")
-    if name == "kelp_plant":
-        a.block(x, y + 1, z, "kelp")
     if name == "bubble_column":
         a.block(x, y - 1, z, "soul_sand")
     if name == "fire":
@@ -92,8 +92,10 @@ def repair(a, sample):
     if name in {"wheat", "carrots", "potatoes", "beetroots", "torchflower_crop", "pitcher_crop"}:
         a.block(x, y - 1, z, "farmland")
     a.block(x, y, z, sample["state"], meta)
+    if name == "kelp_plant":
+        a.block(x, y + 1, z, "kelp[age=25]")
     # Restore the paired half after the base, avoiding ghost door/bed exhibits after updates.
-    if not a.legacy and props.get("half") == "lower":
+    if not a.legacy and props.get("half") == "lower" and (name != 'pitcher_crop' or int(props.get('age',0)) >= 3):
         top = dict(props, half="upper")
         a.block(x, y + 1, z, name + "[" + ",".join(k + "=" + v for k, v in top.items()) + "]")
     if not a.legacy and name.endswith("_bed"):

@@ -20,6 +20,7 @@ public final class DevelopmentAccounts {
 
     @Mod.EventHandler
     public void onInit(FMLInitializationEvent event) {
+        if (LiveFlightSmokeTest.installIfRequested()) return;
         if (BlockClientSmokeTest.installIfRequested()) return;
         Minecraft minecraft = Minecraft.getMinecraft();
         accounts = new AccountManager(minecraft, minecraft.mcDataDir.toPath().resolve("ViaForge/accounts"));

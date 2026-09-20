@@ -18,6 +18,7 @@ public final class Offhand {
     private static EntityPlayer owner;
     private static InventoryBasic inventory = new InventoryBasic("Offhand",false,1);
     public static int context=-1, useHand, swingHand;
+    private static boolean localUseSwing;
     public static ItemStack mainDuringUse;
     private static final java.util.Map<Integer,Integer> SWINGS=new java.util.HashMap<>();
     public static boolean active() { return ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.TWO_HANDS) && Minecraft.getMinecraft().thePlayer!=null; }
@@ -33,7 +34,7 @@ public final class Offhand {
             owner.inventoryContainer.inventorySlots.remove(45);owner.inventoryContainer.inventoryItemStacks.remove(45);
             crafting(owner.inventoryContainer,false);
         }
-        owner=null;inventory=new InventoryBasic("Offhand",false,1);context=-1;mainDuringUse=null;useHand=swingHand=0;SWINGS.clear();HandRenderer.clear();
+        owner=null;inventory=new InventoryBasic("Offhand",false,1);context=-1;mainDuringUse=null;useHand=swingHand=0;localUseSwing=false;SWINGS.clear();HandRenderer.clear();
     }
     public static void ensure() {
         if(!active()) return;
@@ -77,6 +78,14 @@ public final class Offhand {
     public static void swing(int hand) {
         EntityPlayer p=Minecraft.getMinecraft().thePlayer;swingHand=hand;
         int old=context;context=hand;try{p.swingItem();}finally{context=old;}
+    }
+    public static boolean localUseSwing() { return localUseSwing; }
+    public static void swingUse(int hand) {
+        boolean previous=localUseSwing;
+        // 26.3 predicts interaction swings locally; USE_ITEM/USE_ITEM_ON authorizes
+        // the server animation. Its PUNCH packet is exclusively an attack action.
+        localUseSwing=ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.SERVER_OWNS_USE_SWING);
+        try { swing(hand); } finally { localUseSwing=previous; }
     }
     public static int swingHand(EntityLivingBase entity){return entity==Minecraft.getMinecraft().thePlayer?swingHand:SWINGS.getOrDefault(entity.getEntityId(),0);}
     public static void remove(int id){SWINGS.remove(id);}

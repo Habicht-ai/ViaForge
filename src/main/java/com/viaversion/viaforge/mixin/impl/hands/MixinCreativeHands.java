@@ -24,5 +24,8 @@ public abstract class MixinCreativeHands extends GuiContainer {
         textures.bindTexture(Offhand.active()&&resource.getResourcePath().equals("textures/gui/container/creative_inventory/tab_inventory.png")?new net.minecraft.util.ResourceLocation("viaforge",resource.getResourcePath()):resource);
     }
     @Redirect(method="drawGuiContainerBackgroundLayer",at=@At(value="INVOKE",target="Lnet/minecraft/client/gui/inventory/GuiInventory;drawEntityOnScreen(IIIFFLnet/minecraft/entity/EntityLivingBase;)V"))
-    private void player(int x,int y,int size,float yaw,float pitch,net.minecraft.entity.EntityLivingBase entity){GuiInventory.drawEntityOnScreen(x+(Offhand.active()?45:0),y,size,yaw+(Offhand.active()?45:0),pitch,entity);}
+    private void player(int x,int y,int size,float yaw,float pitch,net.minecraft.entity.EntityLivingBase entity){
+        if(com.viaversion.viaforge.items.InventoryEntityPreview.enabled())com.viaversion.viaforge.items.InventoryEntityPreview.draw(guiLeft+73,guiTop+6,guiLeft+105,guiTop+49,size,x-yaw,y-30-pitch,entity);
+        else GuiInventory.drawEntityOnScreen(x+(Offhand.active()?45:0),y,size,yaw+(Offhand.active()?45:0),pitch,entity);
+    }
 }

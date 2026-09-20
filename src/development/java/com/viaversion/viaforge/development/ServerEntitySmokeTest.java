@@ -50,13 +50,14 @@ final class ServerEntitySmokeTest {
             require(ServerEntityViews.get(610) != null && world.getEntityByID(610) == cloud, "Same-dimension respawn retains tracked cloud");
 
             spawn(profile, client, server, handler, 611, 73);
-            require(world.getEntityByID(611) instanceof EntityPotion, "Native thrown potion spawn");
+            // ViaRewind 4.2 waits for item metadata to populate native potion spawn data.
             for (int itemId : new int[]{438, 441}) {
                 ItemStack potion = ItemVariants.potion(stack(itemId, 0), "strong_healing");
                 com.viaversion.viaversion.api.minecraft.item.Item wire = ServerItemSmokeTest.wire(potion); wire.setIdentifier(itemId);
                 metadata = packet(profile, "SET_ENTITY_DATA"); Types.VAR_INT.writePrimitive(metadata, 611);
                 metadata.writeByte(first).writeByte(5); Types.ITEM1_8.write(metadata, wire); metadata.writeByte(255);
                 send(client, server, handler, metadata);
+                require(world.getEntityByID(611) instanceof EntityPotion, "Native thrown potion spawns with original item metadata");
                 ItemStack actual = ServerEntityViews.get(611).potion;
                 require(actual.getItem() == potion.getItem() && actual.getTagCompound().equals(potion.getTagCompound()), "Thrown potion type and NBT " + profile);
                 metadata = packet(profile, "SET_ENTITY_DATA"); Types.VAR_INT.writePrimitive(metadata, 611); metadata.writeByte(0).writeByte(0).writeByte(0).writeByte(255);
@@ -80,6 +81,28 @@ final class ServerEntitySmokeTest {
             require(!ServerEntityViews.blocking(player, true, view.offhand), "Remote shield released");
             equipment = packet(profile, "SET_EQUIPPED_ITEM"); Types.VAR_INT.writePrimitive(equipment, 612); Types.VAR_INT.writePrimitive(equipment, 1); Types.ITEM1_8.write(equipment, null);
             send(client, server, handler, equipment); require(view.offhand == null, "Empty equipment clears remote shield");
+            ElytraFlightSmokeTest.verify(world,new ElytraFlightSmokeTest.Wire(){
+                public void use(net.minecraft.network.play.client.C17PacketCustomPayload packet,boolean swing,int hand)throws Exception {
+                    OffhandSmokeTest.wire(profile,client,packet,swing?"SWING":"USE_ITEM",b->require(Types.VAR_INT.readPrimitive(b)==hand,"Actual input preserves selected hand on target wire"));
+                }
+                public void start(net.minecraft.network.play.client.C17PacketCustomPayload packet)throws Exception {
+                    ByteBuf source=BlockPipelineSmokeTest.packet(0x17);packet.writePacketData(new PacketBuffer(source));
+                    try{client.writeOutbound(source);}catch(com.viaversion.viaversion.exception.CancelEncoderException expected){}
+                    client.runPendingTasks();ByteBuf compressed;while((compressed=client.readOutbound())!=null)server.writeInbound(compressed);
+                    ByteBuf result=BlockPipelineSmokeTest.take(server,BlockItemPipelineSmokeTest.serverbound(profile,"PLAYER_COMMAND"));
+                    try{require(Types.VAR_INT.readPrimitive(result)==1&&Types.VAR_INT.readPrimitive(result)==8&&Types.VAR_INT.readPrimitive(result)==0&&!result.isReadable(),"1.9 boundary START_FALL_FLYING action");}finally{result.release();}
+                }
+                public void flag(int id,boolean flying,NetHandlerPlayClient flightHandler)throws Exception {
+                    ByteBuf source=packet(profile,"SET_ENTITY_DATA");Types.VAR_INT.writePrimitive(source,id);source.writeByte(0).writeByte(0).writeByte(ElytraFlightSmokeTest.flags(id,flying)).writeByte(255);
+                    send(client,server,flightHandler,source);
+                }
+                public void rocket(int id,int targetId,NetHandlerPlayClient flightHandler)throws Exception {
+                    if(targetId>=0)spawn(profile,client,server,flightHandler,id,76);
+                    ByteBuf source=packet(profile,"SET_ENTITY_DATA");Types.VAR_INT.writePrimitive(source,id);
+                    source.writeByte(first+1).writeByte(1);Types.VAR_INT.writePrimitive(source,Math.max(0,targetId));source.writeByte(255);
+                    send(client,server,flightHandler,source);
+                }
+            });
             ServerEffectsSmokeTest.pipeline(profile, client, server, handler, world);
             ServerCombatSmokeTest.pipeline(profile, client, server, handler, world);
             EndVisualSmokeTest.pipeline(profile, client, server, handler, world);

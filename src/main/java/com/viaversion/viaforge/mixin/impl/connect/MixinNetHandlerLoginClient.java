@@ -45,7 +45,7 @@ public class MixinNetHandlerLoginClient {
         final ExtendedNetworkManager mixinNetworkManager = (ExtendedNetworkManager) networkManager;
         if (mixinNetworkManager.viaForge$getTrackedVersion().olderThanOrEqualTo(LegacyProtocolVersion.r1_6_4)) {
             final UserConnection user = networkManager.channel().attr(ViaForgeCommon.VF_VIA_USER).get();
-            if (user != null && user.has(ProtocolMetadataStorage.class) && !user.get(ProtocolMetadataStorage.class).authenticate) {
+            if (user != null && user.has(ProtocolMetadataStorage.class) && !user.get(ProtocolMetadataStorage.class).isAuthenticate()) {
                 // We are in the 1.7 -> 1.6 protocol, so we need to skip the joinServer call
                 // if the server is in offline mode, due the packet changes <-> networking changes
                 // Minecraft's networking code is bad for us.

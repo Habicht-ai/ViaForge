@@ -1,15 +1,17 @@
 # Lokales ViaForge-Testlabor
 
-Die Sammlung verwendet **48 originale Vanilla-Server**: genau die Ressourcen-Releases
-der 48 registrierten ViaForge-Profile, von 1.9 bis 26.2. Protokollgleiche Patches
+Die Sammlung verwendet originale Vanilla-Server f?r alle registrierten Ressourcen-Releases,
+von 1.9 bis 26.3. Die Anzahl wird aus `tools/test-servers/versions.json` abgeleitet. Protokollgleiche Patches
 teilen ein Profil; beispielsweise ist 1.16.5 der Testserver für Protokoll 754.
 Es handelt sich nicht um einen einzelnen Server mit vorgeschalteter Via-Übersetzung.
 
-Auf diesem PC wurden am 16.09.2026 alle 48 Testwelten aufgebaut und nach einem
+Historischer Stand vor dieser Erweiterung: Auf diesem PC wurden am 16.09.2026 alle 48 Testwelten aufgebaut und nach einem
 echten Serverneustart erfolgreich geprüft: **7.020 Weltprüfungen**, zusätzlich
 13 Werkzeugtests und echte Offline-Logins auf 1.12.2 und 26.2. Der genaue
 Abschlussbericht liegt unter `run/test-servers/FINAL-REPORT.md`. Das bestätigt
 die Testwelten, nicht die fehlerfreie Darstellung im ViaForge-Client.
+
+Die Erweiterung vom 19.09.2026 und ihre Pr?fgrenzen stehen in [UPGRADE-26.3.md](UPGRADE-26.3.md).
 
 ## Benutzen
 
@@ -18,7 +20,7 @@ sich unter **http://127.0.0.1:8765**, ohne ein Konsolenfenster. Ein Doppelklick 
 `Testserver.bat` öffnet ebenfalls die Webseite. Weitere Doppelklicks verwenden
 die bereits laufende Webverwaltung.
 
-Die Webseite zeigt alle 48 Versionen mit aktuellem Status, Spielerzahl, Adresse
+Die Webseite zeigt alle Versionen aus dem Manifest mit aktuellem Status, Spielerzahl, Adresse
 und letztem Weltprüfergebnis. Suche, Statusfilter, Favoriten und die Gruppen
 Regression/Legacy/Modern helfen bei der Auswahl. Einzelne oder ausgewählte
 Server lassen sich direkt starten und mit Speichern stoppen. Die Speicheranzeige
@@ -75,8 +77,9 @@ ViaForge-Zielversion wählen. Diese häufig gebrauchten Adressen sind fest:
 | 1.21.11 | `127.0.0.1:25635` |
 | 26.1.2 | `127.0.0.1:25636` |
 | 26.2 | `127.0.0.1:25637` |
+| 26.3 | `127.0.0.1:25638` |
 
-`./Testserver.bat import-list all` ergänzt die 48 Einträge in **`run/servers.dat`**
+`./Testserver.bat import-list all` ergänzt die Einträge aus dem Manifest in **`run/servers.dat`**
 der Entwicklungsinstanz, einschließlich ViaForge-Versionseinstellung. Vorhandene
 Einträge und unbekannte NBT-Tags bleiben erhalten, eine Sicherung wird angelegt,
 bereits eingetragene Adressen werden nicht dupliziert. Der Import verweigert
@@ -167,12 +170,12 @@ Versionen lassen sich mit Komma auswählen, etwa `start 1.12.2,26.2`. Gruppen:
 
 | Gruppe | Versionen |
 | --- | --- |
-| `regression` | 1.12.2, 1.13.2, 1.21.11, 26.2 |
+| `regression` | 1.12.2, 1.13.2, 1.21.11, 26.3 |
 | `legacy` | 1.9, 1.10.2, 1.11.2, 1.12.2 |
-| `modern` | 1.16.5, 1.18.2, 1.20.6, 26.2 |
-| `all` | alle 48 Profile |
+| `modern` | 1.16.5, 1.18.2, 1.20.6, 26.3 |
+| `all` | alle Profile aus dem Manifest |
 
-Alle 48 können als Auswahl angesprochen werden. **Auf diesem 32-GB-PC ist ihr
+Alle Profile können als Auswahl angesprochen werden. **Auf diesem 32-GB-PC ist ihr
 gleichzeitiger Betrieb mit dieser Konfiguration nicht vorgesehen:** die
 Speicherprüfung kalkuliert ungefähr 81 GB inklusive Reserve. Der Starter
 verweigert zu große Gruppen, bevor er weitere Prozesse startet. Alte Server
@@ -207,7 +210,7 @@ Server. Eine laufende Minecraft-Clientinstanz wird nicht beendet.
 - `inventory-catalog.json`: originale Legacy-Creative-Stacks einschließlich NBT und Quellprüfsummen.
 - `exhibition-probe.json`: tatsächlicher Login-, Schutz- und Reparaturtest auf 1.12.2 und 26.2.
 - `backups/before-refinement-1/`: Sicherung der gesamten Welt vor den Ausstellungskorrekturen.
-- `FINAL-REPORT.md`, `final-report.json`: zusammengefasste Abschlussprüfung aller 48 Versionen.
+- `FINAL-REPORT.md`, `final-report.json`: zusammengefasste Prüfung der Profile aus dem Manifest, mit Datum und Grenzen.
 - `provision-report.json`: Ergebnisse der Aufbauversuche; ältere Fehler bleiben zur Diagnose erhalten.
 
 Alle Laufzeitdaten sind durch den vorhandenen `run/`-Eintrag vom Git ausgeschlossen.

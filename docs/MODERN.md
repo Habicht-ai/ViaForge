@@ -4,10 +4,12 @@ ViaForge reuses the client catalog and features implemented through 1.12.2 on
 explicit adapters for later server protocols. This does not add every block,
 item, entity or gameplay mechanic introduced by those later releases.
 
+Current upgrade details and limitations: [26.3 and Elytra](UPGRADE-26.3.md). Historical verification entries below describe their dated runs.
+
 ## Protocol support and profiles
 
-The bundled ViaVersion/ViaBackwards 5.11.0 and ViaRewind 4.1.3 provide a path from
-Forge's protocol 47 to protocol 776 (26.2), including 47 translation layers for
+The bundled ViaVersion/ViaBackwards 5.12.0 and ViaRewind 4.2.0 provide a path from
+Forge's protocol 47 to protocol 777 (26.3), including 48 translation layers for
 that target. Library connectivity and ViaForge client feature coverage are
 separate. Snapshots and unknown protocol IDs do not inherit extended features.
 
@@ -20,7 +22,7 @@ separate. Snapshots and unknown protocol IDs do not inherit extended features.
 | 1.19 | 759, 760, 761, 762 | 1.19, 1.19.2, 1.19.3, 1.19.4 |
 | 1.20 | 763, 764, 765, 766 | 1.20.1, 1.20.2, 1.20.4, 1.20.6 |
 | 1.21 | 767, 768, 769, 770, 771, 772, 773, 774 | 1.21.1, 1.21.3, 1.21.4, 1.21.5, 1.21.6, 1.21.8, 1.21.10, 1.21.11 |
-| 26.x | 775, 776 | 26.1.2, 26.2 |
+| 26.x | 775, 776, 777 | 26.1.2, 26.2, 26.3 |
 
 Releases sharing a wire protocol use the latest listed resource patch. The
 handshake cannot distinguish, for example, 1.20.5 from 1.20.6 or 26.1 from

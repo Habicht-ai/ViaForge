@@ -13,5 +13,6 @@ public abstract class MixinCombatTick {
         ServerCombatState.tick((EntityPlayer)(Object)this);
         com.viaversion.viaforge.items.ServerItemCooldowns.tick((EntityPlayer)(Object)this);
         com.viaversion.viaforge.hands.Offhand.tick((EntityPlayer)(Object)this);
+        com.viaversion.viaforge.items.ServerElytraVisuals.tick((EntityPlayer)(Object)this);
     }
 }

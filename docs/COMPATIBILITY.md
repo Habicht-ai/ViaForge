@@ -142,7 +142,7 @@ Profiles inherit the earlier behavior and select exact verified archives plus
 variants, parent/texture references, renamed item models and particle atlases are
 converted from the target's original resources before publication.
 
-ModernBlockFamilies adds explicit preservation boundaries through 26.2 with the
+ModernBlockFamilies adds explicit preservation boundaries through 26.3 with the
 source chunk codec, inverse forward mappings and metadata/block-entity layout.
 ComponentItemSnapshot retains original component patches across structured item
 changes, including Via's original hashes for inventory clicks. The native item
@@ -165,7 +165,7 @@ ownership, disabled-codec fallback and decoder reordering. These are architectur
 fixtures, not a claim of real 1.13 support.
 
 The existing Forge smoke suite now creates `CompatibilityDecodeHandler` through
-the same registry and adapter factory as production for all ten legacy profiles and 38 flattened/modern targets.
+the same registry and adapter factory as production for all registered legacy and flattened/modern resource profiles.
 Its actual chunk, item, entity, hand, boat, UI, effect and model checks remain in
 place. Read `build/logs/block-client-smoke-test.txt`: it must begin with `PASS`.
 
@@ -185,4 +185,12 @@ the 1.21.2 boundary. The test reproduced the reported 26.2 encoder exception.
 
 For a focused Forge regression run, optionally set `VIAFORGE_SMOKE_PROTOCOL`
 to an exact registered protocol (for example `776`). Omit it for the required
-full 48-profile run; a focused PASS does not certify the other profiles.
+full run over every registered resource profile; a focused PASS does not certify the other profiles.
+
+## Elytra and 26.3 update
+
+See [UPGRADE-26.3.md](UPGRADE-26.3.md) for the explicit protocol 777 boundary, current dependency versions, Elytra movement and saved-world repairs. ELYTRA is a client feature with ITEMS and ENTITY_VISUALS dependencies; ELYTRA_FIREWORKS is a separate rule starting at protocol 316. Flight actions use the existing serverbound adapter, and original metadata arrives through the session-tagged client event queue.
+
+[ELYTRA-MOVEMENT.md](ELYTRA-MOVEMENT.md) documents local start prediction since 1.15,
+server-owned landing flags, collision-aware size changes and crawling since 1.14.
+These are independent named behavior rules, not tests against packet-layout revisions.

@@ -32,6 +32,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSlot;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 public class GuiProtocolSelector extends GuiScreen {
@@ -41,6 +42,8 @@ public class GuiProtocolSelector extends GuiScreen {
     private final GuiScreen parent;
     private final boolean simple;
     private final FinishedCallback finishedCallback;
+    private final boolean saveOnClose;
+    private ProtocolVersion selection;
 
     private SlotList list;
     private List<String> creditLines;
@@ -49,16 +52,19 @@ public class GuiProtocolSelector extends GuiScreen {
     private long time;
 
     public GuiProtocolSelector(final GuiScreen parent) {
-        this(parent, false, (version, unused) -> {
-            // Default action is to set the target version and go back to the parent screen.
-            ViaForgeCommon.getManager().setTargetVersion(version);
-        });
+        this(parent, false, (version, unused) -> ViaForgeCommon.getManager().setTargetVersion(version), true);
     }
 
     public GuiProtocolSelector(final GuiScreen parent, final boolean simple, final FinishedCallback finishedCallback) {
+        this(parent, simple, finishedCallback, false);
+    }
+
+    private GuiProtocolSelector(GuiScreen parent, boolean simple, FinishedCallback finishedCallback, boolean saveOnClose) {
         this.parent = parent;
         this.simple = simple;
         this.finishedCallback = finishedCallback;
+        this.saveOnClose = saveOnClose;
+        this.selection = ViaForgeCommon.getManager().getTargetVersion();
     }
 
     @Override
@@ -73,7 +79,19 @@ public class GuiProtocolSelector extends GuiScreen {
         final int lineHeight = fontRendererObj.FONT_HEIGHT + 2;
         creditLines = fontRendererObj.listFormattedStringToWidth(ORIGINAL_MOD_CREDIT, Math.max(1, width - 10));
         final int listTop = 6 + lineHeight * (3 + creditLines.size());
+        int scroll = list == null ? 0 : list.getAmountScrolled();
         list = new SlotList(mc, width, height, listTop, height - 30, lineHeight);
+        list.scrollBy(scroll);
+    }
+
+    @Override
+    public void onGuiClosed() {
+        // Config.set writes YAML synchronously. Persist once when leaving, not
+        // on each row click (GuiSlot even reports a single press twice).
+        if (saveOnClose && selection != ViaForgeCommon.getManager().getTargetVersion()) {
+            finishedCallback.finished(selection, parent);
+        }
+        super.onGuiClosed();
     }
 
     public void setStatus(final String status) {
@@ -135,6 +153,8 @@ public class GuiProtocolSelector extends GuiScreen {
     }
 
     class SlotList extends GuiSlot {
+        private final List<ProtocolVersion> versions = com.viaversion.viaforge.common.ProtocolSelection.versions();
+        private long handledClick = Long.MIN_VALUE;
 
         public SlotList(Minecraft client, int width, int height, int top, int bottom, int slotHeight) {
             super(client, width, height, top, bottom, slotHeight);
@@ -142,12 +162,25 @@ public class GuiProtocolSelector extends GuiScreen {
 
         @Override
         protected int getSize() {
-            return ProtocolVersion.getReversedProtocols().size();
+            return versions.size();
         }
 
         @Override
         protected void elementClicked(int index, boolean b, int i1, int i2) {
-            finishedCallback.finished(ProtocolVersion.getReversedProtocols().get(index), parent);
+            long event = Mouse.getEventNanoseconds();
+            if (event == handledClick || index < 0 || index >= versions.size()) return;
+            handledClick = event;
+            selection = versions.get(index);
+            if (!saveOnClose) finishedCallback.finished(selection, parent);
+        }
+
+        @Override
+        public void handleMouseInput() {
+            // GuiSlot normally uses coordinates saved by the previous frame.
+            // Queued mouse events can otherwise choose a different row.
+            mouseX = Mouse.getEventX() * GuiProtocolSelector.this.width / mc.displayWidth;
+            mouseY = GuiProtocolSelector.this.height - Mouse.getEventY() * GuiProtocolSelector.this.height / mc.displayHeight - 1;
+            super.handleMouseInput();
         }
 
         @Override
@@ -162,8 +195,10 @@ public class GuiProtocolSelector extends GuiScreen {
 
         @Override
         protected void drawSlot(int index, int x, int y, int slotHeight, int mouseX, int mouseY) {
-            final ProtocolVersion targetVersion = ViaForgeCommon.getManager().getTargetVersion();
-            final ProtocolVersion version = ProtocolVersion.getReversedProtocols().get(index);
+            // Native GuiSlot invokes drawSlot even for off-screen entries.
+            if (y + slotHeight < top || y >= bottom) return;
+            final ProtocolVersion targetVersion = selection;
+            final ProtocolVersion version = versions.get(index);
 
             String color;
             if (targetVersion == version) {

@@ -10,7 +10,7 @@ import java.util.*;
 public final class LegacyItemModels {
     public static Map<String, byte[]> generate(Map<String, byte[]> assets) throws IOException {
         Map<String, byte[]> models = new HashMap<>();
-        Set<String> names = new HashSet<>(Arrays.asList("shield_blocking", "broken_elytra"));
+        Set<String> names = new HashSet<>(Arrays.asList("shield_blocking", "broken_elytra", "fireworks"));
         for(String egg:com.viaversion.viaforge.common.blocks.SpawnEggNames.MODERN.keySet())names.add("egg/"+egg);
         for (LegacyItemCatalog.Definition item : LegacyItemCatalog.ITEMS) names.add(item.model);
         for (String material : new String[]{"wooden", "stone", "iron", "diamond", "golden"}) {
@@ -25,7 +25,7 @@ public final class LegacyItemModels {
                 JsonObject textures = new JsonObject(); textures.addProperty("layer0", "minecraft:items/paper"); model.add("textures", textures);
             }
             models.put(path, model.toString().getBytes(StandardCharsets.UTF_8));
-            if (name.endsWith("_sword") || name.endsWith("_axe") || name.endsWith("_pickaxe") || name.endsWith("_shovel") || name.endsWith("_hoe")) {
+            if (name.equals("fireworks") || name.endsWith("_sword") || name.endsWith("_axe") || name.endsWith("_pickaxe") || name.endsWith("_shovel") || name.endsWith("_hoe")) {
                 models.put("models/item/combat/" + name + ".json", model.toString().getBytes(StandardCharsets.UTF_8));
             }
             if (name.equals("shield") || name.equals("shield_blocking")) {

@@ -14,20 +14,20 @@ class TestLab(unittest.TestCase):
     def test_manifest_exactly_matches_registered_resource_versions(self):
         resources = json.loads((lab.REPO / "src/main/resources/assets/viaforge/block-versions.json").read_text())
         self.assertEqual(set(resources), {r["version"] for r in lab.VERSIONS})
-        self.assertEqual(48, len(lab.VERSIONS))
-        self.assertEqual(48, len({r["protocol"] for r in lab.VERSIONS}))
-        self.assertEqual(96, len({r[k] for r in lab.VERSIONS for k in ["port", "rcon_port"]}))
+        self.assertEqual(len(lab.VERSIONS), len({r["protocol"] for r in lab.VERSIONS}))
+        self.assertEqual(2 * len(lab.VERSIONS), len({r[k] for r in lab.VERSIONS for k in ["port", "rcon_port"]}))
         for row in lab.VERSIONS:
             self.assertTrue(row["server"]["url"].startswith("https://piston-data.mojang.com/"))
             self.assertEqual(40, len(row["server"]["sha1"]))
 
     def test_setup_does_not_accept_terms_or_overwrite_world_configuration(self):
-        row = lab.select("26.2")[0]
+        row = lab.select("26.3")[0]
         with tempfile.TemporaryDirectory() as tmp, patch.object(lab, "ROOT", Path(tmp)):
             lab.properties(row)
             directory = Path(tmp) / row["version"]
             self.assertIn("eula=false", (directory / "eula.txt").read_text())
             self.assertIn("view-distance=16", (directory / "server.properties").read_text())
+            self.assertIn("white-list=false", (directory / "server.properties").read_text())
             lab.assert_local(row)
             before = (directory / "control.json").read_text()
             (directory / "server.properties").write_text("custom=true\n")
@@ -58,7 +58,7 @@ class TestLab(unittest.TestCase):
         self.assertEqual(b"\x80\x06", lab.varint(768))
         self.assertEqual(b"\xff\xff\xff\xff\x0f", lab.varint(-1))
 
-    def test_all48_fail_memory_check_without_starting_processes(self):
+    def test_all_fail_memory_check_without_starting_processes(self):
         with patch.object(lab, "status", return_value=None), patch.object(lab, "assert_local"), patch.object(lab, "recover_stale_worker"), \
                 patch.object(Path, "read_text", return_value="eula=true"), \
                 patch.object(lab, "free_memory_mb", return_value=16384), patch("subprocess.Popen") as launch:
@@ -88,7 +88,7 @@ class TestLab(unittest.TestCase):
 
     def test_generated_chests_and_samples_stay_in_loaded_footprint(self):
         # These use actual generated server registries when the lab has been set up.
-        for version in ["1.9", "1.12.2", "1.13", "1.20.6", "26.2"]:
+        for version in ["1.9", "1.12.2", "1.13", "1.20.6", "26.2", "26.3"]:
             row = lab.select(version)[0]
             if not (lab.ROOT / version / "catalog.json").exists():
                 self.skipTest("Originalserver-Kataloge fehlen; zuerst setup/catalog")
@@ -154,7 +154,7 @@ class TestLab(unittest.TestCase):
         extra = server_list.string_tag("custom", "unveraendert")
         original = b"\x0a\0\0" + extra + b"\x09" + server_list.utf("servers") + b"\x0a\0\0\0\x01" + old_entry + b"\0"
         merged, added = server_list.merge(original, lab.VERSIONS)
-        self.assertEqual(48, added)
+        self.assertEqual(len(lab.VERSIONS), added)
         self.assertIn(extra, merged)
         self.assertIn(old_entry, merged)
         self.assertIn(server_list.string_tag("viaForge$version", "26.2"), merged)

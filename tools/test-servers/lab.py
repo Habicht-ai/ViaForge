@@ -113,11 +113,12 @@ def properties(row):
     modern = row["protocol"] >= 393
     props = {
         "server-ip": "127.0.0.1", "server-port": row["port"], "online-mode": "false",
+        "white-list": "false", "enforce-whitelist": "false",
         "enforce-secure-profile": "false", "enable-rcon": "true", "rcon.port": row["rcon_port"],
         "rcon.password": password, "broadcast-rcon-to-ops": "false", "enable-query": "false",
         "enable-jmx-monitoring": "false", "management-server-enabled": "false",
         "motd": f"ViaForge Testlabor | {row['version']} | Protokoll {row['protocol']}",
-        "level-name": "world", "level-seed": "764189", "level-type": "minecraft:flat" if row["protocol"] >= 735 else "FLAT",
+        "level-name": "world", "level-seed": "764189", "level-type": "minecraft:flat" if row["protocol"] >= 759 else "flat",
         "generate-structures": "false", "gamemode": creative_property(row),
         "difficulty": "normal" if modern else "2", "force-gamemode": "false", "hardcore": "false",
         "max-players": "4", "view-distance": "16", "simulation-distance": "3", "spawn-protection": "0",
@@ -126,19 +127,14 @@ def properties(row):
         "network-compression-threshold": "256", "pause-when-empty-seconds": "0",
         "sync-chunk-writes": "true", "initial-enabled-packs": "vanilla",
     }
-    # Ground at y=63, shared coordinates even across the 1.18 height change.
+    # The parser changes in 1.13 (flattened preset strings), 1.16 (JSON), and 1.19 (namespaced type).
+    import terrain
     if row["protocol"] < 393:
         props["generator-settings"] = "3;minecraft:bedrock,59*minecraft:stone,3*minecraft:dirt,minecraft:grass;1;"
     elif row["protocol"] < 735:
-        props["generator-settings"] = json.dumps({"biome": "minecraft:plains", "layers": [
-            {"block": "minecraft:bedrock", "height": 1}, {"block": "minecraft:stone", "height": 59},
-            {"block": "minecraft:dirt", "height": 3}, {"block": "minecraft:grass_block", "height": 1}], "structures": {}})
+        props["generator-settings"] = "minecraft:bedrock,59*minecraft:stone,3*minecraft:dirt,minecraft:grass_block;1;"
     else:
-        props["generator-settings"] = json.dumps({"biome": "minecraft:plains", "layers": [
-            {"block": "minecraft:bedrock", "height": 1},
-            {"block": "minecraft:stone", "height": 123 if row["protocol"] >= 757 else 59},
-            {"block": "minecraft:dirt", "height": 3}, {"block": "minecraft:grass_block", "height": 1}],
-            "structure_overrides": [], "structures": {"structures": {}}})
+        props["generator-settings"] = json.dumps(terrain.flat_settings(row))
     path = folder / "server.properties"
     # Setup can be repeated, but never silently overwrite user configuration.
     if not path.exists():
@@ -506,6 +502,8 @@ def worker(row):
     child = None
     try:
         assert_local(row)
+        import terrain
+        terrain.prepare_new_world(row)
         with (folder / "console.log").open("ab", buffering=0) as log:
             child = subprocess.Popen([java(row), "-Xms256m", f"-Xmx{heap(row)}m", "-XX:ActiveProcessorCount=2",
                                       "-Dfile.encoding=UTF-8", "-Dlog4j2.formatMsgNoLookups=true",
@@ -632,7 +630,7 @@ def dashboard():
     (ROOT / "index.html").write_text("<!doctype html><html lang='de'><meta charset='utf-8'><title>ViaForge Testlabor</title>"
         "<style>body{font:16px system-ui;max-width:1000px;margin:40px auto;background:#151c26;color:#e0ecf5}"
         "td,th{padding:9px 22px;text-align:left;border-bottom:1px solid #344}code{color:#8ee3ba}a{color:#8bd5ff}</style>"
-        f"<h1>ViaForge Testlabor</h1><p>48 originale Vanilla-Versionen. Zugriff nur auf diesem PC. {verified}/48 Welten geprueft.</p>"
+        f"<h1>ViaForge Testlabor</h1><p>{len(VERSIONS)} originale Vanilla-Versionen. Zugriff nur auf diesem PC. {verified}/{len(VERSIONS)} Welten geprueft.</p>"
         "<p>Starten: <code>Testserver.bat start 26.2</code> &middot; Gruppe: <code>start regression</code><br>"
         "Beenden mit Speichern: <code>Testserver.bat stop all</code></p>"
         "<p>Im Spiel: Multiplayer → Direkt verbinden → Adresse kopieren. In ViaForge die passende Serverversion waehlen.</p>"
@@ -717,9 +715,9 @@ def audit(rows):
 
 
 def select(value):
-    groups = {"regression": ["1.12.2", "1.13.2", "1.21.11", "26.2"],
+    groups = {"regression": ["1.12.2", "1.13.2", "1.21.11", "26.3"],
               "legacy": ["1.9", "1.10.2", "1.11.2", "1.12.2"],
-              "modern": ["1.16.5", "1.18.2", "1.20.6", "26.2"]}
+              "modern": ["1.16.5", "1.18.2", "1.20.6", "26.3"]}
     if value == "all":
         return VERSIONS
     names = groups.get(value, value.split(","))

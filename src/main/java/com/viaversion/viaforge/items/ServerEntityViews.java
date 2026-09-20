@@ -19,6 +19,7 @@ public final class ServerEntityViews {
         public final int type;
         public ItemStack potion, offhand;
         public int handState;
+        public int boostedEntity = -1;
         public boolean leftHanded, fallFlying;
         public boolean crystalBase = true;
         public net.minecraft.util.BlockPos crystalBeam;
@@ -27,7 +28,7 @@ public final class ServerEntityViews {
     }
     private static WorldClient world;
     private static final Map<Integer, View> VIEWS = new HashMap<>();
-    public static void clear() { VIEWS.clear(); world = null; com.viaversion.viaforge.blocks.ServerEditorPermissions.clear(); ServerTotemAnimation.clear(); ServerCombatState.clear(); ServerItemCooldowns.clear(); com.viaversion.viaforge.hands.Offhand.clear(); com.viaversion.viaforge.mobs.ServerMobs.clear(); com.viaversion.viaforge.boats.ServerBoats.clear(); }
+    public static void clear() { ServerElytraFlight.clear(); VIEWS.clear(); world = null; com.viaversion.viaforge.blocks.ServerEditorPermissions.clear(); ServerTotemAnimation.clear(); ServerCombatState.clear(); ServerItemCooldowns.clear(); com.viaversion.viaforge.hands.Offhand.clear(); com.viaversion.viaforge.mobs.ServerMobs.clear(); com.viaversion.viaforge.boats.ServerBoats.clear(); }
     public static View get(int id) { return world == Minecraft.getMinecraft().theWorld ? VIEWS.get(id) : null; }
     public static boolean blocking(EntityLivingBase entity, boolean offhand, ItemStack stack) {
         if (!ClientItems.is(stack, com.viaversion.viaforge.common.blocks.LegacyItemCatalog.Kind.SHIELD)) return false;
@@ -44,7 +45,15 @@ public final class ServerEntityViews {
         if (world != current || operation == 0) { clear(); world = current; }
         if (operation == 28) { com.viaversion.viaforge.blocks.ServerEditorPermissions.accept(input); return; }
         if (!ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.ENTITY_VISUALS)) return;
-        if (operation == 6) ServerItemCooldowns.clear();
+        if (operation == 6) {
+            ServerItemCooldowns.clear(); ServerElytraFlight.clear();
+            EntityPlayer local = Minecraft.getMinecraft().thePlayer;
+            if (local != null) {
+                View playerView = VIEWS.get(local.getEntityId());
+                if (playerView != null) playerView.fallFlying = false;
+                for (View view : VIEWS.values()) if (view.boostedEntity == local.getEntityId()) view.boostedEntity = -1;
+            }
+        }
         // A same-dimension respawn retains the native world and its tracked entities.
         if (world == null || operation == 0 || operation == 6) return;
         if (operation == 7) {
@@ -74,7 +83,7 @@ public final class ServerEntityViews {
             case 1: {
                 input.skipBytes(16); int type = input.readUnsignedByte();
                 double x = input.readDouble(), y = input.readDouble(), z = input.readDouble();
-                if (type != 3 && type != 73 && type != 60 && type != 91 && type != 51) return;
+                if (type != 76 && type != 3 && type != 73 && type != 60 && type != 91 && type != 51) return;
                 View view = new View(type); VIEWS.put(entityId, view);
                 if (type == 3) {
                     ServerAreaEffectCloud cloud = new ServerAreaEffectCloud(world);
@@ -129,7 +138,10 @@ public final class ServerEntityViews {
         if (view == null) return;
         for (EntityData data : entries) {
             Object value = data.getValue();
-            if (view.type == 73 && data.id() == first && data.dataType().type() == Types.ITEM1_8) {
+            if (view.type == 76 && data.id() == first + 1 && value instanceof Integer) {
+                // The normalized 1.12 layout uses zero for no attachment (modern OptionalInt.empty).
+                view.boostedEntity = (Integer)value > 0 ? (Integer)value : -1;
+            } else if (view.type == 73 && data.id() == first && data.dataType().type() == Types.ITEM1_8) {
                 ItemStack stack = item((com.viaversion.viaversion.api.minecraft.item.Item)value);
                 if (ClientItems.is(stack, com.viaversion.viaforge.common.blocks.LegacyItemCatalog.Kind.LINGERING)
                         || ClientItems.is(stack, com.viaversion.viaforge.common.blocks.LegacyItemCatalog.Kind.SPLASH)) view.potion = stack;
@@ -146,7 +158,7 @@ public final class ServerEntityViews {
                 }
                 if (data.id() == first + 1 && value instanceof Boolean) view.crystalBase = (Boolean)value;
             } else if (view.type == -1 && value instanceof Byte) {
-                if (data.id() == 0) view.fallFlying = ((Byte)value & 128) != 0;
+                if (data.id() == 0) { view.fallFlying = ((Byte)value & 128) != 0; ServerElytraFlight.metadata(id, view.fallFlying); }
                 if (data.id() == first) view.handState = (Byte)value;
                 if (data.id() == first + 8) view.leftHanded = (Byte)value == 0;
             } else if (view.type == -1 && (data.id() == first + 9 || data.id() == first + 10)) {
@@ -167,6 +179,12 @@ public final class ServerEntityViews {
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         try { Types.ITEM1_8.write(buffer, copy); return buffer.readItemStackFromBuffer(); }
         finally { buffer.release(); }
+    }
+    public static int boosts(int playerId) {
+        if (world != Minecraft.getMinecraft().theWorld) return 0;
+        int count = 0;
+        for (View view : VIEWS.values()) if (view.type == 76 && view.boostedEntity == playerId) count++;
+        return count;
     }
     private ServerEntityViews() { }
 }

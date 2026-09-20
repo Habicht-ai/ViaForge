@@ -4,7 +4,7 @@ import com.viaversion.viaforge.common.compatibility.*;
 import com.viaversion.viaforge.common.blocks.*;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import com.viaversion.viaversion.connection.UserConnectionImpl;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.*;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.*;
@@ -15,6 +15,17 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class CompatibilityArchitectureTest {
+    private static UserConnection connection() {
+        final com.viaversion.viaversion.connection.ProtocolInfoImpl info = new com.viaversion.viaversion.connection.ProtocolInfoImpl();
+        final Map<Class<?>,Object> stored = new HashMap<>();
+        return (UserConnection)java.lang.reflect.Proxy.newProxyInstance(CompatibilityArchitectureTest.class.getClassLoader(),new Class<?>[]{UserConnection.class},(proxy,method,args)->{
+            if(method.getName().equals("getProtocolInfo"))return info;
+            if(method.getName().equals("put")){stored.put(args[0].getClass(),args[0]);return null;}
+            if(method.getName().equals("get"))return stored.get(args[0]);
+            if(method.getName().equals("has"))return stored.containsKey(args[0]);
+            throw new UnsupportedOperationException(method.getName());
+        });
+    }
     private static CompatibilityProfile original(){return CompatibilityRegistry.DEFAULT.resolve(340);}
     @Test public void allExistingProfilesKeepExactAssetsAndCumulativeFeatures(){
         for(BlockVersionProfile legacy:BlockVersionProfile.values()){
@@ -29,7 +40,7 @@ public class CompatibilityArchitectureTest {
         }
     }
     @Test public void newerUnknownAndNativeTargetsNeverPretendToBeLegacyWire(){
-        for(int protocol:new int[]{47,106,111,341,394,402,405,777,1000,Integer.MAX_VALUE}){
+        for(int protocol:new int[]{47,106,111,341,394,402,405,778,1000,Integer.MAX_VALUE}){
             CompatibilityProfile p=CompatibilityRegistry.DEFAULT.resolve(protocol);
             assertEquals(protocol,p.serverProtocol());assertFalse(p.extended());assertNull(p.adapter());assertNull(p.resources());assertFalse(p.has(ClientFeature.TWO_HANDS));
         }
@@ -62,7 +73,7 @@ public class CompatibilityArchitectureTest {
         SessionEpoch.Ticket disconnected=session.begin(a,original());session.clear();assertFalse(session.current(disconnected));
     }
     @Test public void bothOutgoingDirectionsUseTheConnectionBoundCodec(){
-        EmbeddedChannel channel=new EmbeddedChannel(new io.netty.channel.ChannelInboundHandlerAdapter());UserConnectionImpl user=new UserConnectionImpl(channel,true);user.getProtocolInfo().setServerProtocolVersion(ProtocolVersion.v1_13_2);
+        EmbeddedChannel channel=new EmbeddedChannel(new io.netty.channel.ChannelInboundHandlerAdapter());UserConnection user=connection();user.getProtocolInfo().setServerProtocolVersion(ProtocolVersion.v1_13_2);
         ProbeFactory adapter=new ProbeFactory();CompatibilityProfile profile=new CompatibilityProfile(404,original().rules(),ResourceProfile.legacy("1.12.2"),adapter);user.put(profile);
         try{
             assertSame(profile,CompatibilityRegistry.forUser(user));
@@ -87,7 +98,7 @@ public class CompatibilityArchitectureTest {
     }
     @Test public void sharedItemBridgeUsesDifferentServerIdsInBothDirections(){
         EmbeddedChannel channel=new EmbeddedChannel(new io.netty.channel.ChannelInboundHandlerAdapter());
-        UserConnectionImpl user=new UserConnectionImpl(channel,true);user.getProtocolInfo().setServerProtocolVersion(ProtocolVersion.v1_13_2);
+        UserConnection user=connection();user.getProtocolInfo().setServerProtocolVersion(ProtocolVersion.v1_13_2);
         user.getProtocolInfo().setPipeline((com.viaversion.viaversion.api.protocol.ProtocolPipeline)java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(),new Class<?>[]{com.viaversion.viaversion.api.protocol.ProtocolPipeline.class},(proxy,method,args)->{
             if(method.getName().equals("pipes"))return Collections.emptyList();throw new UnsupportedOperationException(method.getName());
         }));

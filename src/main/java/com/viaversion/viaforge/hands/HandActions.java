@@ -36,7 +36,7 @@ public final class HandActions {
                 int count=held==null?0:held.stackSize;
                 if(net.minecraftforge.event.ForgeEventFactory.onPlayerInteract(p,net.minecraftforge.event.entity.player.PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK,mc.theWorld,hit.getBlockPos(),hit.sideHit,hit.hitVec).isCanceled())return true;
                 if(mc.playerController.onPlayerRightClick(p,mc.theWorld,held,hit.getBlockPos(),hit.sideHit,hit.hitVec)) {
-                    Offhand.swing(hand);
+                    Offhand.swingUse(hand);
                     if(held!=null&&held.stackSize<=0)p.inventory.mainInventory[p.inventory.currentItem]=null;
                     if(held!=null&&(held.stackSize!=count||p.capabilities.isCreativeMode))HandRenderer.reset(hand);
                     return true;
@@ -48,6 +48,15 @@ public final class HandActions {
         if(net.minecraftforge.event.ForgeEventFactory.onPlayerInteract(p,net.minecraftforge.event.entity.player.PlayerInteractEvent.Action.RIGHT_CLICK_AIR,mc.theWorld,null,null,null).isCanceled())return true;
         bucketUsed=false;
         boolean changed=mc.playerController.sendUseItem(p,mc.theWorld,held);
+        if(held.getItem()==Items.fireworks
+                && com.viaversion.viaforge.compatibility.ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.ELYTRA_FIREWORKS)
+                && com.viaversion.viaforge.items.ServerElytraFlight.flying(p)) {
+            // The 1.8 ItemFirework has no air-use result. A successful glide use
+            // consumes this hand's interaction even when the server owns the stack count.
+            if(com.viaversion.viaforge.compatibility.ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.ROCKET_USE_SWING))Offhand.swingUse(hand);
+            HandRenderer.reset(hand);
+            return true;
+        }
         if(p.isUsingItem()){Offhand.useHand=hand;return true;}
         if(changed||bucketUsed){HandRenderer.reset(hand);return true;}
         Item item=held.getItem();

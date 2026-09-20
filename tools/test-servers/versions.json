@@ -670,5 +670,19 @@
     },
     "metadata_url": "https://piston-meta.mojang.com/v1/packages/987b91a95ae93b3bb78cc14d6e0bbd31bad08d59/26.2.json",
     "metadata_sha1": "987b91a95ae93b3bb78cc14d6e0bbd31bad08d59"
+  },
+  {
+    "version": "26.3",
+    "protocol": 777,
+    "port": 25638,
+    "rcon_port": 26638,
+    "java": 25,
+    "server": {
+      "sha1": "33680f5f2ac32864d6d7cf5e56a705fdb3e05f4c",
+      "size": 62294556,
+      "url": "https://piston-data.mojang.com/v1/objects/33680f5f2ac32864d6d7cf5e56a705fdb3e05f4c/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/96c00d95a31328714d3811cfade2804bb050e455/26.3.json",
+    "metadata_sha1": "96c00d95a31328714d3811cfade2804bb050e455"
   }
 ]

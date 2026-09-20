@@ -51,6 +51,16 @@ def nbt(data):
     return reader.payload(kind)
 
 
+def block_state(value):
+    # 26.3 uses bare identifiers or {id,properties}, inside heterogeneous-list
+    # wrappers. Older chunks retain {Name,Properties}. Normalize without defaults.
+    if isinstance(value, dict) and set(value) == {''}: value = value['']
+    if isinstance(value, str): return {'Name': value}
+    if 'id' in value:
+        return {'Name': value['id'], **({'Properties': value['properties']} if 'properties' in value else {})}
+    return value
+
+
 class World:
     def __init__(self, folder):
         self.region = folder / "world" / "region"
@@ -101,7 +111,7 @@ class World:
             return {"Name": "minecraft:air"}
         packed = states.get("data", section.get("BlockStates", []))
         if len(palette) == 1 or not packed:
-            return palette[0]
+            return block_state(palette[0])
         bits = max(4, (len(palette) - 1).bit_length())
         # 1.16+ avoids values crossing a 64-bit word; 1.13-1.15 packs continuously.
         padded = "block_states" in section or chunk.get("_data_version", 0) >= 2529
@@ -113,7 +123,8 @@ class World:
             value = (packed[word] & ((1 << 64) - 1)) >> shift
             if shift + bits > 64:
                 value |= (packed[word + 1] & ((1 << 64) - 1)) << (64 - shift)
-        return palette[value & ((1 << bits) - 1)]
+        block = palette[value & ((1 << bits) - 1)]
+        return block_state(block)
 
     def block_entity(self, x, y, z):
         chunk = self.chunk(x // 16, z // 16)
@@ -153,7 +164,7 @@ def audit_signs(world, manifest):
     return issues
 
 
-def audit(row):
+def audit(row, terrain_check=True):
     folder = lab.ROOT / row["version"]
     record = json.loads((folder / "process.json").read_text()) if (folder / "process.json").exists() else {}
     if (folder / "worker.lock").exists() and any(lab.process_alive(record[k]) for k in ("worker_pid", "server_pid") if k in record):
@@ -190,6 +201,12 @@ def audit(row):
     if manifest.exists():
         signs = json.loads(manifest.read_text(encoding="utf-8"))
         result.update(signs_checked=len(signs), sign_issues=audit_signs(world, signs))
+    if terrain_check:
+        import terrain
+        ground = terrain.inspect(row)
+        lab.save(folder / 'terrain-audit.json', ground)
+        result.update(terrain_intrusions=ground['intrusions'], generator_flat=ground['flat'])
+        result['scope'] += ' Also scans extra natural terrain and the saved generator inside the reserved exhibition.'
     lab.save(folder / "world-audit.json", result)
     print(row["version"], "Blockabgleich:", result["unexpected"], "unerwartete Abweichungen;",
           len(missing) + len(changed) - result["unexpected"], "kurzlebige/gleichwertige Zustaende", flush=True)
@@ -202,4 +219,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     results = [audit(row) for row in lab.select(args.versions)]
     lab.save(lab.ROOT / "world-audit-summary.json", [dict(version=r["version"], samples=r["samples"],
-             missing=len(r["missing"]), changed_type=len(r["changed_type"])) for r in results])
+             missing=len(r["missing"]), changed_type=len(r["changed_type"]), unexpected=r['unexpected'],
+             sign_issues=len(r.get('sign_issues', [])), terrain_intrusions=r['terrain_intrusions'],
+             generator_flat=r['generator_flat']) for r in results])
+    if any(r['unexpected'] or r.get('sign_issues') or r['terrain_intrusions'] or not r['generator_flat'] for r in results):
+        raise SystemExit(1)

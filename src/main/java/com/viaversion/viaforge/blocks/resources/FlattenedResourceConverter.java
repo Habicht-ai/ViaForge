@@ -27,6 +27,9 @@ public final class FlattenedResourceConverter {
                 String target=alias.getValue().getAsString();
                 // Removed in 1.17, and never referenced by a vanilla item/model.
                 if((target.equals("textures/item/spawn_egg.png")||target.equals("textures/item/spawn_egg_overlay.png"))&&source.containsKey("models/item/egg/bat.json"))continue;
+                // 26.3's original filled-map model is a single untinted layer.
+                if(target.equals("textures/item/filled_map_markings.png")&&!source.containsKey(target)
+                        &&source.containsKey("textures/item/abandoned_camp_map.png"))continue;
                 if(target.equals("textures/item/ruby.png")&&!source.containsKey(target))continue;
                 if(!source.containsKey(target))throw new IllegalArgumentException("Missing target texture "+target);
                 result.put(alias.getKey(),source.get(target));
@@ -56,7 +59,7 @@ public final class FlattenedResourceConverter {
             }
             result.put("blockstates/"+block.name+".json",bytes(states));
         }
-        String[][] models={{"bottle_drinkable","potion"},{"bottle_splash","splash_potion"},{"bottle_lingering","lingering_potion"},
+        String[][] models={{"fireworks","firework_rocket"},{"bottle_drinkable","potion"},{"bottle_splash","splash_potion"},{"bottle_lingering","lingering_potion"},
                 {"skull_dragon","dragon_head"},{"chorus_fruit_popped","popped_chorus_fruit"},{"totem","totem_of_undying"},{"spawn_egg","template_spawn_egg"}};
         for(String[] pair:models)alias(result,"models/item/"+pair[0]+".json","models/item/"+pair[1]+".json");
         alias(result,"models/block/purpur_pillar_top.json","models/block/purpur_pillar.json");

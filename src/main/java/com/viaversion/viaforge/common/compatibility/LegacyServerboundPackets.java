@@ -11,6 +11,13 @@ final class LegacyServerboundPackets {
         wrapper.cancel();
         if(channel.equals("VF|hands"))hands(wrapper);
         else if(channel.equals("VF|boat"))boats(wrapper);
+        else if(channel.equals("VF|elytra")) {
+            int id=wrapper.read(Types.VAR_INT);
+            if(id!=wrapper.user().getEntityTracker(Protocol1_9To1_8.class).clientEntityId())return;
+            PacketWrapper action=PacketWrapper.create(ServerboundPackets1_9.PLAYER_COMMAND,wrapper.user());
+            action.write(Types.VAR_INT,id);action.write(Types.VAR_INT,8);action.write(Types.VAR_INT,0);
+            action.sendToServer(Protocol1_9To1_8.class,true);
+        }
     }
     private static void hands(PacketWrapper wrapper) {
         wrapper.cancel();

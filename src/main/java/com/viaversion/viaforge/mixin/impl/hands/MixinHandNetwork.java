@@ -13,6 +13,7 @@ public abstract class MixinHandNetwork {
     @Inject(method="addToSendQueue",at=@At("HEAD"),cancellable=true)
     private void handPacket(Packet packet,CallbackInfo ci) {
         if(!Offhand.active())return;
+        if(packet instanceof C0APacketAnimation && Offhand.localUseSwing()){ci.cancel();return;}
         if(packet instanceof C15PacketClientSettings){((NetHandlerPlayClient)(Object)this).addToSendQueue(HandPackets.wrapped(packet,Offhand.mainLeft()?0:1));ci.cancel();return;}
         if(packet instanceof C0APacketAnimation)Offhand.swingHand=Math.max(0,Offhand.context);
         boolean use=Offhand.context>=0&&(packet instanceof C08PacketPlayerBlockPlacement||packet instanceof C02PacketUseEntity||packet instanceof C0APacketAnimation);

@@ -29,7 +29,7 @@ import com.viaversion.viaforge.common.protocoltranslator.provider.ViaForgeEncryp
 import com.viaversion.viaforge.common.protocoltranslator.provider.ViaForgeMovementTransmitterProvider;
 import com.viaversion.viaforge.common.protocoltranslator.provider.ViaForgeOldAuthProvider;
 import com.viaversion.viaforge.common.protocoltranslator.provider.ViaForgeBaseVersionProvider;
-import net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.provider.ClassicMPPassProvider;
+import net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.provider.ClassicMpPassProvider;
 import net.raphimc.vialegacy.protocol.release.r1_2_4_5tor1_3_1_2.provider.OldAuthProvider;
 import net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.provider.EncryptionProvider;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.provider.GameProfileFetcher;
@@ -51,7 +51,7 @@ public class ViaForgePlatformLoader implements ViaPlatformLoader {
         providers.use(OldAuthProvider.class, new ViaForgeOldAuthProvider());
         providers.use(GameProfileFetcher.class, platform.getGameProfileFetcher());
         providers.use(EncryptionProvider.class, new ViaForgeEncryptionProvider());
-        providers.use(ClassicMPPassProvider.class, new ViaForgeClassicMPPassProvider());
+        providers.use(ClassicMpPassProvider.class, new ViaForgeClassicMPPassProvider());
     }
 
     @Override

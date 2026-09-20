@@ -43,7 +43,7 @@ public final class LegacyEntityPackets {
                 int type = probe.readUnsignedByte();
                 if (type == 1) { boats.add(entityId); operation = 20; break; }
                 if (type == 67 || type == 93 || (type == 68 || type == 79) && profile.protocol() >= 315) { operation = 16; break; }
-                if (type != 3 && type != 73 && type != 60 && type != 91 && type != 51) return null;
+                if (type != 76 && type != 3 && type != 73 && type != 60 && type != 91 && type != 51) return null;
                 operation = 1; break;
             case "SET_ENTITY_DATA": operation = 2; break;
             case "SET_EQUIPPED_ITEM": operation = 3; break;

@@ -19,7 +19,7 @@ public abstract class MixinShieldArmPose {
         ModelBiped model = (ModelBiped)(Object)this;
         EntityPlayer player = (EntityPlayer)entity;
         ServerEntityViews.View view = ServerEntityViews.get(entity.getEntityId());
-        model.heldItemLeft = 0;
+        model.heldItemLeft = model.heldItemRight = 0;
         if (view != null && (view.handState & 3) == 3 && ClientItems.is(view.offhand, Kind.SHIELD)) model.heldItemRight = player.getHeldItem() == null ? 0 : 1;
         for (boolean other : new boolean[]{false, true}) {
             ItemStack stack = other ? com.viaversion.viaforge.hands.Offhand.of(player) : player.getHeldItem();
@@ -35,6 +35,12 @@ public abstract class MixinShieldArmPose {
     private void leftShieldYaw(float a, float b, float c, float d, float e, float f, Entity entity, CallbackInfo ci) {
         ModelBiped model = (ModelBiped)(Object)this;
         if (entity instanceof EntityPlayer && ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.TWO_HANDS) && model.heldItemLeft == 3) model.bipedLeftArm.rotateAngleY += .5235988F;
+        if (entity instanceof EntityPlayer && ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.SHIELD_FOLLOWS_LOOK)) {
+            float x=net.minecraft.util.MathHelper.clamp_float(model.bipedHead.rotateAngleX,-1.3962634F,.43633232F);
+            float y=net.minecraft.util.MathHelper.clamp_float(model.bipedHead.rotateAngleY,-.5235988F,.5235988F);
+            if(model.heldItemRight==3){model.bipedRightArm.rotateAngleX+=x;model.bipedRightArm.rotateAngleY+=y;}
+            if(model.heldItemLeft==3){model.bipedLeftArm.rotateAngleX+=x;model.bipedLeftArm.rotateAngleY+=y;}
+        }
         if(!(entity instanceof EntityPlayer)||!com.viaversion.viaforge.hands.Offhand.active())return;
         EntityPlayer player=(EntityPlayer)entity;ServerEntityViews.View view=ServerEntityViews.get(entity.getEntityId());
         boolean local=player==net.minecraft.client.Minecraft.getMinecraft().thePlayer;

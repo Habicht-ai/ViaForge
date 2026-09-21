@@ -1,4 +1,4 @@
-"""Loopback-only browser UI for the existing Vanilla test-server manager."""
+"""Loopback-only browser UI with one active server per Minecraft version."""
 from __future__ import annotations
 
 import argparse
@@ -20,15 +20,17 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlsplit
 
 import lab
+import profiles
 
 PORT = 8765
 APP_ID = "viaforge-testlabor-web-v1"
 ASSETS = Path(__file__).with_name("web")
-ROWS = {r["version"]: r for r in lab.VERSIONS}
-ACTIONS = {"start", "stop", "verify", "inspect", "restore", "kit", "op"}
+ROWS = profiles.mapping()
+ACTIONS = {"start", "stop", "verify", "inspect", "restore", "kit", "op", "ac-on", "ac-off", "ac-status", "backup", "restore-backup"}
 TITLES = {"start": "Starten", "stop": "Speichern und stoppen", "verify": "Welt prüfen",
           "kit": "Testpaket geben", "op": "Operator vergeben", "inspect": "Gespeicherte Exponate prüfen",
-          "restore": "Ausstellung wiederherstellen"}
+          "restore": "Ausstellung wiederherstellen", "ac-on": "Grim aktivieren", "ac-off": "Grim deaktivieren",
+          "ac-status": "Grim-Status abfragen", "backup": "Server sichern", "restore-backup": "Sicherung wiederherstellen"}
 
 
 def read_json(path, default=None):
@@ -50,6 +52,7 @@ def tail(path, limit=24000):
 
 
 def inspect_server(row):
+    import grim
     folder = lab.ROOT / row["version"]
     found = lab.status(row)
     record = read_json(folder / "process.json", {})
@@ -57,7 +60,8 @@ def inspect_server(row):
     if (folder / "worker.lock").exists() and record:
         managed = all(lab.process_alive(record.get(key, 0)) for key in ("worker_pid", "server_pid"))
     protocol_ok = bool(found and found.get("version", {}).get("protocol") == row["protocol"])
-    state = "running" if protocol_ok else "conflict" if found else "starting" if managed else "offline"
+    booting = managed and (not found or found.get('version', {}).get('protocol') == -1)
+    state = "running" if protocol_ok else "starting" if booting else "conflict" if found else "offline"
     report = read_json(folder / "arena-report.json", {})
     # A later failed verification must not be hidden by an older successful restart test.
     checks = [read_json(folder / name, {}) for name in ("persistence-check.json", "verification.json")]
@@ -67,15 +71,34 @@ def inspect_server(row):
     transient = {"minecraft:flowing_water", "minecraft:flowing_lava", "minecraft:frosted_ice"}
     issues = [s for s in audit.get("missing", []) + audit.get("changed_type", []) if s["name"] not in transient
               and not (s["name"].endswith("air") and s.get("actual", {}).get("Name", "").endswith("air"))]
-    return dict(version=row["version"], protocol=row["protocol"], address=f"127.0.0.1:{row['port']}",
+    world_check = read_json(folder / 'world-validation.json', {})
+    if world_check and world_check.get('instance') != row['version']:
+        world_check = {}
+    # Restoring a different snapshot invalidates results from the displaced world.
+    restored = read_json(folder / 'snapshot-restore.json', {}).get('time', 0)
+    maintenance = read_json(folder / 'exhibition-maintenance.json', {})
+    saved_changed = max(restored, maintenance.get('time', 0))
+    if check.get('time', 0) < restored:
+        check = {}
+    if world_check.get('time', 0) < saved_changed:
+        world_check = {}
+    ac = grim.state(row, running=state == 'running')
+    if row.get('unavailable_reason'):
+        ac = dict(state='unavailable', reason=row['unavailable_reason'])
+    return dict(version=row.get('profile_version', row['version']), protocol=row["protocol"], address=f"127.0.0.1:{row['port']}",
+                minecraft_version=row.get("minecraft_version", row["version"]), platform=row.get("platform", "Vanilla"),
+                platform_build=row.get("platform_build"), grim_version=row.get("grim_version"),
+                anticheat=ac,
                 state=state, managed=managed, players=(found or {}).get("players", {}).get("online", 0),
                 heap_mb=lab.heap(row), budget_mb=lab.heap(row) + 450,
-                prepared=(folder / "server.jar").exists() and bool(report),
+                prepared=(folder / row.get("launch_jar", "server.jar")).exists() and bool(report),
                 catalog=(folder / "arena-index.json").exists(),
                 blocks=report.get("block_types", 0), items=report.get("item_stacks", 0),
                 mobs=report.get("living_types", 0), variants=report.get("legacy_mob_variants", 0),
                 verified=check.get("success"), checks=check.get("passed", 0), checked_at=check.get("time"),
-                exhibit_issues=len(issues) + len(audit.get("sign_issues", [])) + ground.get('intrusions', 0) + (1 if ground and not ground.get('flat') else 0) if audit else None,
+                world_verified=world_check.get('success'), world_checked_at=world_check.get('time'),
+                world_check_error=world_check.get('error'),
+                exhibit_issues=len(issues) + len(audit.get("sign_issues", [])) + ground.get('intrusions', 0) + len(ground.get('missing_chunks', [])) + (1 if ground and not ground.get('flat') else 0) if audit and audit.get('time', 0) >= restored else None,
                 terrain_intrusions=ground.get('intrusions'), generator_flat=ground.get('flat'),
                 exhibit_checked_at=audit.get("time"), gallery_protection=report.get("gallery_protection", False),
                 started=record.get("started") if managed else None)
@@ -100,7 +123,7 @@ class App:
         with concurrent.futures.ThreadPoolExecutor(max_workers=16) as pool:
             while not self.closed.is_set():
                 try:
-                    servers = list(pool.map(inspect_server, lab.VERSIONS))
+                    servers = list(pool.map(inspect_server, ROWS.values()))
                     snapshot = dict(servers=servers, updated_at=time.time(), free_mb=lab.free_memory_mb(), error=None)
                     with self.lock:
                         self.snapshot = snapshot
@@ -174,10 +197,16 @@ class App:
         if not isinstance(data, dict) or data.get("action") not in ACTIONS:
             raise ValueError("Unbekannte Aktion.")
         versions = data.get("versions")
-        if not isinstance(versions, list) or not versions or len(versions) > len(lab.VERSIONS) or any(
+        if not isinstance(versions, list) or not versions or len(versions) > len(ROWS) or any(
                 not isinstance(v, str) or v not in ROWS for v in versions) or len(set(versions)) != len(versions):
             raise ValueError("Bitte gültige Server auswählen.")
         player = data.get("player", "")
+        if data["action"].startswith("ac-") and any(not ROWS[v].get("grim_version") for v in versions):
+            raise ValueError("Grim ist für diese Minecraft-Version nicht verfügbar.")
+        backup_id = data.get("backup_id", "")
+        if data["action"] == "restore-backup" and (len(versions) != 1 or not isinstance(backup_id, str)
+                or not re.fullmatch(r"snapshot-[0-9-]+-[a-f0-9]{6}", backup_id)):
+            raise ValueError("Eine konkrete Sicherung für genau einen Server auswählen.")
         if data["action"] in {"kit", "op"} and (not isinstance(player, str) or not re.fullmatch(r"[A-Za-z0-9_]{1,16}", player)):
             raise ValueError("Ein gültiger Minecraft-Spielername ist erforderlich.")
         with self.lock:
@@ -189,6 +218,7 @@ class App:
                 raise ValueError("Die Warteschlange ist voll. Bitte kurz warten.")
             job = dict(id=secrets.token_hex(12), action=data["action"], title=TITLES[data["action"]],
                        versions=versions, player=player if data["action"] in {"kit", "op"} else "",
+                       backup_id=backup_id if data["action"] == "restore-backup" else "",
                        state="queued", created=time.time())
             self.jobs.append(job)
             self.jobs = self.jobs[-100:]
@@ -203,11 +233,18 @@ class App:
                 with self.lock:
                     job.update(state="running", started=time.time())
                 path.parent.mkdir(parents=True, exist_ok=True)
-                argv = [sys.executable, "-u", str(lab.HERE / "lab.py"), job["action"], ",".join(job["versions"])]
+                instances = ','.join(ROWS[v]['version'] for v in job['versions'])
+                argv = [sys.executable, "-u", str(lab.HERE / "lab.py"), job["action"], 'instance:' + instances]
                 if job["action"] == "inspect":
-                    argv = [sys.executable, "-u", str(lab.HERE / "world_audit.py"), ",".join(job["versions"])]
+                    argv = [sys.executable, "-u", str(lab.HERE / "world_validation.py"), instances, '--saved-only']
                 if job["action"] == "restore":
-                    argv = [sys.executable, "-u", str(lab.HERE / "exhibition.py"), ",".join(job["versions"]), "--restore"]
+                    argv = [sys.executable, "-u", str(lab.HERE / "exhibition.py"), instances, "--restore"]
+                if job["action"].startswith("ac-"):
+                    argv = [sys.executable, "-u", str(lab.HERE / "grim.py"), job["action"][3:], instances]
+                if job["action"] in {"backup", "restore-backup"}:
+                    argv = [sys.executable, "-u", str(lab.HERE / "snapshots.py"), job["action"], instances]
+                    if job.get("backup_id"):
+                        argv.append(job["backup_id"])
                 if job["player"]:
                     argv.append(job["player"])
                 env = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1")
@@ -220,6 +257,13 @@ class App:
                                                  stdout=output, stderr=subprocess.STDOUT, env=env,
                                                  creationflags=lab.NO_WINDOW)
                         code = child.wait()
+                        if code == 0 and job['action'] in {'restore', 'restore-backup'}:
+                            # The newly saved world needs its own result, including
+                            # terrain outside the sampled exhibit positions.
+                            code = subprocess.call([sys.executable, '-u', str(lab.HERE / 'world_validation.py'),
+                                                    instances, '--saved-only'], cwd=lab.REPO,
+                                                   stdin=subprocess.DEVNULL, stdout=output,
+                                                   stderr=subprocess.STDOUT, env=env, creationflags=lab.NO_WINDOW)
                 with self.lock:
                     job.update(state="success" if code == 0 else "failed", exit_code=code, finished=time.time())
                 if job["action"] == "shutdown" and code == 0:
@@ -294,12 +338,17 @@ class Handler(BaseHTTPRequestHandler):
                           "/style.css": ("style.css", "text/css; charset=utf-8"),
                           "/favicon.svg": ("favicon.svg", "image/svg+xml")}[path]
             return self.send(200, (ASSETS / name).read_bytes(), mime)
-        match = re.fullmatch(r"/api/servers/([\d.]+)/(catalog|log)", path)
+        match = re.fullmatch(r"/api/servers/([\d.]+(?:-grim)?)/(catalog|log|verbose|backups)", path)
         if match and match[1] in ROWS:
-            folder = lab.ROOT / match[1]
+            folder = lab.ROOT / ROWS[match[1]]['version']
             if match[2] == "catalog":
                 catalog = read_json(folder / "arena-index.json")
                 return self.send(200 if catalog else 404, catalog or {"error": "Noch kein Katalog vorhanden."})
+            if match[2] == "verbose":
+                return self.send(200, {"output": tail(folder / "plugins/ViaForgeLabAC/events.jsonl")})
+            if match[2] == "backups":
+                import snapshots
+                return self.send(200, snapshots.list_backups(ROWS[match[1]]))
             return self.send(200, {"output": tail(folder / "console.log")})
         self.send(404, {"error": "Nicht gefunden."})
 

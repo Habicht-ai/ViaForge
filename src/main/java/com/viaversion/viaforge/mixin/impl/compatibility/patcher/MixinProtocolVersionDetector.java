@@ -35,7 +35,11 @@ public abstract class MixinProtocolVersionDetector {
     @Dynamic
     @Inject(method = "isCompatibleWithVersion", at = @At("HEAD"), cancellable = true)
     private void viaforge$setCompatible(String ip, int version, CallbackInfoReturnable cir) {
-        cir.setReturnValue(ViaForgeCommon.getManager().getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_11));
+        net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getMinecraft();
+        ProtocolVersion target = mc.getNetHandler() == null ? null
+                : ((com.viaversion.viaforge.common.extended.ExtendedNetworkManager) mc.getNetHandler().getNetworkManager()).viaForge$getTrackedVersion();
+        if (target == null) target = ViaForgeCommon.getManager().getTargetVersion();
+        cir.setReturnValue(target.newerThanOrEqualTo(ProtocolVersion.v1_11));
     }
 
 }

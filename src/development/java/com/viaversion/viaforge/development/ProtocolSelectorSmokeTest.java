@@ -53,10 +53,72 @@ final class ProtocolSelectorSmokeTest {
             click.invoke(list,index,false,100,100);
             require(writes[0]==0&&ViaForgeCommon.getManager().getTargetVersion()==current,"Browsing selection never writes configuration on the drawing/input thread");
             deferred.onGuiClosed();require(writes[0]==1,"Selected global version is committed when leaving the menu");
+
+            ProtocolVersion override=ProtocolVersion.v1_12_2;
+            final ProtocolVersion[] chosen={override};int[] serverCallbacks={0};
+            GuiProtocolSelector server=new GuiProtocolSelector(null,override,(version,parent)->{chosen[0]=version;serverCallbacks[0]++;});
+            server.setWorldAndResolution(mc,360,240);
+            Method selected=list(server).getClass().getDeclaredMethod("isSelected",int.class);selected.setAccessible(true);
+            require((Boolean)selected.invoke(list(server),versions.indexOf(override)),"Per-server menu highlights its saved override");
+            Method action=GuiProtocolSelector.class.getDeclaredMethod("actionPerformed",GuiButton.class);action.setAccessible(true);
+            action.invoke(server,new GuiButton(4,0,0,"Use global"));
+            require(serverCallbacks[0]==1&&chosen[0]==null,"Use global removes the override, without pinning today's global version");
+            require(!(Boolean)selected.invoke(list(server),versions.indexOf(override)),"Inherited mode has no pinned row");
+            require(ViaForgeCommon.getManager().getTargetVersion()==current,"Per-server edits leave global choice intact");
+
+            net.minecraft.client.multiplayer.ServerData data=new net.minecraft.client.multiplayer.ServerData("probe","127.0.0.1",false);
+            com.viaversion.viaforge.common.extended.ExtendedServerData extended=(com.viaversion.viaforge.common.extended.ExtendedServerData)data;
+            extended.viaForge$setVersion(override);
+            net.minecraft.client.multiplayer.ServerData restored=net.minecraft.client.multiplayer.ServerData.getServerDataFromNBTCompound(data.getNBTCompound());
+            require(((com.viaversion.viaforge.common.extended.ExtendedServerData)restored).viaForge$getVersion()==override,"Server override survives NBT save/reload");
+            extended.viaForge$setVersion(null);
+            restored.copyFrom(data);
+            require(((com.viaversion.viaforge.common.extended.ExtendedServerData)restored).viaForge$getVersion()==null,"Removing override survives server-data copy");
+            require(!restored.getNBTCompound().hasKey("viaForge$version"),"Inherited mode is persisted without a stale override");
+            queuedMouseInput(mc,versions);
         }finally{mc.fontRendererObj=old;}
     }
     private static Object list(GuiProtocolSelector screen)throws Exception {
         Field field=GuiProtocolSelector.class.getDeclaredField("list");field.setAccessible(true);return field.get(screen);
+    }
+    private static void queuedMouseInput(Minecraft mc,List<ProtocolVersion> versions)throws Exception {
+        // Feed the real LWJGL event reader and native GuiSlot hit testing. No OS
+        // mouse injection, cursor movement or interference with another client.
+        java.util.Map<Field,Object> saved=new java.util.LinkedHashMap<>();
+        for(String name:new String[]{"readBuffer","buttons","isGrabbed","eventButton","eventState","event_dx","event_dy",
+                "event_dwheel","event_x","event_y","event_nanos","last_event_raw_x","last_event_raw_y"}) {
+            Field f=org.lwjgl.input.Mouse.class.getDeclaredField(name);f.setAccessible(true);saved.put(f,f.get(null));
+        }
+        try {
+            java.util.List<ProtocolVersion> clicks=new java.util.ArrayList<>();
+            GuiProtocolSelector screen=new GuiProtocolSelector(null,true,(version,parent)->clicks.add(version));
+            screen.setWorldAndResolution(mc,360,240);GuiSlot slot=(GuiSlot)list(screen);
+            slot.scrollBy(-100000);slot.scrollBy(37);
+            Field top=GuiSlot.class.getDeclaredField("top");top.setAccessible(true);
+            Field height=GuiSlot.class.getDeclaredField("slotHeight");height.setAccessible(true);
+            // Previous rendered frame deliberately points to another location.
+            for(String field:new String[]{"mouseX","mouseY"}) {
+                Field f=GuiSlot.class.getDeclaredField(field);f.setAccessible(true);f.setInt(slot,0);
+            }
+            java.nio.ByteBuffer events=java.nio.ByteBuffer.allocate(4*org.lwjgl.input.Mouse.EVENT_SIZE);
+            long nanos=System.nanoTime();
+            for(int index:new int[]{5,8}) {
+                int y=top.getInt(slot)+4+index*height.getInt(slot)-slot.getAmountScrolled()+height.getInt(slot)/2;
+                for(int state:new int[]{1,0}) {
+                    events.put((byte)0).put((byte)state).putInt(180*mc.displayWidth/360)
+                            .putInt((240-y-1)*mc.displayHeight/240).putInt(0).putLong(++nanos);
+                }
+            }
+            events.flip();
+            for(Field f:saved.keySet()) {
+                if(f.getName().equals("readBuffer"))f.set(null,events);
+                if(f.getName().equals("buttons"))f.set(null,java.nio.ByteBuffer.allocate(16));
+                if(f.getName().equals("isGrabbed"))f.setBoolean(null,false);
+            }
+            while(org.lwjgl.input.Mouse.next())screen.handleMouseInput();
+            require(clicks.equals(java.util.Arrays.asList(versions.get(5),versions.get(8))),
+                    "Queued clicks use their own coordinates and scrolled row, exactly once per press: "+clicks);
+        }finally{for(java.util.Map.Entry<Field,Object> entry:saved.entrySet())entry.getKey().set(null,entry.getValue());}
     }
     private ProtocolSelectorSmokeTest() { }
 }

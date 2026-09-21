@@ -110,9 +110,9 @@ class Arena:
                     self.block(x, y - 1, z, "sea_lantern")
         self.fill(-20, 63, -112, 40, 63, -82, "quartz_block")
         self.fill(-12, 175, -12, 12, 175, 12, "quartz_block")
-        self.sign(0, 176, -3, ["VIAFORGE LAB", self.row["version"], "START", "Knopf druecken"])
+        self.sign(0, 176, -3, ["VIAFORGE LAB", self.row.get('minecraft_version', self.row['version']), "START", "Knopf druecken"])
         self.button(0, 176, 0, ["Teststationen", "und Navigation"], "tp @p 0 65 -100")
-        self.sign(0, 64, -104, ["VIAFORGE LAB", self.row["version"], f"{len(lab.VERSIONS)} echte Server", "nur localhost"])
+        self.sign(0, 64, -104, ["VIAFORGE LAB", self.row.get('minecraft_version', self.row['version']), f"{len(lab.VANILLA_VERSIONS)} Versionen", "nur localhost"])
         destinations = [("Bloecke A", -78, 65, -78), ("Alle Items", -78, 89, -78),
                         ("Mobs", -78, 113, -78), ("Bloecke B", -78, 145, -78),
                         ("Boot / Wasser", 15, 65, -95), ("Boss-Arena", 0, 209, 80)]
@@ -517,6 +517,13 @@ def upgrade_heights(row):
     print("Hoehenstationen ausserhalb der Ankunftssaeule:", row["version"], flush=True)
 
 
+def verified_commands(commands, output):
+    # Paper's JLine console redraws echo partial and complete INPUT commands.
+    # Only server-emitted chat confirmations count, once per unique command.
+    emitted = set(re.findall(r'(?:\[(?:Server|Rcon)\]|<(?:Server|Rcon)>)\s+(VFLAB_(?:BLOCK|MOB|CHEST|CONTROL)_OK_\d+_END)\b', output))
+    return [command.rsplit('run say ', 1)[1] in emitted for command in commands]
+
+
 def verify(row):
     folder = lab.ROOT / row["version"]
     index = json.loads((folder / "arena-index.json").read_text(encoding="utf-8"))
@@ -575,13 +582,14 @@ def verify(row):
         commands = [re.sub(r"VFLAB_(BLOCK|MOB|CHEST|CONTROL)_OK", lambda m: m[0] + "_" + str(i) + "_END", command)
                     for i, command in enumerate(commands)]
     output = lab.batch(row, commands)
-    matches = len(re.findall(r"Successfully found the block|Found .+|VFLAB_BLOCK_OK|VFLAB_MOB_OK|VFLAB_CHEST_OK|VFLAB_CONTROL_OK", output))
+    confirmed = verified_commands(commands, output) if row['protocol'] >= 393 else None
+    matches = sum(confirmed) if confirmed is not None else len(re.findall(r"Successfully found the block|Found .+", output))
     if row["protocol"] >= 401:
         lab.batch(row, lab.release_chunks(row))
     result = {"version": row["version"], "protocol": found["version"]["protocol"], "checks": len(commands),
-              "passed": matches, "success": matches == len(commands), "output": output, "time": time.time(), "schema": 2}
+              "passed": matches, "success": matches == len(commands), "output": output, "time": time.time(), "schema": 3}
     if row["protocol"] >= 393:
-        result["failed_commands"] = [c for c in commands if c.rsplit("run say ", 1)[1] not in output]
+        result["failed_commands"] = [c for c, passed in zip(commands, confirmed) if not passed]
     lab.save(folder / "verification.json", result)
     if not result["success"]:
         raise RuntimeError(f"{row['version']}: {matches}/{len(commands)} Weltpruefungen bestanden (verification.json)")

@@ -106,3 +106,7 @@ benötigen für ihre zusätzliche Schwimmpose weiterhin eine eigene Anbindung
 der Pose-Metadaten. Die niedrige Tunnelpassage wird automatisiert in Forge
 geprüft; eine vollständige Video-Gegenüberstellung sämtlicher Zielclients
 ist damit nicht belegt.
+
+## Grim-Befunde vom 21.09.2026
+
+Echte Survival-Verbindungen deckten zusätzliche Timing- und Bewegungsabweichungen auf. Neu sind die zielversionsabhängige Restgeschwindigkeitsschwelle 0,003 statt 0,005, die frühere Positions-Erinnerung und geordnete moderne Pong-/Input-/Tick-End-Pakete. Das bedeutet noch keine vollständige moderne Bewegungstreue; insbesondere 26.2 hat weiterhin Grim-Befunde. Ablauf, Nachweise und Grenzen: [REGRESSIONS-2026-09-21.md](REGRESSIONS-2026-09-21.md).

@@ -9,8 +9,9 @@ Developer launches include account management adapted from [Vibe](https://codebe
 - **`run.bat`** launches Minecraft with ViaForge and the developer account manager.
 - **`build.bat`** runs checks and builds the mod JAR without the account manager.
 - Double-click **`Testserver.vbs`** (or **`Testserver.bat`**) to open the local web
-  dashboard for 48 Vanilla test servers: live status, start/stop, favorites and
-  searchable block, item and mob catalogs. See the [test laboratory guide](docs/TESTSERVERS.md).
+  dashboard with one test server per Minecraft version: live status, start/stop,
+  Grim on/off where supported, favorites and searchable block, item and mob catalogs.
+  See the [test laboratory guide](docs/TESTSERVERS.md) and [active profiles](docs/LAB-PROFILES.md).
 - Output: **`build/libs/ViaForge-1.8.9-4.4.0-client.1.jar`**.
 - For a standard Forge 1.8.9 installation, place the JAR in the `mods` folder.
   It is a Forge mod and cannot be launched directly by double-clicking it.
@@ -63,6 +64,14 @@ Accounts can only be switched when no world is running.
 The **ViaForge** button opens the protocol selector. ViaForge's existing protocol
 translation through ViaVersion, ViaBackwards, ViaRewind, ViaLegacy and ViaAprilFools
 is included. The Minecraft client itself always remains on version 1.8.9.
+
+The selector sets the **global default** when you leave it. A version saved under
+**Edit server → Global version / version name** takes priority for that server.
+That menu highlights the saved override; **Use global** removes it. The selection
+is captured when connecting and cannot be changed by server-list pings or a
+multi-version server's advertised version. F3 shows the active connection's
+protocol, which can differ from the current global default.
+See [selection fixes and connection tests](docs/PROTOCOL-SELECTION.md).
 
 ## Versioned blocks and block items
 

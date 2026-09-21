@@ -32,6 +32,11 @@ public final class LiveFlightSmokeTest {
     private int groundCycles, jumpPhase;
     private boolean oldPause;
     private int oldPerspective, oldParticles;
+    private final boolean sequence=System.getenv("VIAFORGE_LIVE_SEQUENCE")!=null;
+    private String action="";
+    private int actionTicks;
+    private boolean sneak;
+    private boolean useQueued, attackQueued;
     private LiveFlightSmokeTest(String output) {
         state=Paths.get(output);protocol=Integer.parseInt(System.getenv("VIAFORGE_LIVE_PROTOCOL"));
         port=Integer.parseInt(System.getenv("VIAFORGE_LIVE_PORT"));
@@ -59,9 +64,23 @@ public final class LiveFlightSmokeTest {
         Files.move(temporary,state,StandardCopyOption.REPLACE_EXISTING);
     }
     @SubscribeEvent public void tick(TickEvent.ClientTickEvent event) {
-        if(event.phase!=TickEvent.Phase.END||finished)return;
+        if(finished)return;
         Minecraft mc=Minecraft.getMinecraft();
         try {
+            if(event.phase==TickEvent.Phase.START) {
+                // Input is processed before this tick's player movement, as in an actual click.
+                // Reflective clicks at END manufacture Grim Post violations in the probe itself.
+                if(attackQueued){attackQueued=false;java.lang.reflect.Method m=Minecraft.class.getDeclaredMethod("clickMouse");m.setAccessible(true);m.invoke(mc);}
+                if(useQueued){
+                    useQueued=false;java.lang.reflect.Method m=Minecraft.class.getDeclaredMethod("rightClickMouse");m.setAccessible(true);m.invoke(mc);
+                    if(!sequence){
+                        java.lang.reflect.Field equip=net.minecraft.client.renderer.ItemRenderer.class.getDeclaredField("equippedProgress");equip.setAccessible(true);
+                        require(equip.getFloat(mc.getItemRenderer())==0,"Live successful rocket use dips the actual hand renderer");
+                        require(protocol<573||mc.thePlayer.isSwingInProgress,"Live modern rocket use swings the player arm");handAnimation=true;
+                    }
+                }
+                return;
+            }
             require(System.currentTimeMillis()-started<150000,"Live flight timed out at stage "+stage);
             require(!(mc.currentScreen instanceof net.minecraft.client.gui.GuiDisconnected),"Server disconnected the live probe");
             if(stage==0) {
@@ -75,8 +94,11 @@ public final class LiveFlightSmokeTest {
                 mc.displayGuiScreen(new GuiConnecting(new GuiMainMenu(),mc,server));stage=1;write("connecting","");return;
             }
             EntityPlayerSP p=mc.thePlayer;if(p==null)return;
-            if(stage==1&&ServerBlockSession.getLoadedResourceVersion()!=null&&p.posY>170) {
+            if(sequence){sequence(mc,p);return;}
+            if(stage==1) {
                 p.movementInput=new net.minecraft.util.MovementInput(){@Override public void updatePlayerMoveState(){this.jump=LiveFlightSmokeTest.this.jump;this.moveForward=forward;}};
+            }
+            if(stage==1&&ServerBlockSession.getLoadedResourceVersion()!=null&&p.posY>170) {
                 write("ready","original login and resources loaded");stage=2;
             }else if(stage==2&&ServerElytraFlight.equipped(p)&&!p.capabilities.allowFlying&&p.posY>200) {
                 mc.displayGuiScreen(null);mc.setIngameFocus();p.rotationYaw=-90;p.rotationPitch=0;
@@ -96,10 +118,7 @@ public final class LiveFlightSmokeTest {
                 if(flightTicks==10){
                     require(p.posY<startY,"Unpowered glide descends");
                     if(protocol>=316){
-                        java.lang.reflect.Method use=Minecraft.class.getDeclaredMethod("rightClickMouse");use.setAccessible(true);use.invoke(mc);
-                        java.lang.reflect.Field equip=net.minecraft.client.renderer.ItemRenderer.class.getDeclaredField("equippedProgress");equip.setAccessible(true);
-                        require(equip.getFloat(mc.getItemRenderer())==0,"Live successful rocket use dips the actual hand renderer");
-                        require(protocol<573||p.isSwingInProgress,"Live modern rocket use swings the player arm");handAnimation=true;
+                        useQueued=true;
                     }
                 }
                 boosted|=ServerEntityViews.boosts(p.getEntityId())>0;
@@ -176,5 +195,34 @@ public final class LiveFlightSmokeTest {
             }
         }catch(Throwable failure){try{write("FAIL",failure.toString());}catch(Exception ignored){}failure.printStackTrace();finished=true;restoreSettings(mc);mc.shutdown();}
     }
-    private void restoreSettings(Minecraft mc) {mc.gameSettings.pauseOnLostFocus=oldPause;mc.gameSettings.thirdPersonView=oldPerspective;mc.gameSettings.particleSetting=oldParticles;}
+    private void restoreSettings(Minecraft mc) {
+        forward=0;jump=false;sneak=false;
+        net.minecraft.client.settings.KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(),false);
+        net.minecraft.client.settings.KeyBinding.setKeyBindState(mc.gameSettings.keyBindAttack.getKeyCode(),false);
+        mc.gameSettings.pauseOnLostFocus=oldPause;mc.gameSettings.thirdPersonView=oldPerspective;mc.gameSettings.particleSetting=oldParticles;
+    }
+    private void sequence(Minecraft mc,EntityPlayerSP p)throws Exception {
+        p.movementInput=new net.minecraft.util.MovementInput(){@Override public void updatePlayerMoveState(){this.jump=LiveFlightSmokeTest.this.jump;this.moveForward=forward;this.sneak=LiveFlightSmokeTest.this.sneak;if(sneak)moveForward*=.3F;}};
+        if(stage==1) {
+            if(ServerBlockSession.getLoadedResourceVersion()==null||p.posY<170)return;
+            mc.displayGuiScreen(null);mc.setIngameFocus();stage=2;write("ready","sequence input harness");
+        }
+        Path commands=state.resolveSibling(state.getFileName()+".action");
+        String next=Files.exists(commands)?new String(Files.readAllBytes(commands),StandardCharsets.UTF_8).trim():"idle";
+        if(!next.equals(action)){action=next;actionTicks=0;if(!(action.equals("inventory"))){mc.displayGuiScreen(null);mc.setIngameFocus();}}
+        actionTicks++;
+        forward=Arrays.asList("walk","sprint","jump","sneak","cycles").contains(action)?1:0;
+        sneak=action.equals("sneak");
+        boolean sprint=Arrays.asList("sprint","jump","cycles").contains(action);
+        net.minecraft.client.settings.KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(),sprint);
+        p.setSprinting(sprint);
+        net.minecraft.client.settings.KeyBinding.setKeyBindState(mc.gameSettings.keyBindAttack.getKeyCode(),action.equals("break"));
+        if(action.equals("break")&&actionTicks==1)attackQueued=true;
+        jump=action.equals("jump") || action.equals("glide")&&actionTicks<3 || action.equals("cycles")&&(actionTicks%16==1||actionTicks%16==3);
+        if(action.equals("use")&&actionTicks==1)useQueued=true;
+        if(action.equals("inventory")&&actionTicks==1)mc.displayGuiScreen(new net.minecraft.client.gui.inventory.GuiInventory(p));
+        String line=String.format(Locale.ROOT,"%d;%s;%.9f;%.9f;%.9f;%s;%s;%s;%s;%.3f%n",System.currentTimeMillis(),action,p.posX,p.posY,p.posZ,ServerElytraFlight.flying(p),p.onGround,p.isSprinting(),p.isInWater(),p.height);
+        Files.write(state.resolveSibling(state.getFileName()+".poses"),line.getBytes(StandardCharsets.UTF_8),StandardOpenOption.CREATE,StandardOpenOption.APPEND);
+        if(action.equals("stop")){write("RECORDED","Sequence complete; Grim findings determine compatibility separately");finished=true;mc.theWorld.sendQuittingDisconnectingPacket();mc.loadWorld(null);restoreSettings(mc);mc.shutdown();}
+    }
 }

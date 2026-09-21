@@ -20,6 +20,7 @@ public final class DevelopmentAccounts {
 
     @Mod.EventHandler
     public void onInit(FMLInitializationEvent event) {
+        if (ProtocolConnectionSmokeTest.installIfRequested()) return;
         if (LiveFlightSmokeTest.installIfRequested()) return;
         if (BlockClientSmokeTest.installIfRequested()) return;
         Minecraft minecraft = Minecraft.getMinecraft();

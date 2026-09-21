@@ -24,6 +24,7 @@ final class ServerEntitySmokeTest {
         net.minecraft.entity.Entity previousCamera = mc.getRenderViewEntity();
         NetHandlerPlayClient handler = new NetHandlerPlayClient(mc, null, new NetworkManager(EnumPacketDirection.CLIENTBOUND), new GameProfile(new UUID(0, 17), "VisualTest"));
         Field field = NetHandlerPlayClient.class.getDeclaredField("clientWorldController"); field.setAccessible(true); field.set(handler, world);
+        Field ready = NetHandlerPlayClient.class.getDeclaredField("doneLoadingTerrain"); ready.setAccessible(true); ready.setBoolean(handler, true);
         mc.theWorld = world; ServerEntityViews.clear();
         mc.thePlayer = new net.minecraft.client.entity.EntityPlayerSP(mc, world, handler, new net.minecraft.stats.StatFileWriter());
         mc.setRenderViewEntity(mc.thePlayer);

@@ -136,3 +136,7 @@ Oben rechts öffnet **Anwendung beenden** die Auswahl:
 In den Serverdetails prüft **Gespeicherte Exponate prüfen** die Blockausstellung
 eines beendeten Servers. **Laufende Welt prüfen** prüft den gestarteten Server.
 Funde erscheinen in der Übersicht und in den Aktionsergebnissen.
+
+## Erneute Prüfung vom 21.09.2026
+
+Die neue Terrainprüfung berücksichtigt alle reservierten Chunks und die Luftsäule bis zur gespeicherten Bauhöhe, meldet fehlende Chunks und erhält Außenbauten auch bei Flüssigkeitsbarrieren. Der Screenshot hat weiterhin keine gesicherte Versionszuordnung. Frische Befunde und der mit Backup ausgeführte Reparaturtest: [REGRESSIONS-2026-09-21.md](REGRESSIONS-2026-09-21.md).

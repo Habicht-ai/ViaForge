@@ -1,0 +1,17 @@
+name: ViaForgeLabAC
+version: 1.0.0
+api-version: '1.13'
+main: viaforge.lab.LabAC
+depend: [GrimAC]
+description: Local loopback laboratory control and observation of the pinned Grim build
+commands:
+  labac:
+    description: Persistent laboratory anticheat switch and actual status
+    usage: /labac on|off|status
+permissions:
+  labac.control:
+    default: true
+    description: Switch anticheat in the local laboratory
+  labac.status:
+    default: true
+    description: Read actual laboratory anticheat state

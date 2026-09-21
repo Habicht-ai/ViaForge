@@ -43,6 +43,7 @@ public class GuiProtocolSelector extends GuiScreen {
     private final boolean simple;
     private final FinishedCallback finishedCallback;
     private final boolean saveOnClose;
+    private final boolean serverSpecific;
     private ProtocolVersion selection;
 
     private SlotList list;
@@ -60,17 +61,32 @@ public class GuiProtocolSelector extends GuiScreen {
     }
 
     private GuiProtocolSelector(GuiScreen parent, boolean simple, FinishedCallback finishedCallback, boolean saveOnClose) {
+        this(parent, simple, finishedCallback, saveOnClose, false, ViaForgeCommon.getManager().getTargetVersion());
+    }
+
+    /** A null override means this server follows the global selection. */
+    public GuiProtocolSelector(GuiScreen parent, ProtocolVersion serverOverride, FinishedCallback finishedCallback) {
+        this(parent, true, finishedCallback, false, true, serverOverride);
+    }
+
+    private GuiProtocolSelector(GuiScreen parent, boolean simple, FinishedCallback finishedCallback,
+                                boolean saveOnClose, boolean serverSpecific, ProtocolVersion initialSelection) {
         this.parent = parent;
         this.simple = simple;
         this.finishedCallback = finishedCallback;
         this.saveOnClose = saveOnClose;
-        this.selection = ViaForgeCommon.getManager().getTargetVersion();
+        this.serverSpecific = serverSpecific;
+        this.selection = initialSelection;
     }
 
     @Override
     public void initGui() {
         super.initGui();
         buttonList.add(new GuiButton(1, 5, height - 25, 20, 20, "<-"));
+        if (serverSpecific) {
+            buttonList.add(new GuiButton(4, 30, height - 25, Math.min(300, width - 35), 20,
+                    "Use global: " + ViaForgeCommon.getManager().getTargetVersion().getName()));
+        }
         if (!this.simple) {
             buttonList.add(new GuiButton(2, width - 105, 5, 100, 20, "Create dump"));
             buttonList.add(new GuiButton(3, width - 105, height - 25, 100, 20, "Reload configs"));
@@ -78,9 +94,15 @@ public class GuiProtocolSelector extends GuiScreen {
 
         final int lineHeight = fontRendererObj.FONT_HEIGHT + 2;
         creditLines = fontRendererObj.listFormattedStringToWidth(ORIGINAL_MOD_CREDIT, Math.max(1, width - 10));
-        final int listTop = 6 + lineHeight * (3 + creditLines.size());
-        int scroll = list == null ? 0 : list.getAmountScrolled();
+        final int listTop = 6 + lineHeight * (4 + creditLines.size());
+        boolean firstOpen = list == null;
+        int scroll = firstOpen ? 0 : list.getAmountScrolled();
         list = new SlotList(mc, width, height, listTop, height - 30, lineHeight);
+        if (firstOpen) {
+            ProtocolVersion effective = selection != null ? selection : ViaForgeCommon.getManager().getTargetVersion();
+            int index = list.versions.indexOf(effective);
+            scroll = Math.max(0, index * lineHeight - (height - 30 - listTop) / 2);
+        }
         list.scrollBy(scroll);
     }
 
@@ -112,8 +134,11 @@ public class GuiProtocolSelector extends GuiScreen {
             } catch (InterruptedException | ExecutionException e) {
                 setStatus(ChatFormatting.RED + "Failed to create dump: " + e.getMessage());
             }
-        } else {
+        } else if (button.id == 3) {
             Via.getManager().getConfigurationProvider().reloadConfigs();
+        } else if (button.id == 4 && serverSpecific) {
+            selection = null;
+            finishedCallback.finished(null, parent);
         }
     }
 
@@ -147,6 +172,10 @@ public class GuiProtocolSelector extends GuiScreen {
         for (int i = 0; i < creditLines.size(); i++) {
             drawCenteredString(fontRendererObj, creditLines.get(i), width / 2, (fontRendererObj.FONT_HEIGHT + 2) * (3 + i) + 3, 0xAAAAAA);
         }
+        String scope = serverSpecific ? "This server: " + (selection == null ? "Global default" : selection.getName())
+                : "Global default (server overrides take priority)";
+        drawCenteredString(fontRendererObj, scope, width / 2,
+                (fontRendererObj.FONT_HEIGHT + 2) * (3 + creditLines.size()) + 3, 0xFFFF88);
         drawString(fontRendererObj, status != null ? status : "Discord: http://discord.gg/viaversion", 3, 3, -1);
 
         super.drawScreen(mouseX, mouseY, partialTicks);
@@ -173,7 +202,6 @@ public class GuiProtocolSelector extends GuiScreen {
             selection = versions.get(index);
             if (!saveOnClose) finishedCallback.finished(selection, parent);
         }
-
         @Override
         public void handleMouseInput() {
             // GuiSlot normally uses coordinates saved by the previous frame.
@@ -185,7 +213,7 @@ public class GuiProtocolSelector extends GuiScreen {
 
         @Override
         protected boolean isSelected(int index) {
-            return false;
+            return versions.get(index) == selection;
         }
 
         @Override

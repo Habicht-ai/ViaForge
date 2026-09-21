@@ -17,6 +17,8 @@ TECHNICAL = {"air", "barrier", "light", "structure_void", "structure_block", "co
 
 
 def stacks(row, catalog):
+    if row.get("reference_version"):
+        return stacks(next(r for r in lab.VANILLA_VERSIONS if r["version"] == row["reference_version"]), catalog)
     if row["protocol"] >= 393:
         return [dict(name=e["name"], metadata=0) for e in catalog["items"]
                 if e["name"].removeprefix("minecraft:") not in TECHNICAL]

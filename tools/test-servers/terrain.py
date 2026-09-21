@@ -56,6 +56,9 @@ def prepare_new_world(row):
 def generator(row):
     folder = lab.ROOT / row["version"] / "world"
     path = folder / ("data/minecraft/world_gen_settings.dat" if row["protocol"] >= 775 else "level.dat")
+    if row['protocol'] >= 775 and not path.exists():
+        # Paper 26.x moves per-dimension saved data together with the chunk regions.
+        path = folder / 'dimensions/minecraft/overworld/data/minecraft/world_gen_settings.dat'
     root = world_audit.nbt(gzip.decompress(path.read_bytes()))
     if row["protocol"] >= 775:
         data = root.get("data", root.get("Data", root))
@@ -110,12 +113,16 @@ def fix_generator(row):
         if old == wanted: return False
         path.write_bytes(gzip.compress(replace_tag(gzip.decompress(path.read_bytes()), keys, wanted)))
     else:
-        if row["protocol"] < 393: return False
-        wanted = flat_settings(row)
-        wanted["structures"] = {}
-        wanted.pop("features", None); wanted.pop("lakes", None)
-        if old["settings"] == wanted: return False
-        path.write_bytes(gzip.compress(replace_tag(gzip.decompress(path.read_bytes()), keys, wanted)))
+        if row["protocol"] < 393:
+            wanted = "3;minecraft:bedrock,59*minecraft:stone,3*minecraft:dirt,minecraft:grass;1;"
+        else:
+            wanted = flat_settings(row)
+            wanted["structures"] = {}
+            wanted.pop("features", None); wanted.pop("lakes", None)
+        if old["settings"] == wanted and old['type'] == 'flat': return False
+        raw = replace_tag(gzip.decompress(path.read_bytes()), keys, wanted)
+        raw = replace_tag(raw, ['Data', 'generatorName'], 'flat')
+        path.write_bytes(gzip.compress(raw))
     return True
 
 
@@ -140,12 +147,16 @@ def protected_positions(a, index):
     for command in commands:
         fields = command.split()
         if fields[0] == "setblock":
-            if fields[4].split("[", 1)[0].removeprefix("minecraft:") != "air": protected.add(tuple(map(int, fields[1:4])))
-        elif fields[0] == "fill" and fields[7].removeprefix("minecraft:") != "air":
+            position = tuple(map(int, fields[1:4]))
+            if fields[4].split("[", 1)[0].removeprefix("minecraft:") != "air": protected.add(position)
+            else: protected.discard(position)
+        elif fields[0] == "fill":
             x1, y1, z1, x2, y2, z2 = map(int, fields[1:7])
-            for y in range(max(64, y1), min(222, y2) + 1):
+            for y in range(max(64, min(y1,y2)), min(319, max(y1,y2)) + 1):
                 for z in range(z1, z2 + 1):
-                    for x in range(x1, x2 + 1): protected.add((x, y, z))
+                    for x in range(x1, x2 + 1):
+                        if fields[7].removeprefix("minecraft:") != "air": protected.add((x, y, z))
+                        else: protected.discard((x, y, z))
     # Retain actual chests, specimen cells, paired plant parts, and all mob pens.
     for sample in index["blocks"]:
         x, y, z = sample["position"]
@@ -160,11 +171,13 @@ def natural(block):
     if "legacy_id" in block:
         return block["legacy_id"] in {1, 2, 3, 8, 9, 10, 11, 12, 13, 17, 18, 31, 32, 37, 38, 39, 40, 78, 79, 80, 81, 82, 83, 106, 110, 161, 162, 175}
     name = block.get("Name", "").removeprefix("minecraft:")
-    return name in {"water", "lava", "stone", "dirt", "grass_block", "coarse_dirt", "podzol", "rooted_dirt", "sand", "gravel", "granite", "diorite", "andesite", "clay", "snow", "snow_block", "ice", "packed_ice", "grass", "short_grass", "tall_grass", "fern", "large_fern", "vine", "dandelion", "poppy", "brown_mushroom", "red_mushroom", "sugar_cane", "cactus", "dead_bush", "seagrass", "tall_seagrass"} or name.endswith(("_leaves", "_log", "_ore"))
+    return name in {"water", "lava", "stone", "dirt", "grass_block", "coarse_dirt", "podzol", "rooted_dirt", "sand", "gravel", "granite", "diorite", "andesite", "clay", "snow", "snow_block", "ice", "packed_ice", "grass", "short_grass", "tall_grass", "fern", "large_fern", "vine", "dandelion", "poppy", "brown_mushroom", "red_mushroom", "sugar_cane", "cactus", "dead_bush", "seagrass", "tall_seagrass", "deepslate", "tuff", "calcite", "dripstone_block", "pointed_dripstone", "moss_block", "moss_carpet", "mud", "muddy_mangrove_roots", "mangrove_roots", "azalea", "flowering_azalea", "red_sand", "sandstone", "red_sandstone", "mycelium", "blue_ice", "powder_snow", "bamboo", "bamboo_sapling", "brown_mushroom_block", "red_mushroom_block", "mushroom_stem"} or name.endswith(("_leaves", "_log", "_ore"))
 
 
 def reserved(x, y, z):
-    return -80 <= x <= 79 and -112 <= z <= 111 and 64 <= y <= 222
+    # Include the air column above all four galleries and the Elytra takeoff platform.
+    # A saved world's actual sections determine whether its ceiling is 255 or 319.
+    return -80 <= x <= 79 and -112 <= z <= 111 and 64 <= y <= 319
 
 
 def intrusion_positions(world, protected):
@@ -174,11 +187,11 @@ def intrusion_positions(world, protected):
             chunk = world.chunk(cx, cz)
             for section in chunk.get("sections", chunk.get("Sections", [])):
                 sy = section["Y"]
-                if not 4 <= sy <= 13: continue
+                if not 4 <= sy <= 19: continue
                 palette = section.get("block_states", {}).get("palette", section.get("Palette", []))
                 if palette and not any(natural(b) for b in palette): continue
                 if "Blocks" in section and not any(b in {1, 2, 3, 8, 9, 10, 11, 12, 13, 17, 18, 31, 32, 37, 38, 39, 40, 78, 79, 80, 81, 82, 83, 106, 110, 161, 162, 175} for b in section["Blocks"]): continue
-                for y in range(sy * 16, min(222, sy * 16 + 15) + 1):
+                for y in range(sy * 16, sy * 16 + 16):
                     for z in range(cz * 16, cz * 16 + 16):
                         for x in range(cx * 16, cx * 16 + 16):
                             if (x, y, z) not in protected and natural(world.block(x, y, z)):
@@ -209,25 +222,36 @@ def inspect(row, generated=None, index=None):
         index = json.loads((folder / "arena-index.json").read_text(encoding="utf-8"))
         generated.fixtures(copy.deepcopy(index))
     protected = protected_positions(generated, index)
-    positions = list(intrusion_positions(world_audit.World(folder), protected))
-    _, _, gen = generator(row)
+    world = world_audit.World(folder)
+    positions = list(intrusion_positions(world, protected))
+    missing_chunks = [[x,z] for x in range(-5,5) for z in range(-7,7) if not world.chunk(x,z)]
+    generator_path, generator_keys, gen = generator(row)
     configured = gen.get('type') in ('flat', 'minecraft:flat')
     if row['protocol'] >= 393:
         configured = configured and gen.get('settings', {}).get('layers') == flat_settings(row)['layers']
     return {"version": row["version"], "time": time.time(), "generator": gen, "flat": configured,
+            "world_path": str((folder / 'world').resolve()), "region_path": str(world.region.resolve()),
+            "generator_path": str(generator_path.resolve()), "generator_nbt_path": generator_keys,
+            "chunks_checked": 140 - len(missing_chunks), "missing_chunks": missing_chunks,
+            "section_heights": sorted({s['Y'] for c in world.chunks.values() for s in c.get('sections',c.get('Sections',[]))}),
             "intrusions": len(positions), "positions": positions,
-            "scope": "Natural terrain in reserved x=-80..79,z=-112..111,y=64..222; managed specimens/supports, tanks, chests and mob pens excluded."}
+            "scope": "Natural terrain in reserved x=-80..79,z=-112..111,y=64..319 (actual saved build height); managed specimens/supports, tanks, chests and mob pens excluded. Outside terrain is retained."}
 
 
-def boundary_commands(world):
-    # Natural lakes outside the gallery must not refill cleared cells. Replace only
-    # fluid at its one-block perimeter, never an outside player's solid block/container.
+def boundary_commands(world, protected=()):
+    # Keep outside lakes/builds intact. Contain inflow on our side of the boundary,
+    # only where terrain removal leaves air, and never inside a managed specimen.
     result = []
     edge = [(x, z) for x in (-81, 80) for z in range(-112, 112)]
     edge += [(x, z) for z in (-113, 112) for x in range(-80, 80)]
     for x, z in edge:
-        for y in range(64, 223):
+        inside_x, inside_z = max(-80,min(79,x)), max(-112,min(111,z))
+        for y in range(64, 320):
             b = world.block(x, y, z)
             if b.get("Name") in {"minecraft:water", "minecraft:lava"} or b.get("legacy_id") in {8,9,10,11}:
-                if not world.block_entity(x, y, z): result.append(f"setblock {x} {y} {z} glass")
+                position=(inside_x,y,inside_z)
+                inner=world.block(*position)
+                air=inner.get('legacy_id')==0 or inner.get('Name') in {'minecraft:air','minecraft:cave_air','minecraft:void_air'}
+                if position not in protected and not world.block_entity(*position) and (air or natural(inner)):
+                    result.append(f"setblock {inside_x} {y} {inside_z} glass")
     return result

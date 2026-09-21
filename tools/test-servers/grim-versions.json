@@ -1,0 +1,1338 @@
+[
+  {
+    "version": "1.9.4-grim",
+    "protocol": 110,
+    "port": 27000,
+    "rcon_port": 27001,
+    "java": 8,
+    "server": {
+      "sha1": "edbb7b1758af33d365bf835eb9d13de005b1e274",
+      "size": 9399053,
+      "url": "https://piston-data.mojang.com/v1/objects/edbb7b1758af33d365bf835eb9d13de005b1e274/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/b1a314ce2b67b3639bd6407ddcd549ce236de6f6/1.9.4.json",
+    "metadata_sha1": "b1a314ce2b67b3639bd6407ddcd549ce236de6f6",
+    "minecraft_version": "1.9.4",
+    "reference_version": "1.9.4",
+    "platform": "Paper",
+    "platform_build": 775,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.9.4-775.jar",
+      "checksums": {
+        "sha256": "15a5821ddeacc596432c3fbf24262a2d264f556060ecd6f1838fb01ab5629a81"
+      },
+      "size": 20965788,
+      "url": "https://fill-data.papermc.io/v1/objects/15a5821ddeacc596432c3fbf24262a2d264f556060ecd6f1838fb01ab5629a81/paper-1.9.4-775.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.10.2-grim",
+    "protocol": 210,
+    "port": 27002,
+    "rcon_port": 27003,
+    "java": 8,
+    "server": {
+      "sha1": "3d501b23df53c548254f5e3f66492d178a48db63",
+      "size": 9459897,
+      "url": "https://piston-data.mojang.com/v1/objects/3d501b23df53c548254f5e3f66492d178a48db63/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/819460dcabf1a2e41b0cf65d342b18ad8dc12281/1.10.2.json",
+    "metadata_sha1": "819460dcabf1a2e41b0cf65d342b18ad8dc12281",
+    "minecraft_version": "1.10.2",
+    "reference_version": "1.10.2",
+    "platform": "Paper",
+    "platform_build": 918,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.10.2-918.jar",
+      "checksums": {
+        "sha256": "83354d24a22b6265e76c089b3d17a568abb446c0ccd12c2452f5e148412b16c2"
+      },
+      "size": 21051207,
+      "url": "https://fill-data.papermc.io/v1/objects/83354d24a22b6265e76c089b3d17a568abb446c0ccd12c2452f5e148412b16c2/paper-1.10.2-918.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.11.2-grim",
+    "protocol": 316,
+    "port": 27004,
+    "rcon_port": 27005,
+    "java": 8,
+    "server": {
+      "sha1": "f00c294a1576e03fddcac777c3cf4c7d404c4ba4",
+      "size": 9720835,
+      "url": "https://piston-data.mojang.com/v1/objects/f00c294a1576e03fddcac777c3cf4c7d404c4ba4/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/fa3f6d94a9fad648ff97d18fd710997261a421e8/1.11.2.json",
+    "metadata_sha1": "fa3f6d94a9fad648ff97d18fd710997261a421e8",
+    "minecraft_version": "1.11.2",
+    "reference_version": "1.11.2",
+    "platform": "Paper",
+    "platform_build": 1106,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.11.2-1106.jar",
+      "checksums": {
+        "sha256": "3d0f40ec1f9630dfdbafa626cc20c266d7fb90fc22583dc1b995e7fbfb76830d"
+      },
+      "size": 24287234,
+      "url": "https://fill-data.papermc.io/v1/objects/3d0f40ec1f9630dfdbafa626cc20c266d7fb90fc22583dc1b995e7fbfb76830d/paper-1.11.2-1106.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.12-grim",
+    "protocol": 335,
+    "port": 27006,
+    "rcon_port": 27007,
+    "java": 8,
+    "server": {
+      "sha1": "8494e844e911ea0d63878f64da9dcc21f53a3463",
+      "size": 30202458,
+      "url": "https://piston-data.mojang.com/v1/objects/8494e844e911ea0d63878f64da9dcc21f53a3463/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/da76e0a25ffccf2765f9e86ce61c063e44b2183b/1.12.json",
+    "metadata_sha1": "da76e0a25ffccf2765f9e86ce61c063e44b2183b",
+    "minecraft_version": "1.12",
+    "reference_version": "1.12",
+    "platform": "Paper",
+    "platform_build": 1169,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.12-1169.jar",
+      "checksums": {
+        "sha256": "1e7e88a2ed6f2b70fa3f6ec6611373458c5d72b2a8707e60921df601c791e60e"
+      },
+      "size": 38347817,
+      "url": "https://fill-data.papermc.io/v1/objects/1e7e88a2ed6f2b70fa3f6ec6611373458c5d72b2a8707e60921df601c791e60e/paper-1.12-1169.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.12.1-grim",
+    "protocol": 338,
+    "port": 27008,
+    "rcon_port": 27009,
+    "java": 8,
+    "server": {
+      "sha1": "561c7b2d54bae80cc06b05d950633a9ac95da816",
+      "size": 30221337,
+      "url": "https://piston-data.mojang.com/v1/objects/561c7b2d54bae80cc06b05d950633a9ac95da816/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/5b3e7d137ea360e1d418f0cf68de160acf93fbff/1.12.1.json",
+    "metadata_sha1": "5b3e7d137ea360e1d418f0cf68de160acf93fbff",
+    "minecraft_version": "1.12.1",
+    "reference_version": "1.12.1",
+    "platform": "Paper",
+    "platform_build": 1204,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.12.1-1204.jar",
+      "checksums": {
+        "sha256": "dba2219d674ad85e4ef2c41931d34b6fa4be75a887973ecaaf286727a03812da"
+      },
+      "size": 38617469,
+      "url": "https://fill-data.papermc.io/v1/objects/dba2219d674ad85e4ef2c41931d34b6fa4be75a887973ecaaf286727a03812da/paper-1.12.1-1204.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.12.2-grim",
+    "protocol": 340,
+    "port": 27010,
+    "rcon_port": 27011,
+    "java": 8,
+    "server": {
+      "sha1": "886945bfb2b978778c3a0288fd7fab09d315b25f",
+      "size": 30222121,
+      "url": "https://piston-data.mojang.com/v1/objects/886945bfb2b978778c3a0288fd7fab09d315b25f/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/832d95b9f40699d4961394dcf6cf549e65f15dc5/1.12.2.json",
+    "metadata_sha1": "832d95b9f40699d4961394dcf6cf549e65f15dc5",
+    "minecraft_version": "1.12.2",
+    "reference_version": "1.12.2",
+    "platform": "Paper",
+    "platform_build": 1620,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.12.2-1620.jar",
+      "checksums": {
+        "sha256": "3a2041807f492dcdc34ebb324a287414946e3e05ec3df6fd03f5b5f7d9afc210"
+      },
+      "size": 40979699,
+      "url": "https://fill-data.papermc.io/v1/objects/3a2041807f492dcdc34ebb324a287414946e3e05ec3df6fd03f5b5f7d9afc210/paper-1.12.2-1620.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.13-grim",
+    "protocol": 393,
+    "port": 27012,
+    "rcon_port": 27013,
+    "java": 8,
+    "server": {
+      "sha1": "d0caafb8438ebd206f99930cfaecfa6c9a13dca0",
+      "size": 32649675,
+      "url": "https://piston-data.mojang.com/v1/objects/d0caafb8438ebd206f99930cfaecfa6c9a13dca0/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/c24c2fd37c8ca2e1c18721e2c77caf4d24c87f92/1.13.json",
+    "metadata_sha1": "c24c2fd37c8ca2e1c18721e2c77caf4d24c87f92",
+    "minecraft_version": "1.13",
+    "reference_version": "1.13",
+    "platform": "Paper",
+    "platform_build": 173,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.13-173.jar",
+      "checksums": {
+        "sha256": "00db82d214242c9345266d44ff8d11a8e857a1a02edf7cb5fcc2d1d973283129"
+      },
+      "size": 41881625,
+      "url": "https://fill-data.papermc.io/v1/objects/00db82d214242c9345266d44ff8d11a8e857a1a02edf7cb5fcc2d1d973283129/paper-1.13-173.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.13.1-grim",
+    "protocol": 401,
+    "port": 27014,
+    "rcon_port": 27015,
+    "java": 8,
+    "server": {
+      "sha1": "fe123682e9cb30031eae351764f653500b7396c9",
+      "size": 33832589,
+      "url": "https://piston-data.mojang.com/v1/objects/fe123682e9cb30031eae351764f653500b7396c9/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/f37fe6f0912ddb7ac3e7d5201a73d56ce170a57f/1.13.1.json",
+    "metadata_sha1": "f37fe6f0912ddb7ac3e7d5201a73d56ce170a57f",
+    "minecraft_version": "1.13.1",
+    "reference_version": "1.13.1",
+    "platform": "Paper",
+    "platform_build": 386,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.13.1-386.jar",
+      "checksums": {
+        "sha256": "6637401d87d0f5db5aaee90d7103f52c5e1baaf6b6d4643a5793e7b02b5775cb"
+      },
+      "size": 43029770,
+      "url": "https://fill-data.papermc.io/v1/objects/6637401d87d0f5db5aaee90d7103f52c5e1baaf6b6d4643a5793e7b02b5775cb/paper-1.13.1-386.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.13.2-grim",
+    "protocol": 404,
+    "port": 27016,
+    "rcon_port": 27017,
+    "java": 8,
+    "server": {
+      "sha1": "3737db93722a9e39eeada7c27e7aca28b144ffa7",
+      "size": 33835116,
+      "url": "https://piston-data.mojang.com/v1/objects/3737db93722a9e39eeada7c27e7aca28b144ffa7/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/fa3ddc22146c46bfeb0e9d322c6f83b937e25005/1.13.2.json",
+    "metadata_sha1": "fa3ddc22146c46bfeb0e9d322c6f83b937e25005",
+    "minecraft_version": "1.13.2",
+    "reference_version": "1.13.2",
+    "platform": "Paper",
+    "platform_build": 657,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.13.2-657.jar",
+      "checksums": {
+        "sha256": "11e828d0565ab76a0a0e180c056364a95de44958cfd6a6af3f9b1dc70b03e9cd"
+      },
+      "size": 44991089,
+      "url": "https://fill-data.papermc.io/v1/objects/11e828d0565ab76a0a0e180c056364a95de44958cfd6a6af3f9b1dc70b03e9cd/paper-1.13.2-657.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.14-grim",
+    "protocol": 477,
+    "port": 27018,
+    "rcon_port": 27019,
+    "java": 8,
+    "server": {
+      "sha1": "f1a0073671057f01aa843443fef34330281333ce",
+      "size": 35914001,
+      "url": "https://piston-data.mojang.com/v1/objects/f1a0073671057f01aa843443fef34330281333ce/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/0fd01dd81eaa451d3130b1cf025a10f129585b10/1.14.json",
+    "metadata_sha1": "0fd01dd81eaa451d3130b1cf025a10f129585b10",
+    "minecraft_version": "1.14",
+    "reference_version": "1.14",
+    "platform": "Paper",
+    "platform_build": 17,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.14-17.jar",
+      "checksums": {
+        "sha256": "338be77f5239c44cff3f80f5c107b5e61ac48fb39348bce7249303209201072a"
+      },
+      "size": 44195664,
+      "url": "https://fill-data.papermc.io/v1/objects/338be77f5239c44cff3f80f5c107b5e61ac48fb39348bce7249303209201072a/paper-1.14-17.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.14.1-grim",
+    "protocol": 480,
+    "port": 27020,
+    "rcon_port": 27021,
+    "java": 8,
+    "server": {
+      "sha1": "ed76d597a44c5266be2a7fcd77a8270f1f0bc118",
+      "size": 35927691,
+      "url": "https://piston-data.mojang.com/v1/objects/ed76d597a44c5266be2a7fcd77a8270f1f0bc118/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/183e49ba0fabb5ef8a304f8f5907fa887f40c466/1.14.1.json",
+    "metadata_sha1": "183e49ba0fabb5ef8a304f8f5907fa887f40c466",
+    "minecraft_version": "1.14.1",
+    "reference_version": "1.14.1",
+    "platform": "Paper",
+    "platform_build": 50,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.14.1-50.jar",
+      "checksums": {
+        "sha256": "2bcf8017485cc41b3e72daa7285a46f26a85d055b9d638bc9a07f77632168ad7"
+      },
+      "size": 44231593,
+      "url": "https://fill-data.papermc.io/v1/objects/2bcf8017485cc41b3e72daa7285a46f26a85d055b9d638bc9a07f77632168ad7/paper-1.14.1-50.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.14.2-grim",
+    "protocol": 485,
+    "port": 27022,
+    "rcon_port": 27023,
+    "java": 8,
+    "server": {
+      "sha1": "808be3869e2ca6b62378f9f4b33c946621620019",
+      "size": 35932967,
+      "url": "https://piston-data.mojang.com/v1/objects/808be3869e2ca6b62378f9f4b33c946621620019/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/83299b3bf3139ebd9ae5547b3144dcf68d4cb1fd/1.14.2.json",
+    "metadata_sha1": "83299b3bf3139ebd9ae5547b3144dcf68d4cb1fd",
+    "minecraft_version": "1.14.2",
+    "reference_version": "1.14.2",
+    "platform": "Paper",
+    "platform_build": 107,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.14.2-107.jar",
+      "checksums": {
+        "sha256": "12034e578e014eb369e2929f3725bd409858bf94128e46d1f286d5be36c3cb0e"
+      },
+      "size": 44257364,
+      "url": "https://fill-data.papermc.io/v1/objects/12034e578e014eb369e2929f3725bd409858bf94128e46d1f286d5be36c3cb0e/paper-1.14.2-107.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.14.3-grim",
+    "protocol": 490,
+    "port": 27024,
+    "rcon_port": 27025,
+    "java": 8,
+    "server": {
+      "sha1": "d0d0fe2b1dc6ab4c65554cb734270872b72dadd6",
+      "size": 35952401,
+      "url": "https://piston-data.mojang.com/v1/objects/d0d0fe2b1dc6ab4c65554cb734270872b72dadd6/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/e21618620e02be5a14543d1d17ffdba941d09aa8/1.14.3.json",
+    "metadata_sha1": "e21618620e02be5a14543d1d17ffdba941d09aa8",
+    "minecraft_version": "1.14.3",
+    "reference_version": "1.14.3",
+    "platform": "Paper",
+    "platform_build": 134,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.14.3-134.jar",
+      "checksums": {
+        "sha256": "b6d2d8ac67d685141697a8cecd99c47baf604900007eb0e270fd6ea86cbbc540"
+      },
+      "size": 44316692,
+      "url": "https://fill-data.papermc.io/v1/objects/b6d2d8ac67d685141697a8cecd99c47baf604900007eb0e270fd6ea86cbbc540/paper-1.14.3-134.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.14.4-grim",
+    "protocol": 498,
+    "port": 27026,
+    "rcon_port": 27027,
+    "java": 8,
+    "server": {
+      "sha1": "3dc3d84a581f14691199cf6831b71ed1296a9fdf",
+      "size": 35958734,
+      "url": "https://piston-data.mojang.com/v1/objects/3dc3d84a581f14691199cf6831b71ed1296a9fdf/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/be146d5f66a3627ed0a87c234c4d8dde8ab35098/1.14.4.json",
+    "metadata_sha1": "be146d5f66a3627ed0a87c234c4d8dde8ab35098",
+    "minecraft_version": "1.14.4",
+    "reference_version": "1.14.4",
+    "platform": "Paper",
+    "platform_build": 245,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.14.4-245.jar",
+      "checksums": {
+        "sha256": "bd8ec5cdb22370d37816a6de26798df3d2b0d6f9c7c96c88ca45a1303fea50e8"
+      },
+      "size": 43972138,
+      "url": "https://fill-data.papermc.io/v1/objects/bd8ec5cdb22370d37816a6de26798df3d2b0d6f9c7c96c88ca45a1303fea50e8/paper-1.14.4-245.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.15-grim",
+    "protocol": 573,
+    "port": 27028,
+    "rcon_port": 27029,
+    "java": 8,
+    "server": {
+      "sha1": "e9f105b3c5c7e85c7b445249a93362a22f62442d",
+      "size": 36164465,
+      "url": "https://piston-data.mojang.com/v1/objects/e9f105b3c5c7e85c7b445249a93362a22f62442d/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/833322370ab320e77717097082effe1d124d48bd/1.15.json",
+    "metadata_sha1": "833322370ab320e77717097082effe1d124d48bd",
+    "minecraft_version": "1.15",
+    "reference_version": "1.15",
+    "platform": "Paper",
+    "platform_build": 21,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.15-21.jar",
+      "checksums": {
+        "sha256": "8b726c0deb6c3a265d679a3d3a2c0f8e5243fbc6ddcfcaf42e24209cb1f829b4"
+      },
+      "size": 43926936,
+      "url": "https://fill-data.papermc.io/v1/objects/8b726c0deb6c3a265d679a3d3a2c0f8e5243fbc6ddcfcaf42e24209cb1f829b4/paper-1.15-21.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.15.1-grim",
+    "protocol": 575,
+    "port": 27030,
+    "rcon_port": 27031,
+    "java": 8,
+    "server": {
+      "sha1": "4d1826eebac84847c71a77f9349cc22afd0cf0a1",
+      "size": 36164938,
+      "url": "https://piston-data.mojang.com/v1/objects/4d1826eebac84847c71a77f9349cc22afd0cf0a1/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/18c3063de87ae126b4e017121219ba802be0755b/1.15.1.json",
+    "metadata_sha1": "18c3063de87ae126b4e017121219ba802be0755b",
+    "minecraft_version": "1.15.1",
+    "reference_version": "1.15.1",
+    "platform": "Paper",
+    "platform_build": 62,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.15.1-62.jar",
+      "checksums": {
+        "sha256": "22a7a19f378db8edf92cdba57d91ceea7e4fa6470b677e6bbe57e8f7e1d9a4dd"
+      },
+      "size": 43943383,
+      "url": "https://fill-data.papermc.io/v1/objects/22a7a19f378db8edf92cdba57d91ceea7e4fa6470b677e6bbe57e8f7e1d9a4dd/paper-1.15.1-62.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.15.2-grim",
+    "protocol": 578,
+    "port": 27032,
+    "rcon_port": 27033,
+    "java": 8,
+    "server": {
+      "sha1": "bb2b6b1aefcd70dfd1892149ac3a215f6c636b07",
+      "size": 36175593,
+      "url": "https://piston-data.mojang.com/v1/objects/bb2b6b1aefcd70dfd1892149ac3a215f6c636b07/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/e9d0adb8f642abe422909ede50f651b2b58a3573/1.15.2.json",
+    "metadata_sha1": "e9d0adb8f642abe422909ede50f651b2b58a3573",
+    "minecraft_version": "1.15.2",
+    "reference_version": "1.15.2",
+    "platform": "Paper",
+    "platform_build": 393,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.15.2-393.jar",
+      "checksums": {
+        "sha256": "bd2dd6f2cc489cf9e2bb800cb4fb6d63e9d293945d3ac10b09dd9c6098fa9f34"
+      },
+      "size": 45026753,
+      "url": "https://fill-data.papermc.io/v1/objects/bd2dd6f2cc489cf9e2bb800cb4fb6d63e9d293945d3ac10b09dd9c6098fa9f34/paper-1.15.2-393.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.16.1-grim",
+    "protocol": 736,
+    "port": 27034,
+    "rcon_port": 27035,
+    "java": 8,
+    "server": {
+      "sha1": "a412fd69db1f81db3f511c1463fd304675244077",
+      "size": 37968964,
+      "url": "https://piston-data.mojang.com/v1/objects/a412fd69db1f81db3f511c1463fd304675244077/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/54fa3af57d041d2771e66d390197b2c0288e697c/1.16.1.json",
+    "metadata_sha1": "54fa3af57d041d2771e66d390197b2c0288e697c",
+    "minecraft_version": "1.16.1",
+    "reference_version": "1.16.1",
+    "platform": "Paper",
+    "platform_build": 138,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.16.1-138.jar",
+      "checksums": {
+        "sha256": "929559ba1dfc6de2904e17289fb3d1ac95f0ab48c7540cf5b8c2f055fea9d59c"
+      },
+      "size": 46983807,
+      "url": "https://fill-data.papermc.io/v1/objects/929559ba1dfc6de2904e17289fb3d1ac95f0ab48c7540cf5b8c2f055fea9d59c/paper-1.16.1-138.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.16.2-grim",
+    "protocol": 751,
+    "port": 27086,
+    "rcon_port": 27087,
+    "java": 8,
+    "server": {
+      "sha1": "c5f6fb23c3876461d46ec380421e42b289789530",
+      "size": 37942337,
+      "url": "https://piston-data.mojang.com/v1/objects/c5f6fb23c3876461d46ec380421e42b289789530/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/998d9ef5770d05c20d760dc16cf85151f35009f2/1.16.2.json",
+    "metadata_sha1": "998d9ef5770d05c20d760dc16cf85151f35009f2",
+    "minecraft_version": "1.16.2",
+    "reference_version": "1.16.2",
+    "platform": "Paper",
+    "platform_build": 189,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.16.2-189.jar",
+      "checksums": {
+        "sha256": "e5e10517daaa9bd6d54a8a0d22d866e31da7c1b47cb9e425ffaac236fde75ec9"
+      },
+      "size": 46848237,
+      "url": "https://fill-data.papermc.io/v1/objects/e5e10517daaa9bd6d54a8a0d22d866e31da7c1b47cb9e425ffaac236fde75ec9/paper-1.16.2-189.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.16.3-grim",
+    "protocol": 753,
+    "port": 27038,
+    "rcon_port": 27039,
+    "java": 8,
+    "server": {
+      "sha1": "f02f4473dbf152c23d7d484952121db0b36698cb",
+      "size": 37942656,
+      "url": "https://piston-data.mojang.com/v1/objects/f02f4473dbf152c23d7d484952121db0b36698cb/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/6485dd131ef68c968041a9f6fd73094b027e42e1/1.16.3.json",
+    "metadata_sha1": "6485dd131ef68c968041a9f6fd73094b027e42e1",
+    "minecraft_version": "1.16.3",
+    "reference_version": "1.16.3",
+    "platform": "Paper",
+    "platform_build": 253,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.16.3-253.jar",
+      "checksums": {
+        "sha256": "940303ee5f5bcc08377e388ea1c1daa109c1ac8c4d189dc67de1106853f2fc23"
+      },
+      "size": 46856246,
+      "url": "https://fill-data.papermc.io/v1/objects/940303ee5f5bcc08377e388ea1c1daa109c1ac8c4d189dc67de1106853f2fc23/paper-1.16.3-253.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.16.5-grim",
+    "protocol": 754,
+    "port": 27040,
+    "rcon_port": 27041,
+    "java": 8,
+    "server": {
+      "sha1": "1b557e7b033b583cd9f66746b7a9ab1ec1673ced",
+      "size": 37962360,
+      "url": "https://piston-data.mojang.com/v1/objects/1b557e7b033b583cd9f66746b7a9ab1ec1673ced/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/fba9f7833e858a1257d810d21a3a9e3c967f9077/1.16.5.json",
+    "metadata_sha1": "fba9f7833e858a1257d810d21a3a9e3c967f9077",
+    "minecraft_version": "1.16.5",
+    "reference_version": "1.16.5",
+    "platform": "Paper",
+    "platform_build": 794,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.16.5-794.jar",
+      "checksums": {
+        "sha256": "e67da4851d08cde378ab2b89be58849238c303351ed2482181a99c2c2b489276"
+      },
+      "size": 53944842,
+      "url": "https://fill-data.papermc.io/v1/objects/e67da4851d08cde378ab2b89be58849238c303351ed2482181a99c2c2b489276/paper-1.16.5-794.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.17-grim",
+    "protocol": 755,
+    "port": 27042,
+    "rcon_port": 27043,
+    "java": 16,
+    "server": {
+      "sha1": "0a269b5f2c5b93b1712d0f5dc43b6182b9ab254e",
+      "size": 43621201,
+      "url": "https://piston-data.mojang.com/v1/objects/0a269b5f2c5b93b1712d0f5dc43b6182b9ab254e/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/0d9ace8a2ecfd1f4c782786f4b985a499240ff12/1.17.json",
+    "metadata_sha1": "0d9ace8a2ecfd1f4c782786f4b985a499240ff12",
+    "minecraft_version": "1.17",
+    "reference_version": "1.17",
+    "platform": "Paper",
+    "platform_build": 79,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.17-79.jar",
+      "checksums": {
+        "sha256": "760a93b94a58d619bd647d71af84688617d0444d22b716500bc6b343858dc871"
+      },
+      "size": 60391784,
+      "url": "https://fill-data.papermc.io/v1/objects/760a93b94a58d619bd647d71af84688617d0444d22b716500bc6b343858dc871/paper-1.17-79.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.17.1-grim",
+    "protocol": 756,
+    "port": 27044,
+    "rcon_port": 27045,
+    "java": 16,
+    "server": {
+      "sha1": "a16d67e5807f57fc4e550299cf20226194497dc2",
+      "size": 43626592,
+      "url": "https://piston-data.mojang.com/v1/objects/a16d67e5807f57fc4e550299cf20226194497dc2/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/e0e7ab5ed6f55bbd874ef95be3c9356d67e64b57/1.17.1.json",
+    "metadata_sha1": "e0e7ab5ed6f55bbd874ef95be3c9356d67e64b57",
+    "minecraft_version": "1.17.1",
+    "reference_version": "1.17.1",
+    "platform": "Paper",
+    "platform_build": 411,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.17.1-411.jar",
+      "checksums": {
+        "sha256": "6cc1ee2f94253ce10b5374ed85fffc735a97d8f1b64db293683dfa24dd3cc05f"
+      },
+      "size": 61886260,
+      "url": "https://fill-data.papermc.io/v1/objects/6cc1ee2f94253ce10b5374ed85fffc735a97d8f1b64db293683dfa24dd3cc05f/paper-1.17.1-411.jar"
+    },
+    "jvm_args": [
+      "-DPaper.IgnoreJavaVersion=true"
+    ]
+  },
+  {
+    "version": "1.18.1-grim",
+    "protocol": 757,
+    "port": 27046,
+    "rcon_port": 27047,
+    "java": 17,
+    "server": {
+      "sha1": "125e5adf40c659fd3bce3e66e67a16bb49ecc1b9",
+      "size": 46324407,
+      "url": "https://piston-data.mojang.com/v1/objects/125e5adf40c659fd3bce3e66e67a16bb49ecc1b9/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/7ff864e988a2c29907154d5f9701e87e5d5e554a/1.18.1.json",
+    "metadata_sha1": "7ff864e988a2c29907154d5f9701e87e5d5e554a",
+    "minecraft_version": "1.18.1",
+    "reference_version": "1.18.1",
+    "platform": "Paper",
+    "platform_build": 216,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.18.1-216.jar",
+      "checksums": {
+        "sha256": "a94917a4472c2cbc9907a15c666bbb784f95ecd7b53c77bc08fe71103e5487f5"
+      },
+      "size": 34617939,
+      "url": "https://fill-data.papermc.io/v1/objects/a94917a4472c2cbc9907a15c666bbb784f95ecd7b53c77bc08fe71103e5487f5/paper-1.18.1-216.jar"
+    },
+    "jvm_args": []
+  },
+  {
+    "version": "1.18.2-grim",
+    "protocol": 758,
+    "port": 27048,
+    "rcon_port": 27049,
+    "java": 17,
+    "server": {
+      "sha1": "c8f83c5655308435b3dcf03c06d9fe8740a77469",
+      "size": 46592587,
+      "url": "https://piston-data.mojang.com/v1/objects/c8f83c5655308435b3dcf03c06d9fe8740a77469/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/334b33fcba3c9be4b7514624c965256535bd7eba/1.18.2.json",
+    "metadata_sha1": "334b33fcba3c9be4b7514624c965256535bd7eba",
+    "minecraft_version": "1.18.2",
+    "reference_version": "1.18.2",
+    "platform": "Paper",
+    "platform_build": 388,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.18.2-388.jar",
+      "checksums": {
+        "sha256": "0578f18f4d632b494b468ec56b3b414b5b56fea087ee7d39cf6dcdf4c9d01f05"
+      },
+      "size": 34829667,
+      "url": "https://fill-data.papermc.io/v1/objects/0578f18f4d632b494b468ec56b3b414b5b56fea087ee7d39cf6dcdf4c9d01f05/paper-1.18.2-388.jar"
+    },
+    "jvm_args": []
+  },
+  {
+    "version": "1.19-grim",
+    "protocol": 759,
+    "port": 27050,
+    "rcon_port": 27051,
+    "java": 17,
+    "server": {
+      "sha1": "e00c4052dac1d59a1188b2aa9d5a87113aaf1122",
+      "size": 45538778,
+      "url": "https://piston-data.mojang.com/v1/objects/e00c4052dac1d59a1188b2aa9d5a87113aaf1122/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/14bbfb25fb1c1c798e3c9b9482b081a78d1f3a9d/1.19.json",
+    "metadata_sha1": "14bbfb25fb1c1c798e3c9b9482b081a78d1f3a9d",
+    "minecraft_version": "1.19",
+    "reference_version": "1.19",
+    "platform": "Paper",
+    "platform_build": 81,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.19-81.jar",
+      "checksums": {
+        "sha256": "0d39cacc51a77b2b071e1ce862fcbf0b4a4bd668cc7e8b313598d84fa09fabac"
+      },
+      "size": 38158691,
+      "url": "https://fill-data.papermc.io/v1/objects/0d39cacc51a77b2b071e1ce862fcbf0b4a4bd668cc7e8b313598d84fa09fabac/paper-1.19-81.jar"
+    },
+    "jvm_args": []
+  },
+  {
+    "version": "1.19.2-grim",
+    "protocol": 760,
+    "port": 27052,
+    "rcon_port": 27053,
+    "java": 17,
+    "server": {
+      "sha1": "f69c284232d7c7580bd89a5a4931c3581eae1378",
+      "size": 45609512,
+      "url": "https://piston-data.mojang.com/v1/objects/f69c284232d7c7580bd89a5a4931c3581eae1378/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/ed548106acf3ac7e8205a6ee8fd2710facfa164f/1.19.2.json",
+    "metadata_sha1": "ed548106acf3ac7e8205a6ee8fd2710facfa164f",
+    "minecraft_version": "1.19.2",
+    "reference_version": "1.19.2",
+    "platform": "Paper",
+    "platform_build": 307,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.19.2-307.jar",
+      "checksums": {
+        "sha256": "2eb5c7459ec94bcdc597ed711d549a3ab4b0fda13e412a0792a1a069b5903864"
+      },
+      "size": 38319498,
+      "url": "https://fill-data.papermc.io/v1/objects/2eb5c7459ec94bcdc597ed711d549a3ab4b0fda13e412a0792a1a069b5903864/paper-1.19.2-307.jar"
+    },
+    "jvm_args": []
+  },
+  {
+    "version": "1.19.3-grim",
+    "protocol": 761,
+    "port": 27054,
+    "rcon_port": 27055,
+    "java": 17,
+    "server": {
+      "sha1": "c9df48efed58511cdd0213c56b9013a7b5c9ac1f",
+      "size": 47162712,
+      "url": "https://piston-data.mojang.com/v1/objects/c9df48efed58511cdd0213c56b9013a7b5c9ac1f/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/67e6e535052c5467fd22fa06b61d4939227c895e/1.19.3.json",
+    "metadata_sha1": "67e6e535052c5467fd22fa06b61d4939227c895e",
+    "minecraft_version": "1.19.3",
+    "reference_version": "1.19.3",
+    "platform": "Paper",
+    "platform_build": 448,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.19.3-448.jar",
+      "checksums": {
+        "sha256": "3007f2c638d5f04ed32b6adaa33053fe3634ccfa74345c83d3ea4982d38db5dc"
+      },
+      "size": 39127595,
+      "url": "https://fill-data.papermc.io/v1/objects/3007f2c638d5f04ed32b6adaa33053fe3634ccfa74345c83d3ea4982d38db5dc/paper-1.19.3-448.jar"
+    },
+    "jvm_args": []
+  },
+  {
+    "version": "1.19.4-grim",
+    "protocol": 762,
+    "port": 27056,
+    "rcon_port": 27057,
+    "java": 17,
+    "server": {
+      "sha1": "8f3112a1049751cc472ec13e397eade5336ca7ae",
+      "size": 47515675,
+      "url": "https://piston-data.mojang.com/v1/objects/8f3112a1049751cc472ec13e397eade5336ca7ae/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/11cfd0bd10c61a782a2e75f06011310becb5c5b2/1.19.4.json",
+    "metadata_sha1": "11cfd0bd10c61a782a2e75f06011310becb5c5b2",
+    "minecraft_version": "1.19.4",
+    "reference_version": "1.19.4",
+    "platform": "Paper",
+    "platform_build": 550,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.19.4-550.jar",
+      "checksums": {
+        "sha256": "e587d78cba3e99ef8c4bc24cf20cc3bdbbe89e33b0b572070446af4eb6be5ccf"
+      },
+      "size": 42666406,
+      "url": "https://fill-data.papermc.io/v1/objects/e587d78cba3e99ef8c4bc24cf20cc3bdbbe89e33b0b572070446af4eb6be5ccf/paper-1.19.4-550.jar"
+    },
+    "jvm_args": []
+  },
+  {
+    "version": "1.20.1-grim",
+    "protocol": 763,
+    "port": 27058,
+    "rcon_port": 27059,
+    "java": 17,
+    "server": {
+      "sha1": "84194a2f286ef7c14ed7ce0090dba59902951553",
+      "size": 47791053,
+      "url": "https://piston-data.mojang.com/v1/objects/84194a2f286ef7c14ed7ce0090dba59902951553/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/599695fee750ab157846886c6e69583003f22d07/1.20.1.json",
+    "metadata_sha1": "599695fee750ab157846886c6e69583003f22d07",
+    "minecraft_version": "1.20.1",
+    "reference_version": "1.20.1",
+    "platform": "Paper",
+    "platform_build": 196,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.20.1-196.jar",
+      "checksums": {
+        "sha256": "234a9b32098100c6fc116664d64e36ccdb58b5b649af0f80bcccb08b0255eaea"
+      },
+      "size": 43230582,
+      "url": "https://fill-data.papermc.io/v1/objects/234a9b32098100c6fc116664d64e36ccdb58b5b649af0f80bcccb08b0255eaea/paper-1.20.1-196.jar"
+    },
+    "jvm_args": []
+  },
+  {
+    "version": "1.20.2-grim",
+    "protocol": 764,
+    "port": 27060,
+    "rcon_port": 27061,
+    "java": 17,
+    "server": {
+      "sha1": "5b868151bd02b41319f54c8d4061b8cae84e665c",
+      "size": 48285806,
+      "url": "https://piston-data.mojang.com/v1/objects/5b868151bd02b41319f54c8d4061b8cae84e665c/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/01a86412323a385ab15dcc79e1690cc2a8fa5309/1.20.2.json",
+    "metadata_sha1": "01a86412323a385ab15dcc79e1690cc2a8fa5309",
+    "minecraft_version": "1.20.2",
+    "reference_version": "1.20.2",
+    "platform": "Paper",
+    "platform_build": 318,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.20.2-318.jar",
+      "checksums": {
+        "sha256": "ba340a835ac40b8563aa7eda1cd6479a11a7623409c89a2c35cd9d7490ed17a7"
+      },
+      "size": 41741453,
+      "url": "https://fill-data.papermc.io/v1/objects/ba340a835ac40b8563aa7eda1cd6479a11a7623409c89a2c35cd9d7490ed17a7/paper-1.20.2-318.jar"
+    },
+    "jvm_args": []
+  },
+  {
+    "version": "1.20.4-grim",
+    "protocol": 765,
+    "port": 27062,
+    "rcon_port": 27063,
+    "java": 17,
+    "server": {
+      "sha1": "8dd1a28015f51b1803213892b50b7b4fc76e594d",
+      "size": 49150256,
+      "url": "https://piston-data.mojang.com/v1/objects/8dd1a28015f51b1803213892b50b7b4fc76e594d/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/1e91d526711be5cc021bc834d3fb0d543cb7546e/1.20.4.json",
+    "metadata_sha1": "1e91d526711be5cc021bc834d3fb0d543cb7546e",
+    "minecraft_version": "1.20.4",
+    "reference_version": "1.20.4",
+    "platform": "Paper",
+    "platform_build": 499,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 17,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.20.4-499.jar",
+      "checksums": {
+        "sha256": "cabed3ae77cf55deba7c7d8722bc9cfd5e991201c211665f9265616d9fe5c77b"
+      },
+      "size": 42781488,
+      "url": "https://fill-data.papermc.io/v1/objects/cabed3ae77cf55deba7c7d8722bc9cfd5e991201c211665f9265616d9fe5c77b/paper-1.20.4-499.jar"
+    },
+    "jvm_args": []
+  },
+  {
+    "version": "1.20.6-grim",
+    "protocol": 766,
+    "port": 27064,
+    "rcon_port": 27065,
+    "java": 21,
+    "server": {
+      "sha1": "145ff0858209bcfc164859ba735d4199aafa1eea",
+      "size": 51420480,
+      "url": "https://piston-data.mojang.com/v1/objects/145ff0858209bcfc164859ba735d4199aafa1eea/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/2f110963d3e4a75cc7842ef7c0545faae1fabd3c/1.20.6.json",
+    "metadata_sha1": "2f110963d3e4a75cc7842ef7c0545faae1fabd3c",
+    "minecraft_version": "1.20.6",
+    "reference_version": "1.20.6",
+    "platform": "Paper",
+    "platform_build": 151,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 21,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.20.6-151.jar",
+      "checksums": {
+        "sha256": "4b011f5adb5f6c72007686a223174fce82f31aeb4b34faf4652abc840b47e640"
+      },
+      "size": 45826876,
+      "url": "https://fill-data.papermc.io/v1/objects/4b011f5adb5f6c72007686a223174fce82f31aeb4b34faf4652abc840b47e640/paper-1.20.6-151.jar"
+    },
+    "jvm_args": []
+  },
+  {
+    "version": "1.21.1-grim",
+    "protocol": 767,
+    "port": 27066,
+    "rcon_port": 27067,
+    "java": 21,
+    "server": {
+      "sha1": "59353fb40c36d304f2035d51e7d6e6baa98dc05c",
+      "size": 51627615,
+      "url": "https://piston-data.mojang.com/v1/objects/59353fb40c36d304f2035d51e7d6e6baa98dc05c/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/81396eb81dcfec06cf6fa1c6fa06e4ab0c15eb81/1.21.1.json",
+    "metadata_sha1": "81396eb81dcfec06cf6fa1c6fa06e4ab0c15eb81",
+    "minecraft_version": "1.21.1",
+    "reference_version": "1.21.1",
+    "platform": "Paper",
+    "platform_build": 133,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 21,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.21.1-133.jar",
+      "checksums": {
+        "sha256": "39bd8c00b9e18de91dcabd3cc3dcfa5328685a53b7187a2f63280c22e2d287b9"
+      },
+      "size": 49394394,
+      "url": "https://fill-data.papermc.io/v1/objects/39bd8c00b9e18de91dcabd3cc3dcfa5328685a53b7187a2f63280c22e2d287b9/paper-1.21.1-133.jar"
+    },
+    "jvm_args": []
+  },
+  {
+    "version": "1.21.3-grim",
+    "protocol": 768,
+    "port": 27068,
+    "rcon_port": 27069,
+    "java": 21,
+    "server": {
+      "sha1": "45810d238246d90e811d896f87b14695b7fb6839",
+      "size": 56122038,
+      "url": "https://piston-data.mojang.com/v1/objects/45810d238246d90e811d896f87b14695b7fb6839/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/c0cffaeccefc2de1fade4b97ede3d37bdf4920b0/1.21.3.json",
+    "metadata_sha1": "c0cffaeccefc2de1fade4b97ede3d37bdf4920b0",
+    "minecraft_version": "1.21.3",
+    "reference_version": "1.21.3",
+    "platform": "Paper",
+    "platform_build": 83,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 21,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.21.3-83.jar",
+      "checksums": {
+        "sha256": "87e973e1d338e869e7fdbc4b8fadc1579d7bb0246a0e0cf6e5700ace6c8bc17e"
+      },
+      "size": 50931273,
+      "url": "https://fill-data.papermc.io/v1/objects/87e973e1d338e869e7fdbc4b8fadc1579d7bb0246a0e0cf6e5700ace6c8bc17e/paper-1.21.3-83.jar"
+    },
+    "jvm_args": []
+  },
+  {
+    "version": "1.21.4-grim",
+    "protocol": 769,
+    "port": 27070,
+    "rcon_port": 27071,
+    "java": 21,
+    "server": {
+      "sha1": "4707d00eb834b446575d89a61a11b5d548d8c001",
+      "size": 56880250,
+      "url": "https://piston-data.mojang.com/v1/objects/4707d00eb834b446575d89a61a11b5d548d8c001/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/d152a3712859b294a2dff641f99a7fe219cd3aec/1.21.4.json",
+    "metadata_sha1": "d152a3712859b294a2dff641f99a7fe219cd3aec",
+    "minecraft_version": "1.21.4",
+    "reference_version": "1.21.4",
+    "platform": "Paper",
+    "platform_build": 232,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 21,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.21.4-232.jar",
+      "checksums": {
+        "sha256": "5ee4f542f628a14c644410b08c94ea42e772ef4d29fe92973636b6813d4eaffc"
+      },
+      "size": 51437498,
+      "url": "https://fill-data.papermc.io/v1/objects/5ee4f542f628a14c644410b08c94ea42e772ef4d29fe92973636b6813d4eaffc/paper-1.21.4-232.jar"
+    },
+    "jvm_args": []
+  },
+  {
+    "version": "1.21.5-grim",
+    "protocol": 770,
+    "port": 27072,
+    "rcon_port": 27073,
+    "java": 21,
+    "server": {
+      "sha1": "e6ec2f64e6080b9b5d9b471b291c33cc7f509733",
+      "size": 57269758,
+      "url": "https://piston-data.mojang.com/v1/objects/e6ec2f64e6080b9b5d9b471b291c33cc7f509733/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/9b841ffc9571fd1219b887b6ff3a705774cb9614/1.21.5.json",
+    "metadata_sha1": "9b841ffc9571fd1219b887b6ff3a705774cb9614",
+    "minecraft_version": "1.21.5",
+    "reference_version": "1.21.5",
+    "platform": "Paper",
+    "platform_build": 114,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 21,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.21.5-114.jar",
+      "checksums": {
+        "sha256": "2ae6ae22adf417699746e0f89fc2ef6cb6ee050a5f6608cee58f0535d60b509e"
+      },
+      "size": 51427274,
+      "url": "https://fill-data.papermc.io/v1/objects/2ae6ae22adf417699746e0f89fc2ef6cb6ee050a5f6608cee58f0535d60b509e/paper-1.21.5-114.jar"
+    },
+    "jvm_args": []
+  },
+  {
+    "version": "1.21.6-grim",
+    "protocol": 771,
+    "port": 27074,
+    "rcon_port": 27075,
+    "java": 21,
+    "server": {
+      "sha1": "6e64dcabba3c01a7271b4fa6bd898483b794c59b",
+      "size": 57554576,
+      "url": "https://piston-data.mojang.com/v1/objects/6e64dcabba3c01a7271b4fa6bd898483b794c59b/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/7f6e01a863f29a9e56cf84479ddb9645cb2a026c/1.21.6.json",
+    "metadata_sha1": "7f6e01a863f29a9e56cf84479ddb9645cb2a026c",
+    "minecraft_version": "1.21.6",
+    "reference_version": "1.21.6",
+    "platform": "Paper",
+    "platform_build": 48,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 21,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.21.6-48.jar",
+      "checksums": {
+        "sha256": "35e2dfa66b3491b9d2f0bb033679fa5aca1e1fdf097e7a06a80ce8afeda5c214"
+      },
+      "size": 52639704,
+      "url": "https://fill-data.papermc.io/v1/objects/35e2dfa66b3491b9d2f0bb033679fa5aca1e1fdf097e7a06a80ce8afeda5c214/paper-1.21.6-48.jar"
+    },
+    "jvm_args": []
+  },
+  {
+    "version": "1.21.8-grim",
+    "protocol": 772,
+    "port": 27076,
+    "rcon_port": 27077,
+    "java": 21,
+    "server": {
+      "sha1": "6bce4ef400e4efaa63a13d5e6f6b500be969ef81",
+      "size": 57555044,
+      "url": "https://piston-data.mojang.com/v1/objects/6bce4ef400e4efaa63a13d5e6f6b500be969ef81/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/f34765e6e291cdb47de80b7b3bd1cccd53e1fbf3/1.21.8.json",
+    "metadata_sha1": "f34765e6e291cdb47de80b7b3bd1cccd53e1fbf3",
+    "minecraft_version": "1.21.8",
+    "reference_version": "1.21.8",
+    "platform": "Paper",
+    "platform_build": 60,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 21,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.21.8-60.jar",
+      "checksums": {
+        "sha256": "8de7c52c3b02403503d16fac58003f1efef7dd7a0256786843927fa92ee57f1e"
+      },
+      "size": 52811717,
+      "url": "https://fill-data.papermc.io/v1/objects/8de7c52c3b02403503d16fac58003f1efef7dd7a0256786843927fa92ee57f1e/paper-1.21.8-60.jar"
+    },
+    "jvm_args": []
+  },
+  {
+    "version": "1.21.10-grim",
+    "protocol": 773,
+    "port": 27078,
+    "rcon_port": 27079,
+    "java": 21,
+    "server": {
+      "sha1": "95495a7f485eedd84ce928cef5e223b757d2f764",
+      "size": 58642415,
+      "url": "https://piston-data.mojang.com/v1/objects/95495a7f485eedd84ce928cef5e223b757d2f764/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/40ecc577e2cb5924df1f30e0ccc6d2ee9e812dd0/1.21.10.json",
+    "metadata_sha1": "40ecc577e2cb5924df1f30e0ccc6d2ee9e812dd0",
+    "minecraft_version": "1.21.10",
+    "reference_version": "1.21.10",
+    "platform": "Paper",
+    "platform_build": 130,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 21,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.21.10-130.jar",
+      "checksums": {
+        "sha256": "158703f75a26f842ea656b3dc6d75bf3d1ec176b97a2c36384d0b80b3871af53"
+      },
+      "size": 54475623,
+      "url": "https://fill-data.papermc.io/v1/objects/158703f75a26f842ea656b3dc6d75bf3d1ec176b97a2c36384d0b80b3871af53/paper-1.21.10-130.jar"
+    },
+    "jvm_args": []
+  },
+  {
+    "version": "1.21.11-grim",
+    "protocol": 774,
+    "port": 27080,
+    "rcon_port": 27081,
+    "java": 21,
+    "server": {
+      "sha1": "64bb6d763bed0a9f1d632ec347938594144943ed",
+      "size": 56327581,
+      "url": "https://piston-data.mojang.com/v1/objects/64bb6d763bed0a9f1d632ec347938594144943ed/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/f8d822c54003334930a71b7b7b5e16b3d98ea9fd/1.21.11.json",
+    "metadata_sha1": "f8d822c54003334930a71b7b7b5e16b3d98ea9fd",
+    "minecraft_version": "1.21.11",
+    "reference_version": "1.21.11",
+    "platform": "Paper",
+    "platform_build": 132,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 21,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-1.21.11-132.jar",
+      "checksums": {
+        "sha256": "5ffef465eeeb5f2a3c23a24419d97c51afd7dbb4923ff42df9a3f58bba1ccfba"
+      },
+      "size": 54846016,
+      "url": "https://fill-data.papermc.io/v1/objects/5ffef465eeeb5f2a3c23a24419d97c51afd7dbb4923ff42df9a3f58bba1ccfba/paper-1.21.11-132.jar"
+    },
+    "jvm_args": []
+  },
+  {
+    "version": "26.1.2-grim",
+    "protocol": 775,
+    "port": 27082,
+    "rcon_port": 27083,
+    "java": 25,
+    "server": {
+      "sha1": "97ccd4c0ed3f81bbb7bfacddd1090b0c56f9bc51",
+      "size": 60417480,
+      "url": "https://piston-data.mojang.com/v1/objects/97ccd4c0ed3f81bbb7bfacddd1090b0c56f9bc51/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/0b5a79a91e76c2df466c79fb04fd1f355836dea0/26.1.2.json",
+    "metadata_sha1": "0b5a79a91e76c2df466c79fb04fd1f355836dea0",
+    "minecraft_version": "26.1.2",
+    "reference_version": "26.1.2",
+    "platform": "Paper",
+    "platform_build": 74,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 25,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-26.1.2-74.jar",
+      "checksums": {
+        "sha256": "1d70b1dab9cf4a6de615209a536f3a45a2186240253c428213ce2188ab95e5f7"
+      },
+      "size": 52893229,
+      "url": "https://fill-data.papermc.io/v1/objects/1d70b1dab9cf4a6de615209a536f3a45a2186240253c428213ce2188ab95e5f7/paper-26.1.2-74.jar"
+    },
+    "jvm_args": []
+  },
+  {
+    "version": "26.2-grim",
+    "protocol": 776,
+    "port": 27084,
+    "rcon_port": 27085,
+    "java": 25,
+    "server": {
+      "sha1": "823e2250d24b3ddac457a60c92a6a941943fcd6a",
+      "size": 60894273,
+      "url": "https://piston-data.mojang.com/v1/objects/823e2250d24b3ddac457a60c92a6a941943fcd6a/server.jar"
+    },
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/987b91a95ae93b3bb78cc14d6e0bbd31bad08d59/26.2.json",
+    "metadata_sha1": "987b91a95ae93b3bb78cc14d6e0bbd31bad08d59",
+    "minecraft_version": "26.2",
+    "reference_version": "26.2",
+    "platform": "Paper",
+    "platform_build": 126,
+    "grim_version": "2.3.74-8eb5f28",
+    "runtime_java": 25,
+    "launch_jar": "paper.jar",
+    "platform_download": {
+      "name": "paper-26.2-126.jar",
+      "checksums": {
+        "sha256": "9c95eb088b903d9ed96cd457838f3078f02407a965dc8ae36d2c4e551a04355a"
+      },
+      "size": 64521721,
+      "url": "https://fill-data.papermc.io/v1/objects/9c95eb088b903d9ed96cd457838f3078f02407a965dc8ae36d2c4e551a04355a/paper-26.2-126.jar"
+    },
+    "jvm_args": []
+  }
+]

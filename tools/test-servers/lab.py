@@ -23,7 +23,10 @@ import zipfile
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
 ROOT = REPO / "run" / "test-servers"
-VERSIONS = json.loads((HERE / "versions.json").read_text())
+VANILLA_VERSIONS = json.loads((HERE / "versions.json").read_text())
+GRIM_MANIFEST = HERE / "grim-versions.json"
+GRIM_VERSIONS = json.loads(GRIM_MANIFEST.read_text(encoding="utf-8")) if GRIM_MANIFEST.exists() else []
+VERSIONS = VANILLA_VERSIONS + GRIM_VERSIONS
 NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 
 
@@ -46,7 +49,8 @@ def download(url, path, digest, algorithm="sha1"):
     tmp = path.with_suffix(path.suffix + ".download")
     for attempt in range(3):
         try:
-            with urllib.request.urlopen(url, timeout=90) as source, tmp.open("wb") as target:
+            request = urllib.request.Request(url, headers={"User-Agent": "ViaForgeLab/1.0 (https://github.com/GrimAnticheat/Grim)"})
+            with urllib.request.urlopen(request, timeout=90) as source, tmp.open("wb") as target:
                 while data := source.read(1024 * 1024):
                     target.write(data)
             if not matches(tmp):
@@ -63,7 +67,7 @@ def java(row):
     minimum = row["java"]
     config = ROOT / "java.json"
     configured = json.loads(config.read_text()) if config.exists() else {}
-    preferred = str(8 if minimum == 8 else 21 if minimum <= 21 else 25)
+    preferred = str(row.get("runtime_java", 8 if minimum == 8 else 21 if minimum <= 21 else 25))
     if preferred in configured and Path(configured[preferred]).is_file():
         return configured[preferred]
     candidates = list((Path.home() / ".jdks").glob("*/bin/java.exe"))
@@ -117,7 +121,7 @@ def properties(row):
         "enforce-secure-profile": "false", "enable-rcon": "true", "rcon.port": row["rcon_port"],
         "rcon.password": password, "broadcast-rcon-to-ops": "false", "enable-query": "false",
         "enable-jmx-monitoring": "false", "management-server-enabled": "false",
-        "motd": f"ViaForge Testlabor | {row['version']} | Protokoll {row['protocol']}",
+        "motd": f"ViaForge Testlabor | {row.get('minecraft_version', row['version'])} | Protokoll {row['protocol']}",
         "level-name": "world", "level-seed": "764189", "level-type": "minecraft:flat" if row["protocol"] >= 759 else "flat",
         "generate-structures": "false", "gamemode": creative_property(row),
         "difficulty": "normal" if modern else "2", "force-gamemode": "false", "hardcore": "false",
@@ -149,23 +153,29 @@ def setup(rows):
     for row in rows:
         properties(row)
     def fetch(row):
+        if row.get("platform") == "Paper":
+            import grim
+            grim.install(row)
+            return row["version"]
         descriptor = row["server"]
         download(descriptor["url"], ROOT / row["version"] / "server.jar", descriptor["sha1"])
         return row["version"]
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
         for result in pool.map(fetch, rows):
             print("Server geprueft:", result, flush=True)
-    for minimum in sorted({r["java"] for r in rows}):
-        row = next(r for r in rows if r["java"] == minimum)
+    for row in rows:
+        minimum = row["java"]
         try:
             java(row)
         except RuntimeError:
-            install_runtime(8 if minimum == 8 else 21 if minimum <= 21 else 25)
+            install_runtime(row.get("runtime_java", 8 if minimum == 8 else 21 if minimum <= 21 else 25))
             java(row)
     dashboard()
 
 
 def catalog(row):
+    if row.get("reference_version"):
+        return catalog(next(r for r in VANILLA_VERSIONS if r["version"] == row["reference_version"]))
     folder = ROOT / row["version"]
     result = folder / "catalog.json"
     if result.exists():
@@ -469,13 +479,19 @@ def start(rows):
                 sock.bind(("127.0.0.1", port))
         folder = ROOT / row["version"]
         with (folder / "worker.log").open("a") as log:
-            subprocess.Popen([sys.executable, str(Path(__file__).resolve()), "_worker", row["version"]],
+            worker_process = subprocess.Popen([sys.executable, str(Path(__file__).resolve()), "_worker", row["version"]],
                              cwd=REPO, stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.STDOUT,
                              creationflags=NO_WINDOW | getattr(subprocess, "DETACHED_PROCESS", 0))
         deadline = time.monotonic() + 180
         while time.monotonic() < deadline:
+            if worker_process.poll() is not None:
+                raise RuntimeError(f"Server exited during startup: {folder / 'console.log'}")
             found = status(row)
             if found and "version" in found:
+                # Paper answers status with protocol -1 while its plugins/worlds are still loading.
+                if found["version"].get("protocol") == -1:
+                    time.sleep(.5)
+                    continue
                 if found["version"]["protocol"] != row["protocol"]:
                     raise RuntimeError("Falsches Serverprotokoll: " + str(found["version"]))
                 try:
@@ -504,10 +520,12 @@ def worker(row):
         assert_local(row)
         import terrain
         terrain.prepare_new_world(row)
+        import paper_boot
+        boot_arguments = paper_boot.prepare(row)
         with (folder / "console.log").open("ab", buffering=0) as log:
             child = subprocess.Popen([java(row), "-Xms256m", f"-Xmx{heap(row)}m", "-XX:ActiveProcessorCount=2",
                                       "-Dfile.encoding=UTF-8", "-Dlog4j2.formatMsgNoLookups=true",
-                                      "-jar", "server.jar", "nogui"], cwd=folder, stdin=subprocess.PIPE,
+                                      *row.get("jvm_args", []), *boot_arguments, "-jar", row.get('_effective_launch_jar', row.get("launch_jar", "server.jar")), "nogui"], cwd=folder, stdin=subprocess.PIPE,
                                      stdout=log, stderr=subprocess.STDOUT, creationflags=NO_WINDOW)
             save(folder / "process.json", {"worker_pid": os.getpid(), "server_pid": child.pid, "started": time.time()})
             while child.poll() is None:
@@ -591,9 +609,11 @@ def stop(rows):
 
 
 def dashboard():
+    import profiles
+    active = profiles.select()
     lines = []
     verified = 0
-    for r in VERSIONS:
+    for r in active:
         folder = ROOT / r["version"]
         ready = (folder / "arena-report.json").exists()
         check = folder / "verification.json"
@@ -610,11 +630,11 @@ def dashboard():
                                         position=pos, detail=("Slot " + str(item["slot"])) if "slot" in item else
                                         ("auf Knopfdruck" if item.get("on_demand") else "Meta " + str(item.get("metadata", 0)))))
             data = json.dumps(records, ensure_ascii=True).replace("<", "\\u003c")
-            (folder / "catalog.html").write_text("<!doctype html><html lang='de'><meta charset='utf-8'><title>Testkatalog " + r["version"] + "</title>"
+            (folder / "catalog.html").write_text("<!doctype html><html lang='de'><meta charset='utf-8'><title>Testkatalog " + r.get('profile_version', r['version']) + "</title>"
                 "<style>body{font:16px system-ui;margin:32px;background:#151c26;color:#e0ecf5}a{color:#8ee3ba}"
                 "input,select{padding:10px;background:#243446;color:white;border:1px solid #579;margin:8px}"
                 "td,th{padding:6px 14px;border-bottom:1px solid #344;text-align:left}code{color:#8ee3ba}</style>"
-                "<a href='../index.html'>Alle Versionen</a><h1>Testkatalog " + r["version"] + "</h1>"
+                "<a href='../index.html'>Alle Versionen</a><h1>Testkatalog " + r.get('profile_version', r['version']) + "</h1>"
                 "<p>Suchbegriff eingeben. Koordinaten zeigen das Exponat bzw. die Itemkiste. Zum Teleportieren OP-Rechte verwenden.</p>"
                 "<input id='query' placeholder='z.B. shulker, bed, piglin' size='36'><select id='kind'><option value=''>Alle Bereiche</option>"
                 "<option>blocks</option><option>items</option><option>mobs</option><option>variants</option></select><span id='count'></span>"
@@ -625,12 +645,12 @@ def dashboard():
                 "for(const value of [x.kind,x.name+' '+x.variant,x.detail,x.position.join(', '),'/tp @p '+x.position[0]+' '+(x.position[1]+1)+' '+(x.position[2]-2)]){const td=document.createElement('td');td.textContent=value;tr.append(td)}rows.append(tr)}}"
                 "q.addEventListener('input',render);k.addEventListener('change',render);render();</script></html>", encoding="utf-8")
         state = "Geprueft" if valid else "Testwelt gebaut" if ready else "Testwelt noch zu bauen"
-        lines.append(f"<tr><td>{r['version']}</td><td>{r['protocol']}</td><td><code>127.0.0.1:{r['port']}</code></td>"
+        lines.append(f"<tr><td>{r.get('profile_version', r['version'])}</td><td>{r['protocol']}</td><td><code>127.0.0.1:{r['port']}</code></td>"
                      f"<td>{state}</td><td>" + (f"<a href='{r['version']}/catalog.html'>Katalog durchsuchen</a>" if details.exists() else "") + "</td></tr>")
     (ROOT / "index.html").write_text("<!doctype html><html lang='de'><meta charset='utf-8'><title>ViaForge Testlabor</title>"
         "<style>body{font:16px system-ui;max-width:1000px;margin:40px auto;background:#151c26;color:#e0ecf5}"
         "td,th{padding:9px 22px;text-align:left;border-bottom:1px solid #344}code{color:#8ee3ba}a{color:#8bd5ff}</style>"
-        f"<h1>ViaForge Testlabor</h1><p>{len(VERSIONS)} originale Vanilla-Versionen. Zugriff nur auf diesem PC. {verified}/{len(VERSIONS)} Welten geprueft.</p>"
+        f"<h1>ViaForge Testlabor</h1><p>{len(active)} Minecraft-Versionen, je ein Testserver. Grim schaltbar, soweit unterstuetzt. Zugriff nur auf diesem PC. {verified}/{len(active)} Laufzeitpruefungen bestanden.</p>"
         "<p>Starten: <code>Testserver.bat start 26.2</code> &middot; Gruppe: <code>start regression</code><br>"
         "Beenden mit Speichern: <code>Testserver.bat stop all</code></p>"
         "<p>Im Spiel: Multiplayer → Direkt verbinden → Adresse kopieren. In ViaForge die passende Serverversion waehlen.</p>"
@@ -720,6 +740,10 @@ def select(value):
               "modern": ["1.16.5", "1.18.2", "1.20.6", "26.3"]}
     if value == "all":
         return VERSIONS
+    if value == "vanilla":
+        return VANILLA_VERSIONS
+    if value == "grim":
+        return GRIM_VERSIONS
     names = groups.get(value, value.split(","))
     selected = [r for r in VERSIONS if r["version"] in names]
     if len(selected) != len(names):
@@ -728,12 +752,13 @@ def select(value):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="ViaForge Vanilla-Testlabor (nur localhost)")
+    parser = argparse.ArgumentParser(description="ViaForge-Testlabor (nur localhost, ein Server pro Minecraft-Version)")
     parser.add_argument("action", choices=["setup", "catalog", "start", "stop", "status", "build", "verify", "provision", "audit", "find", "kit", "export-list", "import-list", "command", "op", "accept-eula", "_worker"])
     parser.add_argument("versions", nargs="?", default="all", help="Versionen mit Komma, all, regression, legacy oder modern")
     parser.add_argument("arguments", nargs="*")
     args = parser.parse_args()
-    rows = select(args.versions)
+    import profiles
+    rows = select(args.versions) if args.action == '_worker' else profiles.select(args.versions)
     if args.action == "setup":
         setup(rows)
     elif args.action == "catalog":
@@ -759,7 +784,7 @@ def main():
     elif args.action == "status":
         for r in rows:
             found = status(r)
-            print(f"{r['version']:9} 127.0.0.1:{r['port']}  " + ("LAEUFT " + str(found.get('version', 'startet')) if found else "aus"))
+            print(f"{r.get('profile_version', r['version']):9} 127.0.0.1:{r['port']}  " + ("LAEUFT " + str(found.get('version', 'startet')) if found else "aus"))
     elif args.action == "_worker":
         if len(rows) != 1:
             raise ValueError("Worker benoetigt genau eine Version")

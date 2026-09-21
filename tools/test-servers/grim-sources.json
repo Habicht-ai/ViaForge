@@ -1,0 +1,1535 @@
+{
+  "schema": 1,
+  "resolved_at": 1789941162.5249126,
+  "grim": {
+    "game_versions": [
+      "1.7.2",
+      "1.7.3",
+      "1.7.4",
+      "1.7.5",
+      "1.7.6",
+      "1.7.7",
+      "1.7.8",
+      "1.7.9",
+      "1.7.10",
+      "1.8",
+      "1.8.1",
+      "1.8.2",
+      "1.8.3",
+      "1.8.4",
+      "1.8.5",
+      "1.8.6",
+      "1.8.7",
+      "1.8.8",
+      "1.8.9",
+      "1.9",
+      "1.9.1",
+      "1.9.2",
+      "1.9.3",
+      "1.9.4",
+      "1.10",
+      "1.10.1",
+      "1.10.2",
+      "1.11",
+      "1.11.1",
+      "1.11.2",
+      "1.12",
+      "1.12.1",
+      "1.12.2",
+      "1.13",
+      "1.13.1",
+      "1.13.2",
+      "1.14",
+      "1.14.1",
+      "1.14.2",
+      "1.14.3",
+      "1.14.4",
+      "1.15",
+      "1.15.1",
+      "1.15.2",
+      "1.16",
+      "1.16.1",
+      "1.16.2",
+      "1.16.3",
+      "1.16.4",
+      "1.16.5",
+      "1.17",
+      "1.17.1",
+      "1.18",
+      "1.18.1",
+      "1.18.2",
+      "1.19",
+      "1.19.1",
+      "1.19.2",
+      "1.19.3",
+      "1.19.4",
+      "1.20",
+      "1.20.1",
+      "1.20.2",
+      "1.20.3",
+      "1.20.4",
+      "1.20.5",
+      "1.20.6",
+      "1.21",
+      "1.21.1",
+      "1.21.2",
+      "1.21.3",
+      "1.21.4",
+      "1.21.5",
+      "1.21.6",
+      "1.21.7",
+      "1.21.8",
+      "1.21.9",
+      "1.21.10",
+      "1.21.11",
+      "26.1",
+      "26.1.1",
+      "26.1.2",
+      "26.2"
+    ],
+    "loaders": [
+      "bukkit",
+      "folia",
+      "paper",
+      "purpur",
+      "spigot"
+    ],
+    "environment": "unknown",
+    "id": "Gd6BG1HA",
+    "project_id": "LJNGWSvH",
+    "author_id": "OgXNM6vv",
+    "featured": false,
+    "name": "Grim Anticheat (Bukkit) 2.3.74-8eb5f28",
+    "version_number": "2.3.74-8eb5f28",
+    "changelog": "## Changes in this Build (since previous push)\n### Miscellaneous\n- PacketOrderH only applies to pre-1.21.6 clients - *by ManInMyVan* (`8eb5f28`)",
+    "changelog_url": null,
+    "date_published": "2026-09-10T01:48:02.295574Z",
+    "downloads": 16103,
+    "version_type": "alpha",
+    "status": "listed",
+    "requested_status": null,
+    "files": [
+      {
+        "id": "73OYffsd",
+        "hashes": {
+          "sha1": "48a212fde381fb345dae901c8cd49c3478fe59ff",
+          "sha512": "b210eb49bce1cd4b3e0fe375193522694faa379a347244a0770f62c87ab23c92e06ce4920ee192cbe0112fa1e071191a7d642032777c1db2925e281fee175168"
+        },
+        "url": "https://cdn.modrinth.com/data/LJNGWSvH/versions/Gd6BG1HA/grimac-bukkit-2.3.74-8eb5f28.jar",
+        "filename": "grimac-bukkit-2.3.74-8eb5f28.jar",
+        "primary": true,
+        "size": 12707188,
+        "file_type": null
+      }
+    ],
+    "dependencies": []
+  },
+  "matrix": [
+    {
+      "minecraft": "1.9",
+      "protocol": 107,
+      "grim": "2.3.74-8eb5f28",
+      "available": false,
+      "reason": "No exact Paper release in official download service; no substituted Minecraft version"
+    },
+    {
+      "minecraft": "1.9.1",
+      "protocol": 108,
+      "grim": "2.3.74-8eb5f28",
+      "available": false,
+      "reason": "No exact Paper release in official download service; no substituted Minecraft version"
+    },
+    {
+      "minecraft": "1.9.2",
+      "protocol": 109,
+      "grim": "2.3.74-8eb5f28",
+      "available": false,
+      "reason": "No exact Paper release in official download service; no substituted Minecraft version"
+    },
+    {
+      "minecraft": "1.9.4",
+      "protocol": 110,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 775,
+        "time": "2021-12-20T00:10:49.338Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "4572ef9d91d69f240c8a54321b9885e45ddcb140",
+            "time": "2021-12-18T19:00:53Z",
+            "message": "Update"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.9.4-775.jar",
+            "checksums": {
+              "sha256": "15a5821ddeacc596432c3fbf24262a2d264f556060ecd6f1838fb01ab5629a81"
+            },
+            "size": 20965788,
+            "url": "https://fill-data.papermc.io/v1/objects/15a5821ddeacc596432c3fbf24262a2d264f556060ecd6f1838fb01ab5629a81/paper-1.9.4-775.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.10.2",
+      "protocol": 210,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 918,
+        "time": "2021-12-20T00:10:49.755Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "55cc981a61d080e57bc9ee6f11e975f8893f831c",
+            "time": "2021-12-18T19:11:16Z",
+            "message": "Update"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.10.2-918.jar",
+            "checksums": {
+              "sha256": "83354d24a22b6265e76c089b3d17a568abb446c0ccd12c2452f5e148412b16c2"
+            },
+            "size": 21051207,
+            "url": "https://fill-data.papermc.io/v1/objects/83354d24a22b6265e76c089b3d17a568abb446c0ccd12c2452f5e148412b16c2/paper-1.10.2-918.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.11",
+      "protocol": 315,
+      "grim": "2.3.74-8eb5f28",
+      "available": false,
+      "reason": "No exact Paper release in official download service; no substituted Minecraft version"
+    },
+    {
+      "minecraft": "1.11.2",
+      "protocol": 316,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 1106,
+        "time": "2021-12-20T00:10:50.177Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "7373692e7c208612207058cf9d95e92d23704e7a",
+            "time": "2021-12-19T23:48:36Z",
+            "message": "Update"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.11.2-1106.jar",
+            "checksums": {
+              "sha256": "3d0f40ec1f9630dfdbafa626cc20c266d7fb90fc22583dc1b995e7fbfb76830d"
+            },
+            "size": 24287234,
+            "url": "https://fill-data.papermc.io/v1/objects/3d0f40ec1f9630dfdbafa626cc20c266d7fb90fc22583dc1b995e7fbfb76830d/paper-1.11.2-1106.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.12",
+      "protocol": 335,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 1169,
+        "time": "2017-08-01T02:40:37.150Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "2670d1f8eb57ff7cab7ffe905dc932af1147d7a0",
+            "time": "2017-07-31T07:09:13Z",
+            "message": "Make /plugins list alphabetical"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.12-1169.jar",
+            "checksums": {
+              "sha256": "1e7e88a2ed6f2b70fa3f6ec6611373458c5d72b2a8707e60921df601c791e60e"
+            },
+            "size": 38347817,
+            "url": "https://fill-data.papermc.io/v1/objects/1e7e88a2ed6f2b70fa3f6ec6611373458c5d72b2a8707e60921df601c791e60e/paper-1.12-1169.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.12.1",
+      "protocol": 338,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 1204,
+        "time": "2017-09-14T14:00:44.560Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "9c79dd3214ec847974ccd04e70f2c2c44abcc725",
+            "time": "2017-09-14T13:57:50Z",
+            "message": "Cache generated EventExecutors (fixes #786)\nthe first 'major' change in this PR is to cache the generated event \nexecutrs from the ASM class, by doing this we only generate a single \nclass for every method that we need an executor for, thus reducing the \nnumber of classes that are needed, especially in cases where plugins \nre/unregister events all the time.\nThe second change is to modify the generated classloader map, generated \nclassloaders are not held against the plugin itself but the classloader \nthat the event is declared in, the implication here is that we cannot \ndrop generated classloaders when a plugin disable, and so we use a guava \nweak-key'd hashmap, downfall here is that classes won't be GC'd until \nguava drops the generated classloader, however the first change should \ndeal with most of the grunt."
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.12.1-1204.jar",
+            "checksums": {
+              "sha256": "dba2219d674ad85e4ef2c41931d34b6fa4be75a887973ecaaf286727a03812da"
+            },
+            "size": 38617469,
+            "url": "https://fill-data.papermc.io/v1/objects/dba2219d674ad85e4ef2c41931d34b6fa4be75a887973ecaaf286727a03812da/paper-1.12.1-1204.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.12.2",
+      "protocol": 340,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 1620,
+        "time": "2021-12-20T00:10:50.686Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "e9c4141dab5ec2df7194b75b8ab34c7242c482a6",
+            "time": "2021-12-18T19:25:03Z",
+            "message": "Update"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.12.2-1620.jar",
+            "checksums": {
+              "sha256": "3a2041807f492dcdc34ebb324a287414946e3e05ec3df6fd03f5b5f7d9afc210"
+            },
+            "size": 40979699,
+            "url": "https://fill-data.papermc.io/v1/objects/3a2041807f492dcdc34ebb324a287414946e3e05ec3df6fd03f5b5f7d9afc210/paper-1.12.2-1620.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.13",
+      "protocol": 393,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 173,
+        "time": "2018-08-26T04:04:46.336Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "c53484804732d09ffef6fdc46d9585aacfe66e9c",
+            "time": "2018-08-26T04:04:29Z",
+            "message": "[Auto] Updated Upstream (CraftBukkit)\nUpstream has released updates that appears to apply and compile\ncorrectly. This update has not been tested by PaperMC and as with ANY\nupdate, please do your own testing\nCraftBukkit Changes: 162bda93 Add note about 1.13.1"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.13-173.jar",
+            "checksums": {
+              "sha256": "00db82d214242c9345266d44ff8d11a8e857a1a02edf7cb5fcc2d1d973283129"
+            },
+            "size": 41881625,
+            "url": "https://fill-data.papermc.io/v1/objects/00db82d214242c9345266d44ff8d11a8e857a1a02edf7cb5fcc2d1d973283129/paper-1.13-173.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.13.1",
+      "protocol": 401,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 386,
+        "time": "2018-10-22T20:25:57.601Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "9b98a252d6b1cc6351250e2e7d3037153168ae9a",
+            "time": "2018-10-22T19:25:48Z",
+            "message": "Reset players remainingAir on respawn (#1598)\nAs mentioned in #1597, your air level did not reset if you drown.\n Now you get a full breath during respawn."
+          },
+          {
+            "sha": "ce7e1c14a69d6cae8d9a47786643174802207346",
+            "time": "2018-10-22T19:25:16Z",
+            "message": "Add option to prevent players from moving into unloaded chunks (#1608)\nResolves #1551"
+          },
+          {
+            "sha": "7c5b5ce946075bafe5f90f2de76609921ae6cca3",
+            "time": "2018-10-22T19:02:10Z",
+            "message": "[Auto] Updated Upstream (CraftBukkit)\nUpstream has released updates that appears to apply and compile\ncorrectly. This update has not been tested by PaperMC and as with ANY\nupdate, please do your own testing\nCraftBukkit Changes: a639ae44 Remove outdated build delay."
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.13.1-386.jar",
+            "checksums": {
+              "sha256": "6637401d87d0f5db5aaee90d7103f52c5e1baaf6b6d4643a5793e7b02b5775cb"
+            },
+            "size": 43029770,
+            "url": "https://fill-data.papermc.io/v1/objects/6637401d87d0f5db5aaee90d7103f52c5e1baaf6b6d4643a5793e7b02b5775cb/paper-1.13.1-386.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.13.2",
+      "protocol": 404,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 657,
+        "time": "2021-12-20T00:10:51.071Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "2c524f085730b908d40806c9191ae33664d30d99",
+            "time": "2021-12-18T20:50:01Z",
+            "message": "Update"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.13.2-657.jar",
+            "checksums": {
+              "sha256": "11e828d0565ab76a0a0e180c056364a95de44958cfd6a6af3f9b1dc70b03e9cd"
+            },
+            "size": 44991089,
+            "url": "https://fill-data.papermc.io/v1/objects/11e828d0565ab76a0a0e180c056364a95de44958cfd6a6af3f9b1dc70b03e9cd/paper-1.13.2-657.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.14",
+      "protocol": 477,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 17,
+        "time": "2019-05-13T04:07:57.110Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "5e7cfaf718b47be02eefa15589f9b081d3245054",
+            "time": "2019-05-13T04:06:28Z",
+            "message": "Add comment to MC-151674 fix\n[11:00 PM] kashike: <snip> missed // Paper - MC-151674 comment here"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.14-17.jar",
+            "checksums": {
+              "sha256": "338be77f5239c44cff3f80f5c107b5e61ac48fb39348bce7249303209201072a"
+            },
+            "size": 44195664,
+            "url": "https://fill-data.papermc.io/v1/objects/338be77f5239c44cff3f80f5c107b5e61ac48fb39348bce7249303209201072a/paper-1.14-17.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.14.1",
+      "protocol": 480,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 50,
+        "time": "2019-05-27T16:16:18.177Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "01670a510369f94ee3f1c02dcba6cf53effc6564",
+            "time": "2019-05-27T10:57:28Z",
+            "message": "Updated Upstream (Bukkit/CraftBukkit)\nUpstream has released updates that appears to apply and compile\ncorrectly. This update has not been tested by PaperMC and as with ANY\nupdate, please do your own testing\nBukkit Changes: e041de28 SPIGOT-4946: Add VillagerCareerChangeEvent\nCraftBukkit Changes: fcb9f90b SPIGOT-4946: Add VillagerCareerChangeEvent \na4a2f679 SPIGOT-4987: Shulkerbox does not save empty slots"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.14.1-50.jar",
+            "checksums": {
+              "sha256": "2bcf8017485cc41b3e72daa7285a46f26a85d055b9d638bc9a07f77632168ad7"
+            },
+            "size": 44231593,
+            "url": "https://fill-data.papermc.io/v1/objects/2bcf8017485cc41b3e72daa7285a46f26a85d055b9d638bc9a07f77632168ad7/paper-1.14.1-50.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.14.2",
+      "protocol": 485,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 107,
+        "time": "2019-06-24T02:32:25.515Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "bf1d217193bd66ed14eae3e25c7c0e051d0e6f35",
+            "time": "2019-06-24T02:32:10Z",
+            "message": "Fix tracker desync issue (#2224)"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.14.2-107.jar",
+            "checksums": {
+              "sha256": "12034e578e014eb369e2929f3725bd409858bf94128e46d1f286d5be36c3cb0e"
+            },
+            "size": 44257364,
+            "url": "https://fill-data.papermc.io/v1/objects/12034e578e014eb369e2929f3725bd409858bf94128e46d1f286d5be36c3cb0e/paper-1.14.2-107.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.14.3",
+      "protocol": 490,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 134,
+        "time": "2019-07-18T07:59:03.823Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "a41d51f098820e61c2d3a4337cca5e8d23cfe33c",
+            "time": "2019-07-18T07:58:23Z",
+            "message": "ServerExceptionEvent can be fired off main"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.14.3-134.jar",
+            "checksums": {
+              "sha256": "b6d2d8ac67d685141697a8cecd99c47baf604900007eb0e270fd6ea86cbbc540"
+            },
+            "size": 44316692,
+            "url": "https://fill-data.papermc.io/v1/objects/b6d2d8ac67d685141697a8cecd99c47baf604900007eb0e270fd6ea86cbbc540/paper-1.14.3-134.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.14.4",
+      "protocol": 498,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 245,
+        "time": "2021-12-20T00:10:51.822Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "208163ff34b6cf723d6a017f6907d6a435dcb7a8",
+            "time": "2021-12-17T20:44:47Z",
+            "message": "Update"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.14.4-245.jar",
+            "checksums": {
+              "sha256": "bd8ec5cdb22370d37816a6de26798df3d2b0d6f9c7c96c88ca45a1303fea50e8"
+            },
+            "size": 43972138,
+            "url": "https://fill-data.papermc.io/v1/objects/bd8ec5cdb22370d37816a6de26798df3d2b0d6f9c7c96c88ca45a1303fea50e8/paper-1.14.4-245.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.15",
+      "protocol": 573,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 21,
+        "time": "2019-12-17T04:09:12.295Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "4cf63749d58c70ee6fd1665eac66813cc50d6cbd",
+            "time": "2019-12-17T04:08:50Z",
+            "message": "Updated Upstream (CraftBukkit/Spigot)\n\nUpstream has released updates that appears to apply and compile correctly.\nThis update has not been tested by PaperMC and as with ANY update, please do your own testing\n\nCraftBukkit Changes:\ne631456c SPIGOT-5458: Riptide tridents don't lose durability\n\nSpigot Changes:\n3b314f59 SPIGOT-5459: Add minecraft.debugstick.always permission to allow use in survival etc"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.15-21.jar",
+            "checksums": {
+              "sha256": "8b726c0deb6c3a265d679a3d3a2c0f8e5243fbc6ddcfcaf42e24209cb1f829b4"
+            },
+            "size": 43926936,
+            "url": "https://fill-data.papermc.io/v1/objects/8b726c0deb6c3a265d679a3d3a2c0f8e5243fbc6ddcfcaf42e24209cb1f829b4/paper-1.15-21.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.15.1",
+      "protocol": 575,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 62,
+        "time": "2020-01-21T15:13:26.470Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "d4ae43fc008221c475f9938ade5ded3ea0b2badc",
+            "time": "2020-01-21T15:12:47Z",
+            "message": "Updated Upstream (Bukkit/CraftBukkit)\n\nUpstream has released updates that appears to apply and compile correctly.\nThis update has not been tested by PaperMC and as with ANY update, please do your own testing\n\nBukkit Changes:\n58d299a5 Clarify that TotalExperience (XpTotal) is not displayed anywhere\n3342ab1e #460: Add Player#sendExperienceChange\nacc05b40 SPIGOT-5525: saveResource saves files from server jars\n\nCraftBukkit Changes:\n5c6b0dc6 SPIGOT-5526: Call EntityChangeBlockEvent for bees triggering crop growth\nb91ce119 #601: Implement Player#sendExperienceChange\n661bebc6 Remove outdated build delay."
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.15.1-62.jar",
+            "checksums": {
+              "sha256": "22a7a19f378db8edf92cdba57d91ceea7e4fa6470b677e6bbe57e8f7e1d9a4dd"
+            },
+            "size": 43943383,
+            "url": "https://fill-data.papermc.io/v1/objects/22a7a19f378db8edf92cdba57d91ceea7e4fa6470b677e6bbe57e8f7e1d9a4dd/paper-1.15.1-62.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.15.2",
+      "protocol": 578,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 393,
+        "time": "2021-12-20T00:10:52.430Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "f53620f5cebf27d7c3b0c6fa37a91a81eca1f6b8",
+            "time": "2021-12-18T21:21:28Z",
+            "message": "Update"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.15.2-393.jar",
+            "checksums": {
+              "sha256": "bd2dd6f2cc489cf9e2bb800cb4fb6d63e9d293945d3ac10b09dd9c6098fa9f34"
+            },
+            "size": 45026753,
+            "url": "https://fill-data.papermc.io/v1/objects/bd2dd6f2cc489cf9e2bb800cb4fb6d63e9d293945d3ac10b09dd9c6098fa9f34/paper-1.15.2-393.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.16",
+      "protocol": 735,
+      "grim": "2.3.74-8eb5f28",
+      "available": false,
+      "reason": "No exact Paper release in official download service; no substituted Minecraft version"
+    },
+    {
+      "minecraft": "1.16.1",
+      "protocol": 736,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 138,
+        "time": "2020-08-23T12:23:12.153Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "627f4b8561115d40d6a39587d1ad94b0104f7e14",
+            "time": "2020-08-23T12:19:14Z",
+            "message": "Brand support"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.16.1-138.jar",
+            "checksums": {
+              "sha256": "929559ba1dfc6de2904e17289fb3d1ac95f0ab48c7540cf5b8c2f055fea9d59c"
+            },
+            "size": 46983807,
+            "url": "https://fill-data.papermc.io/v1/objects/929559ba1dfc6de2904e17289fb3d1ac95f0ab48c7540cf5b8c2f055fea9d59c/paper-1.16.1-138.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.16.2",
+      "protocol": 751,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 189,
+        "time": "2020-09-10T23:11:15.766Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "fa9c5e0f95989d28d826eb740de4698828364aff",
+            "time": "2020-09-10T23:08:02Z",
+            "message": "(FINAL 1.16.2) Improve Entity Activation Range passenger behavior\n\nPreviously, Entity Activation Range only applied to the root entity of a vehicle chain.\nIf that vehicle is active, every entity as it's passenger would then tick.\n\nThis creates scenarios where EAR does not apply your desired ranges to passengers.\nAdditionally, any entity that was a passenger never had its inactiveTick method called\nwhen the parent was inactive, creating behavioral desyncs.\n\nThis could of been a source of many villager issues when those villagers were in minecarts\nas players commonly do.\n\nNow we will process passengers checking their activation state independently of their vehicle\nand if they are inactive, call their inactiveTick() method to ensure state remains consistent.\n\nThis also helps improve any desync issues with entity position of passengers too.\n\nThis also removes immunity for passenger/vehicles, so it should improve performance\nof these minecart villagers too for EAR."
+          },
+          {
+            "sha": "6fda3fd0edbb6f777fcab3bea8781b816fc30d58",
+            "time": "2020-09-10T23:08:02Z",
+            "message": "(FINAL 1.16.2) Improve Timings support for Active vs Inactive vs Passengers\n\nThis makes it so entities that are passengers of other entities no longer count in the parents timings, as well as\ntracks them as a separate timers per their tick status.\n\nThis lets you see how much time is spent in activated entities vs inactive (as inactive still has to do work)\n\nPassengers is also tracked separately so you can identify \"Villagers in Minecarts\" vs roaming villagers, as\nthe lack of ability to move can impact their performance characteristics.\n\nThis will likely break any plugin that was naughty and directly messed with our internal timings as this\nmoves the timings to the EntityTypes object, speeding up creation of Entities to no longer store\na timing handler object per entity.\n\nThis will also change the output of the entities in timings to use internal ID's instead of class names.\n\nIf a plugin is broken by this, shame them for doing bad things. Paper will not fix it, they will have to fix it."
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.16.2-189.jar",
+            "checksums": {
+              "sha256": "e5e10517daaa9bd6d54a8a0d22d866e31da7c1b47cb9e425ffaac236fde75ec9"
+            },
+            "size": 46848237,
+            "url": "https://fill-data.papermc.io/v1/objects/e5e10517daaa9bd6d54a8a0d22d866e31da7c1b47cb9e425ffaac236fde75ec9/paper-1.16.2-189.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.16.3",
+      "protocol": 753,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 253,
+        "time": "2020-11-01T19:23:12.652Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "4bcebab1675d88d144d2896734f4a940345f76c2",
+            "time": "2020-11-01T19:21:07Z",
+            "message": "Add getOfflinePlayerIfCached(String)"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.16.3-253.jar",
+            "checksums": {
+              "sha256": "940303ee5f5bcc08377e388ea1c1daa109c1ac8c4d189dc67de1106853f2fc23"
+            },
+            "size": 46856246,
+            "url": "https://fill-data.papermc.io/v1/objects/940303ee5f5bcc08377e388ea1c1daa109c1ac8c4d189dc67de1106853f2fc23/paper-1.16.3-253.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.16.5",
+      "protocol": 754,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 794,
+        "time": "2021-12-18T08:25:42.329Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "fa1a7c180c6fcba779e583fc4ed550b48954bcc4",
+            "time": "2021-12-18T08:09:38Z",
+            "message": "Update log4j to 2.17.0\n"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.16.5-794.jar",
+            "checksums": {
+              "sha256": "e67da4851d08cde378ab2b89be58849238c303351ed2482181a99c2c2b489276"
+            },
+            "size": 53944842,
+            "url": "https://fill-data.papermc.io/v1/objects/e67da4851d08cde378ab2b89be58849238c303351ed2482181a99c2c2b489276/paper-1.16.5-794.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.17",
+      "protocol": 755,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 79,
+        "time": "2021-07-06T04:35:32.342Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "a831634d446341efc70f027851effe02a0e7f1d3",
+            "time": "2021-07-06T04:30:39Z",
+            "message": "add Optimize Light Engine patch (#5863)\n\n"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.17-79.jar",
+            "checksums": {
+              "sha256": "760a93b94a58d619bd647d71af84688617d0444d22b716500bc6b343858dc871"
+            },
+            "size": 60391784,
+            "url": "https://fill-data.papermc.io/v1/objects/760a93b94a58d619bd647d71af84688617d0444d22b716500bc6b343858dc871/paper-1.17-79.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.17.1",
+      "protocol": 756,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 411,
+        "time": "2022-04-14T03:49:01.571Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "0954966638822410a9ce32c6ea8ae4110d10a8ba",
+            "time": "2022-04-14T03:41:37Z",
+            "message": "Use patched spigot decompiler\n"
+          },
+          {
+            "sha": "6625db387ea9fe5296a6c6f984975b387c3089f0",
+            "time": "2022-04-14T03:41:37Z",
+            "message": "Replace third party repos with Paper repo\n"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.17.1-411.jar",
+            "checksums": {
+              "sha256": "6cc1ee2f94253ce10b5374ed85fffc735a97d8f1b64db293683dfa24dd3cc05f"
+            },
+            "size": 61886260,
+            "url": "https://fill-data.papermc.io/v1/objects/6cc1ee2f94253ce10b5374ed85fffc735a97d8f1b64db293683dfa24dd3cc05f/paper-1.17.1-411.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.18.1",
+      "protocol": 757,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 216,
+        "time": "2022-02-28T15:39:19.258Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "30cb7d0407bfb01a3bc0cc2da1dc0af32dfae5a4",
+            "time": "2022-02-28T15:31:41Z",
+            "message": "ignore excessive vel for Minecarts (Fixes #7515)\n"
+          }
+        ],
+        "downloads": {
+          "server:mojang": {
+            "name": "paper-1.18.1-216-mojang.jar",
+            "checksums": {
+              "sha256": "4d40508f5f9bbd97dd90b48cf955f40e5bcfb032ab627fdc908d3ba72d2401ab"
+            },
+            "size": 34523381,
+            "url": "https://fill-data.papermc.io/v1/objects/4d40508f5f9bbd97dd90b48cf955f40e5bcfb032ab627fdc908d3ba72d2401ab/paper-1.18.1-216-mojang.jar"
+          },
+          "server:default": {
+            "name": "paper-1.18.1-216.jar",
+            "checksums": {
+              "sha256": "a94917a4472c2cbc9907a15c666bbb784f95ecd7b53c77bc08fe71103e5487f5"
+            },
+            "size": 34617939,
+            "url": "https://fill-data.papermc.io/v1/objects/a94917a4472c2cbc9907a15c666bbb784f95ecd7b53c77bc08fe71103e5487f5/paper-1.18.1-216.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.18.2",
+      "protocol": 758,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 388,
+        "time": "2022-09-20T01:01:55.294Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "fc9ee65a32622d03a91db39364b6f106cf88335b",
+            "time": "2022-09-20T00:52:01Z",
+            "message": "Make WorldCreator#keepSpawnLoaded return the WorldCreator (Fixes #8321) (#8371)\n\n* Make WorldCreator#keepSpawnLoaded return the WorldCreator (Fixes #8321)\n\nThought that I fixed this before push/merge, apparently not, hence, fix\nthe return type and add mitigation for this.\n\n* Fix patch/build\n\n* Rebuild patches\n"
+          }
+        ],
+        "downloads": {
+          "server:mojang": {
+            "name": "paper-1.18.2-388-mojang.jar",
+            "checksums": {
+              "sha256": "a7f99fa2b623222de3a7fc8fe00a30e8dcffd84817f52a374b40961f186535a5"
+            },
+            "size": 34700823,
+            "url": "https://fill-data.papermc.io/v1/objects/a7f99fa2b623222de3a7fc8fe00a30e8dcffd84817f52a374b40961f186535a5/paper-1.18.2-388-mojang.jar"
+          },
+          "server:default": {
+            "name": "paper-1.18.2-388.jar",
+            "checksums": {
+              "sha256": "0578f18f4d632b494b468ec56b3b414b5b56fea087ee7d39cf6dcdf4c9d01f05"
+            },
+            "size": 34829667,
+            "url": "https://fill-data.papermc.io/v1/objects/0578f18f4d632b494b468ec56b3b414b5b56fea087ee7d39cf6dcdf4c9d01f05/paper-1.18.2-388.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.19",
+      "protocol": 759,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 81,
+        "time": "2022-07-25T17:26:58.726Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "345a6a620524ee18db251da2bbb48ff32864be2f",
+            "time": "2022-07-25T16:44:24Z",
+            "message": "Updated Upstream (CraftBukkit)\n\nUpstream has released updates that appear to apply and compile correctly.\nThis update has not been tested by PaperMC and as with ANY update, please do your own testing\n\nCraftBukkit Changes:\nef0946409 PR-1091: Fix exit position in entity travel with portals\nd12768f75 PR-1090: Remove no longer needed world reference from CraftMerchantCustom\n7550f6854 SPIGOT-7115: Support hex color codes in custom merchant inventory titles\n"
+          },
+          {
+            "sha": "86f87ba40030d719e5fb8840ab18c513588de772",
+            "time": "2022-07-25T17:21:31Z",
+            "message": "Fix custom merchant trade event world reference\n"
+          }
+        ],
+        "downloads": {
+          "server:mojang": {
+            "name": "paper-1.19-81-mojang.jar",
+            "checksums": {
+              "sha256": "944bb54712f794f4b356f265b464f6694ef17997960dd46cc5217346d7b8b2e9"
+            },
+            "size": 38071011,
+            "url": "https://fill-data.papermc.io/v1/objects/944bb54712f794f4b356f265b464f6694ef17997960dd46cc5217346d7b8b2e9/paper-1.19-81-mojang.jar"
+          },
+          "server:default": {
+            "name": "paper-1.19-81.jar",
+            "checksums": {
+              "sha256": "0d39cacc51a77b2b071e1ce862fcbf0b4a4bd668cc7e8b313598d84fa09fabac"
+            },
+            "size": 38158691,
+            "url": "https://fill-data.papermc.io/v1/objects/0d39cacc51a77b2b071e1ce862fcbf0b4a4bd668cc7e8b313598d84fa09fabac/paper-1.19-81.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.19.2",
+      "protocol": 760,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 307,
+        "time": "2022-12-06T18:47:03.612Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "476ef25d053c523aea416487a38f72011d72a9cf",
+            "time": "2022-12-06T18:41:04Z",
+            "message": "Add missing Fluid type (#8608)\n\n"
+          }
+        ],
+        "downloads": {
+          "server:mojang": {
+            "name": "paper-1.19.2-307-mojang.jar",
+            "checksums": {
+              "sha256": "4221ba1503a97ed1f184d49323c30231bdbf3637f18c1587ad93eafd88ed4a08"
+            },
+            "size": 38194903,
+            "url": "https://fill-data.papermc.io/v1/objects/4221ba1503a97ed1f184d49323c30231bdbf3637f18c1587ad93eafd88ed4a08/paper-1.19.2-307-mojang.jar"
+          },
+          "server:default": {
+            "name": "paper-1.19.2-307.jar",
+            "checksums": {
+              "sha256": "2eb5c7459ec94bcdc597ed711d549a3ab4b0fda13e412a0792a1a069b5903864"
+            },
+            "size": 38319498,
+            "url": "https://fill-data.papermc.io/v1/objects/2eb5c7459ec94bcdc597ed711d549a3ab4b0fda13e412a0792a1a069b5903864/paper-1.19.2-307.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.19.3",
+      "protocol": 761,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 448,
+        "time": "2023-03-12T18:06:19.675Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "155aa36d89b260ef5841615899299756b5983c0a",
+            "time": "2023-03-12T18:00:02Z",
+            "message": "Properly handle load before plugins in legacy loading (#8962)\n\n"
+          }
+        ],
+        "downloads": {
+          "server:mojang": {
+            "name": "paper-1.19.3-448-mojang.jar",
+            "checksums": {
+              "sha256": "b695b4de5d58cf4c4f0493590f911b5c6b97909f5cc503de40c9e71f07303064"
+            },
+            "size": 39021124,
+            "url": "https://fill-data.papermc.io/v1/objects/b695b4de5d58cf4c4f0493590f911b5c6b97909f5cc503de40c9e71f07303064/paper-1.19.3-448-mojang.jar"
+          },
+          "server:default": {
+            "name": "paper-1.19.3-448.jar",
+            "checksums": {
+              "sha256": "3007f2c638d5f04ed32b6adaa33053fe3634ccfa74345c83d3ea4982d38db5dc"
+            },
+            "size": 39127595,
+            "url": "https://fill-data.papermc.io/v1/objects/3007f2c638d5f04ed32b6adaa33053fe3634ccfa74345c83d3ea4982d38db5dc/paper-1.19.3-448.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.19.4",
+      "protocol": 762,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 550,
+        "time": "2023-06-08T20:10:57.161Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "38b2754b2872c5b2fce13624ddd996336351a327",
+            "time": "2023-06-08T13:44:29Z",
+            "message": "[ci skip] Update test plugin\n"
+          },
+          {
+            "sha": "483368e480eb2ec060d8e68b30e14ec96aba6c4e",
+            "time": "2023-06-08T14:08:58Z",
+            "message": "correct default to join-classpath: true for dependencies (#9279)\n\n"
+          }
+        ],
+        "downloads": {
+          "server:mojang": {
+            "name": "paper-1.19.4-550-mojang.jar",
+            "checksums": {
+              "sha256": "7139954cc4bf554538cbff1c4d939fb57e2de33596f83209d5ba49b362e2eae7"
+            },
+            "size": 42570279,
+            "url": "https://fill-data.papermc.io/v1/objects/7139954cc4bf554538cbff1c4d939fb57e2de33596f83209d5ba49b362e2eae7/paper-1.19.4-550-mojang.jar"
+          },
+          "server:default": {
+            "name": "paper-1.19.4-550.jar",
+            "checksums": {
+              "sha256": "e587d78cba3e99ef8c4bc24cf20cc3bdbbe89e33b0b572070446af4eb6be5ccf"
+            },
+            "size": 42666406,
+            "url": "https://fill-data.papermc.io/v1/objects/e587d78cba3e99ef8c4bc24cf20cc3bdbbe89e33b0b572070446af4eb6be5ccf/paper-1.19.4-550.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.20.1",
+      "protocol": 763,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 196,
+        "time": "2023-09-21T16:59:41.322Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "773dd724469bae89d0c2075edc3d1ddc8d5b0b18",
+            "time": "2023-09-21T16:48:55Z",
+            "message": "Updated Upstream (Bukkit/CraftBukkit) (#9739)\n\nUpstream has released updates that appear to apply and compile correctly.\r\nThis update has not been tested by PaperMC and as with ANY update, please do your own testing\r\n\r\nBukkit Changes:\r\n69c7ce23 PR-990: Use Mockito instead of InvocationHandler for test mocking\r\n997de31d PR-893: Add a stream method to Registry to make it easier to use and to avoid unnecessary wrapping\r\n6a8ce581 Fix malformed javadoc in previous commit\r\n26c74f6d PR-890: Add more Sculk API (bloom, shriek, bloom event)\r\naa067abf PR-895: Load GameEvent and MusicInstrument from registry\r\n\r\nCraftBukkit Changes:\r\n78796c9de Add support for Java 21\r\nddc9a2dad SPIGOT-7475: Don't fire SculkBloomEvent during world generation\r\ncaee2311a PR-1245: Add a stream method to Registry to make it easier to use and to avoid unnecessary wrapping\r\nde421cf56 PR-1242: Add more Sculk API (bloom, shriek, bloom event)\r\n00f5a80fb PR-1252: Fix error when generating a tree in water\r\n10219df3a PR-1248: Load GameEvent and MusicInstrument from registry"
+          }
+        ],
+        "downloads": {
+          "server:mojang": {
+            "name": "paper-1.20.1-196-mojang.jar",
+            "checksums": {
+              "sha256": "67f31f691afd52a0c4ce33827fd635d0d0e86d46dec0ef6f89e1d58cd27832cf"
+            },
+            "size": 43120602,
+            "url": "https://fill-data.papermc.io/v1/objects/67f31f691afd52a0c4ce33827fd635d0d0e86d46dec0ef6f89e1d58cd27832cf/paper-1.20.1-196-mojang.jar"
+          },
+          "server:default": {
+            "name": "paper-1.20.1-196.jar",
+            "checksums": {
+              "sha256": "234a9b32098100c6fc116664d64e36ccdb58b5b649af0f80bcccb08b0255eaea"
+            },
+            "size": 43230582,
+            "url": "https://fill-data.papermc.io/v1/objects/234a9b32098100c6fc116664d64e36ccdb58b5b649af0f80bcccb08b0255eaea/paper-1.20.1-196.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.20.2",
+      "protocol": 764,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 318,
+        "time": "2023-12-03T03:47:16.760Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "9271ee7643614663a6d93323a9e8db2d52123166",
+            "time": "2023-12-03T03:41:35Z",
+            "message": "Dont resend blocks on interactions (#9413)\n\nIn general, the client now has an acknowledgment system that will cause block changes made by the client to be reverted correctly.\r\n\r\nEssentially:\r\n\r\nThe client enters a \"prediction\" stage, where any block changes made will have its old blockstate captured (this is referred to as \"server state\").\r\nIf you update blocks during this stage, the client will update this captured server state as long as they're still currently predicting.\r\nAfter prediction is done (via an ack packet) all captured blockstates are reverted to their captured server state.\r\nThis means that if the server actually updated a block and send a block update packet, it's correctly set, while if a block wasn't updated on the server but WAS updated on the client (server state wasn't updated), that change will be reverted.\r\n\r\nIt should be noted that this system does not yet support block entities, so those still need to be resynced when needed.\r\n\r\nI discovered this when noticing that blocks broken outside of the player's valid interaction distance are still properly reverted, even though the server doesn't send any block updates, only an ack packet."
+          }
+        ],
+        "downloads": {
+          "server:mojang": {
+            "name": "paper-1.20.2-318-mojang.jar",
+            "checksums": {
+              "sha256": "07f57cdc5948dcf3cb3358e43b9a46fbbe8b595fa30c8749cfc102bf44897b69"
+            },
+            "size": 41616994,
+            "url": "https://fill-data.papermc.io/v1/objects/07f57cdc5948dcf3cb3358e43b9a46fbbe8b595fa30c8749cfc102bf44897b69/paper-1.20.2-318-mojang.jar"
+          },
+          "server:default": {
+            "name": "paper-1.20.2-318.jar",
+            "checksums": {
+              "sha256": "ba340a835ac40b8563aa7eda1cd6479a11a7623409c89a2c35cd9d7490ed17a7"
+            },
+            "size": 41741453,
+            "url": "https://fill-data.papermc.io/v1/objects/ba340a835ac40b8563aa7eda1cd6479a11a7623409c89a2c35cd9d7490ed17a7/paper-1.20.2-318.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.20.4",
+      "protocol": 765,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 499,
+        "time": "2024-10-30T19:22:05.407Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "ba31f4128208e954d6648001724887352f71ece9",
+            "time": "2024-05-28T12:20:58Z",
+            "message": "[ci skip] Clean up paperclip build-pr workflow\n\nGracefully handle paperclip uploads to pull requests in case of build\nworkflow issues.\n"
+          },
+          {
+            "sha": "9de3f75fa2af7c47dc2ed3bcec850b9e245dda21",
+            "time": "2024-10-30T18:43:10Z",
+            "message": "Backport small fixes\n"
+          }
+        ],
+        "downloads": {
+          "server:mojang": {
+            "name": "paper-1.20.4-499-mojang.jar",
+            "checksums": {
+              "sha256": "e84aa4943cc51d7545b1c9b669bb1e0b143323d248ebb89012182f5554bc13d7"
+            },
+            "size": 42666591,
+            "url": "https://fill-data.papermc.io/v1/objects/e84aa4943cc51d7545b1c9b669bb1e0b143323d248ebb89012182f5554bc13d7/paper-1.20.4-499-mojang.jar"
+          },
+          "server:default": {
+            "name": "paper-1.20.4-499.jar",
+            "checksums": {
+              "sha256": "cabed3ae77cf55deba7c7d8722bc9cfd5e991201c211665f9265616d9fe5c77b"
+            },
+            "size": 42781488,
+            "url": "https://fill-data.papermc.io/v1/objects/cabed3ae77cf55deba7c7d8722bc9cfd5e991201c211665f9265616d9fe5c77b/paper-1.20.4-499.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.20.6",
+      "protocol": 766,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 151,
+        "time": "2024-10-30T19:15:37.756Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "a4f0f5ccd05592dc9be040d8c17d6795baa7b1b8",
+            "time": "2024-10-30T18:57:33Z",
+            "message": "Backport small fixes\n"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.20.6-151.jar",
+            "checksums": {
+              "sha256": "4b011f5adb5f6c72007686a223174fce82f31aeb4b34faf4652abc840b47e640"
+            },
+            "size": 45826876,
+            "url": "https://fill-data.papermc.io/v1/objects/4b011f5adb5f6c72007686a223174fce82f31aeb4b34faf4652abc840b47e640/paper-1.20.6-151.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.21.1",
+      "protocol": 767,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 133,
+        "time": "2025-03-28T16:16:41.212Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "3cb8529bdbeeec9ff51df2c94e93dbe7e41bb811",
+            "time": "2025-03-28T15:50:48Z",
+            "message": "Add flag to simplify remote item matching logic\n"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.21.1-133.jar",
+            "checksums": {
+              "sha256": "39bd8c00b9e18de91dcabd3cc3dcfa5328685a53b7187a2f63280c22e2d287b9"
+            },
+            "size": 49394394,
+            "url": "https://fill-data.papermc.io/v1/objects/39bd8c00b9e18de91dcabd3cc3dcfa5328685a53b7187a2f63280c22e2d287b9/paper-1.21.1-133.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.21.3",
+      "protocol": 768,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 83,
+        "time": "2025-03-28T15:59:22.645Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "d6c81daebcec6c595dda004bdc13f3cfb305c9ed",
+            "time": "2025-03-28T15:38:00Z",
+            "message": "Add flag to simplify remote matching logic\nUseful for custom clients or proxies that can't calculate the item hash in 1.21.5+\n"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.21.3-83.jar",
+            "checksums": {
+              "sha256": "87e973e1d338e869e7fdbc4b8fadc1579d7bb0246a0e0cf6e5700ace6c8bc17e"
+            },
+            "size": 50931273,
+            "url": "https://fill-data.papermc.io/v1/objects/87e973e1d338e869e7fdbc4b8fadc1579d7bb0246a0e0cf6e5700ace6c8bc17e/paper-1.21.3-83.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.21.4",
+      "protocol": 769,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 232,
+        "time": "2025-06-09T10:18:55.778Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "12d8fe0beb21c1a1d9b093fb411884367cce9e7e",
+            "time": "2025-06-09T09:57:21Z",
+            "message": "Fix infinite loop in RegionFile IO\n\nIf an exception is thrown during decompress then the read process\nwould be started again, which of course would eventually throw in\nthe decompress process.\n"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.21.4-232.jar",
+            "checksums": {
+              "sha256": "5ee4f542f628a14c644410b08c94ea42e772ef4d29fe92973636b6813d4eaffc"
+            },
+            "size": 51437498,
+            "url": "https://fill-data.papermc.io/v1/objects/5ee4f542f628a14c644410b08c94ea42e772ef4d29fe92973636b6813d4eaffc/paper-1.21.4-232.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.21.5",
+      "protocol": 770,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 114,
+        "time": "2025-06-18T11:03:41.500Z",
+        "channel": "ALPHA",
+        "commits": [
+          {
+            "sha": "39203a65e017bf83d83924d8e79c0af4a69232d5",
+            "time": "2025-06-17T00:35:54Z",
+            "message": "[ci skip] Publish PR API and dev bundles (#12672)\n\n* Setup PR publishing\n\nalso remove the JDK matrix, it's pointless with one value and other parts of the workflow depend on a single value...\n\n* Use PaperMC action\n\n* Change base PR maven url\n\n* Update action\n\n* Update action\n\n* Update action\n\n* Update action\n\n* Update action\n\n* Re-enable javadoc...?\n\n* Delete PR comment workflow\n\n* Rename publish tag\n\n* comment broken jd link\n\n* update bot name"
+          },
+          {
+            "sha": "a1b30587d9d5a5d9bf1530f7d1e289f2e29991b6",
+            "time": "2025-06-18T10:07:22Z",
+            "message": "Provide env environment variable and copy spigots sys prop for overriding default repository\n"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.21.5-114.jar",
+            "checksums": {
+              "sha256": "2ae6ae22adf417699746e0f89fc2ef6cb6ee050a5f6608cee58f0535d60b509e"
+            },
+            "size": 51427274,
+            "url": "https://fill-data.papermc.io/v1/objects/2ae6ae22adf417699746e0f89fc2ef6cb6ee050a5f6608cee58f0535d60b509e/paper-1.21.5-114.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.21.6",
+      "protocol": 771,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 48,
+        "time": "2025-06-30T09:49:31.805Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "4d854e66b80dad9898d71a0f0b1f83cd39b97119",
+            "time": "2025-06-30T09:39:07Z",
+            "message": "Disable MC-163962 fix by default\nIt changes restocking behavior pretty drastically compared to Vanilla, keep it as a config option for those that want it\n\nFixes #12761\n"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.21.6-48.jar",
+            "checksums": {
+              "sha256": "35e2dfa66b3491b9d2f0bb033679fa5aca1e1fdf097e7a06a80ce8afeda5c214"
+            },
+            "size": 52639704,
+            "url": "https://fill-data.papermc.io/v1/objects/35e2dfa66b3491b9d2f0bb033679fa5aca1e1fdf097e7a06a80ce8afeda5c214/paper-1.21.6-48.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.21.8",
+      "protocol": 772,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 60,
+        "time": "2025-09-06T21:50:11.982Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "29c8822d90899c89d2689338e81a98f690bcba12",
+            "time": "2025-09-06T21:38:29Z",
+            "message": "Remove no longer needed MC-210802 fix (#13059)\n\n"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.21.8-60.jar",
+            "checksums": {
+              "sha256": "8de7c52c3b02403503d16fac58003f1efef7dd7a0256786843927fa92ee57f1e"
+            },
+            "size": 52811717,
+            "url": "https://fill-data.papermc.io/v1/objects/8de7c52c3b02403503d16fac58003f1efef7dd7a0256786843927fa92ee57f1e/paper-1.21.8-60.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.21.10",
+      "protocol": 773,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 130,
+        "time": "2026-01-04T21:00:59Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "8043efd4d0e5bdc9dd0cbc33e9e8bb49e6d8c012",
+            "time": "2026-01-04T21:00:08Z",
+            "message": "Correctly read per-world gamerule for command blocks (#13411)\n\n"
+          },
+          {
+            "sha": "2f7f1397628914e44154c326b56e5e7e9adf6721",
+            "time": "2025-12-20T23:17:03Z",
+            "message": "[ci skip] Rebuild patches\n"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.21.10-130.jar",
+            "checksums": {
+              "sha256": "158703f75a26f842ea656b3dc6d75bf3d1ec176b97a2c36384d0b80b3871af53"
+            },
+            "size": 54475623,
+            "url": "https://fill-data.papermc.io/v1/objects/158703f75a26f842ea656b3dc6d75bf3d1ec176b97a2c36384d0b80b3871af53/paper-1.21.10-130.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "1.21.11",
+      "protocol": 774,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 132,
+        "time": "2026-05-11T11:43:09Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "c5eb0790f199da6c38d0a650e1e5cd5415b28185",
+            "time": "2026-05-11T11:41:08Z",
+            "message": "Fork friendly byte buf correctly\n"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-1.21.11-132.jar",
+            "checksums": {
+              "sha256": "5ffef465eeeb5f2a3c23a24419d97c51afd7dbb4923ff42df9a3f58bba1ccfba"
+            },
+            "size": 54846016,
+            "url": "https://fill-data.papermc.io/v1/objects/5ffef465eeeb5f2a3c23a24419d97c51afd7dbb4923ff42df9a3f58bba1ccfba/paper-1.21.11-132.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "26.1.2",
+      "protocol": 775,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 74,
+        "time": "2026-07-06T16:51:09Z",
+        "channel": "STABLE",
+        "commits": [],
+        "downloads": {
+          "server:default": {
+            "name": "paper-26.1.2-74.jar",
+            "checksums": {
+              "sha256": "1d70b1dab9cf4a6de615209a536f3a45a2186240253c428213ce2188ab95e5f7"
+            },
+            "size": 52893229,
+            "url": "https://fill-data.papermc.io/v1/objects/1d70b1dab9cf4a6de615209a536f3a45a2186240253c428213ce2188ab95e5f7/paper-26.1.2-74.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "26.2",
+      "protocol": 776,
+      "grim": "2.3.74-8eb5f28",
+      "available": true,
+      "platform": "Paper",
+      "build": {
+        "id": 126,
+        "time": "2026-09-20T02:38:48Z",
+        "channel": "STABLE",
+        "commits": [
+          {
+            "sha": "c646fafccfc89339257ef3286d6756d8f97624c9",
+            "time": "2026-09-20T02:37:27Z",
+            "message": "Call EntityCollideWithEntityEvent for Sulfur Cube pushed by Player (#14157)"
+          }
+        ],
+        "downloads": {
+          "server:default": {
+            "name": "paper-26.2-126.jar",
+            "checksums": {
+              "sha256": "9c95eb088b903d9ed96cd457838f3078f02407a965dc8ae36d2c4e551a04355a"
+            },
+            "size": 64521721,
+            "url": "https://fill-data.papermc.io/v1/objects/9c95eb088b903d9ed96cd457838f3078f02407a965dc8ae36d2c4e551a04355a/paper-26.2-126.jar"
+          }
+        }
+      }
+    },
+    {
+      "minecraft": "26.3",
+      "protocol": 777,
+      "grim": "2.3.74-8eb5f28",
+      "available": false,
+      "reason": "Not declared compatible by the pinned official Grim release"
+    }
+  ],
+  "sources": [
+    "https://github.com/GrimAnticheat/Grim",
+    "https://github.com/GrimAnticheat/Grim/wiki/Permissions",
+    "https://api.modrinth.com/v2/project/grimac/version",
+    "https://fill.papermc.io/v3/projects/paper"
+  ]
+}

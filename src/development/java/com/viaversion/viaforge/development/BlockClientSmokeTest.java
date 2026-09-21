@@ -62,7 +62,7 @@ public final class BlockClientSmokeTest {
                 checkFallbackModels();
                 checkViaPaths();
                 ProtocolSelectorSmokeTest.verify();
-                checks.add("Protocol selector: full/simple callbacks run once per press, invisible rows skip font rendering, resize preserves scroll and global selection persists only on close PASS");
+                checks.add("Protocol selector: queued LWJGL clicks select scrolled rows once; visible rendering, resize, deferred global save, server override highlight/reset and NBT persistence PASS");
                 next();
             } else if (target().resources().version().equals(ServerBlockSession.getLoadedResourceVersion())) {
                 if(profileIndex<profiles.length)verify(profiles[profileIndex]);

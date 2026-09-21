@@ -19,31 +19,37 @@
 package com.viaversion.viaforge.mixin.impl.connect;
 
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import com.viaversion.viaforge.common.ViaForgeCommon;
-import com.viaversion.viaforge.common.extended.ExtendedServerData;
+import com.viaversion.viaforge.common.extended.ExtendedGuiConnecting;
 import com.viaversion.viaforge.common.platform.VersionTracker;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.GuiConnecting;
+import net.minecraft.network.NetworkManager;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 @Mixin(targets = "net.minecraft.client.multiplayer.GuiConnecting$1")
 public class MixinGuiConnecting_1 {
 
-    @Redirect(method = "run", at = @At(value = "INVOKE", target = "Ljava/net/InetAddress;getByName(Ljava/lang/String;)Ljava/net/InetAddress;", remap = false))
-    public InetAddress trackServerVersion(String s) throws UnknownHostException {
-        final InetAddress address = InetAddress.getByName(s);
-        ProtocolVersion version = ((ExtendedServerData) Minecraft.getMinecraft().getCurrentServerData()).viaForge$getVersion();
-        if (version == null) {
-            version = ViaForgeCommon.getManager().getTargetVersion();
-        }
-        VersionTracker.storeServerProtocolVersion(address, version);
+    @Unique
+    private ProtocolVersion viaForge$version;
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void captureSelection(GuiConnecting screen, String threadName, String host, int port, CallbackInfo ci) {
+        // Constructed on the GUI thread before DNS / asynchronous connection work.
+        viaForge$version = ((ExtendedGuiConnecting) screen).viaForge$getConnectionVersion();
+    }
+
+    @Redirect(method = "run", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetworkManager;createNetworkManagerAndConnect(Ljava/net/InetAddress;IZ)Lnet/minecraft/network/NetworkManager;"))
+    public NetworkManager trackServerVersion(InetAddress address, int port, boolean nativeTransport) {
         com.viaversion.viaforge.compatibility.ServerSession.prefetch(
-                com.viaversion.viaforge.common.compatibility.CompatibilityRegistry.DEFAULT.resolve(version.getVersion()));
-        return address;
+                com.viaversion.viaforge.common.compatibility.CompatibilityRegistry.DEFAULT.resolve(viaForge$version.getVersion()));
+        return VersionTracker.connect(viaForge$version,
+                () -> NetworkManager.createNetworkManagerAndConnect(address, port, nativeTransport));
     }
 
 }

@@ -1,4 +1,4 @@
-"""Lossless append to Minecraft's uncompressed servers.dat; unknown tags stay byte-for-byte."""
+"""Preserve servers.dat tags while appending and retargeting managed lab entries."""
 import json
 import shutil
 import struct
@@ -18,9 +18,9 @@ def string_tag(key, value):
 
 
 def entries(rows):
-    return [string_tag("name", "ViaForge Labor " + row["version"]) +
+    return [string_tag("name", "ViaForge Labor " + row.get('profile_version', row.get('minecraft_version', row['version']))) +
             string_tag("ip", "127.0.0.1:" + str(row["port"])) +
-            string_tag("viaForge$version", row["version"]) + b"\0" for row in rows]
+            string_tag("viaForge$version", row.get('minecraft_version', row['version'])) + b"\0" for row in rows]
 
 
 class Reader:
@@ -80,7 +80,35 @@ def address(entry):
     return found
 
 
-def merge(data, rows):
+def retarget_managed(entry, rows):
+    """Only update our exact generated name/address pair; retain user entries and tags."""
+    public = {r.get('profile_version', r.get('minecraft_version', r['version'])): r for r in rows}
+    known = {('ViaForge Labor ' + r['version'], '127.0.0.1:' + str(r['port'])):
+             r.get('minecraft_version', r['version']) for r in lab.VERSIONS}
+    # Exported Paper entries already use the canonical display name.
+    known.update({('ViaForge Labor ' + r.get('minecraft_version', r['version']), '127.0.0.1:' + str(r['port'])):
+                  r.get('minecraft_version', r['version']) for r in lab.VERSIONS})
+    reader = Reader(entry)
+    tags, strings = [], {}
+    while True:
+        start = reader.pos
+        kind = reader.read(1)[0]
+        if not kind: break
+        key = reader.string()
+        if kind == 8: strings[key] = reader.string()
+        else: reader.payload(kind)
+        tags.append((key, entry[start:reader.pos]))
+    version = known.get((strings.get('name'), strings.get('ip')))
+    if version not in public: return entry
+    row = public[version]
+    wanted = {'name': 'ViaForge Labor ' + version, 'ip': '127.0.0.1:' + str(row['port']),
+              'viaForge$version': row.get('minecraft_version', row['version'])}
+    found = {key for key, _ in tags}
+    return b''.join(string_tag(key, wanted[key]) if key in wanted else raw for key, raw in tags) + \
+           b''.join(string_tag(key, value) for key, value in wanted.items() if key not in found) + b'\0'
+
+
+def merge(data, rows, update_profiles=False):
     reader = Reader(data)
     if reader.read(1) != b"\x0a":
         raise ValueError("Unkomprimierte NBT-Serverliste erwartet")
@@ -101,7 +129,8 @@ def merge(data, rows):
             for _ in range(reader.number()):
                 begin = reader.pos
                 reader.payload(10)
-                old.append(data[begin:reader.pos])
+                entry = data[begin:reader.pos]
+                old.append(retarget_managed(entry, rows) if update_profiles else entry)
             addresses = {address(item) for item in old}
             new = [item for item in entries(rows) if address(item) not in addresses]
             added += len(new)
@@ -134,8 +163,8 @@ def import_dev(rows):
         raise RuntimeError("Minecraft-Client laeuft noch. Vor 'import-list' selbst schliessen, damit servers.dat nicht ueberschrieben wird.")
     target = lab.REPO / "run/servers.dat"
     original = target.read_bytes() if target.exists() else b"\x0a\x00\x00\x00"
-    combined, added = merge(original, rows)
-    if not added:
+    combined, added = merge(original, rows, update_profiles=True)
+    if combined == original:
         print("Alle lokalen Adressen sind bereits in der Entwicklungsliste.")
         return
     if target.exists():
@@ -145,4 +174,4 @@ def import_dev(rows):
     temporary = target.with_name("servers.dat.viaforge-lab.tmp")
     temporary.write_bytes(combined)
     temporary.replace(target)
-    print(f"{added} Testserver in run/servers.dat ergaenzt; vorhandene Eintraege unveraendert.")
+    print(f"{added} Testserver ergaenzt; erzeugte Laboreintraege auf aktive Profile aktualisiert. Eigene Eintraege und unbekannte Tags erhalten.")

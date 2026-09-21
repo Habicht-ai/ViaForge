@@ -59,8 +59,7 @@ public class ViaForgeCommon {
     private static ViaForgeCommon manager;
 
     private final ViaForgePlatform platform;
-    private ProtocolVersion targetVersion;
-    private ProtocolVersion previousVersion;
+    private volatile ProtocolVersion targetVersion;
 
     private ViaForgeConfig config;
 
@@ -135,11 +134,6 @@ public class ViaForgeCommon {
             pipeline.addBefore("prepender", PreNettyLengthRemover.NAME, new PreNettyLengthRemover(user));
         }
 
-        channel.closeFuture().addListener(future -> {
-            if (previousVersion != null) {
-                restoreVersion();
-            }
-        });
     }
 
     public void sendConnectionDetails(final Channel channel) {
@@ -152,21 +146,6 @@ public class ViaForgeCommon {
 
     public ProtocolVersion getTargetVersion() {
         return targetVersion;
-    }
-
-    public void restoreVersion() {
-        this.targetVersion = ProtocolVersion.getClosest(config.getClientSideVersion());
-    }
-
-    public void setTargetVersionSilent(final ProtocolVersion targetVersion) {
-        if (targetVersion == null) {
-            throw new IllegalArgumentException("Target version cannot be null");
-        }
-        final ProtocolVersion oldVersion = this.targetVersion;
-        this.targetVersion = targetVersion;
-        if (oldVersion != targetVersion) {
-            previousVersion = oldVersion;
-        }
     }
 
     public void setTargetVersion(final ProtocolVersion targetVersion) {

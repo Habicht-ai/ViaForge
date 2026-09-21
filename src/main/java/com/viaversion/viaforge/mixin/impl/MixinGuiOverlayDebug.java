@@ -20,6 +20,8 @@ package com.viaversion.viaforge.mixin.impl;
 
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaforge.common.ViaForgeCommon;
+import com.viaversion.viaforge.common.extended.ExtendedNetworkManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiOverlayDebug;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,9 +36,11 @@ public class MixinGuiOverlayDebug {
     @Inject(method = "getDebugInfoRight", at = @At(value = "TAIL"))
     public void addViaForgeVersion(CallbackInfoReturnable<List<String>> cir) {
         final ViaForgeCommon common = ViaForgeCommon.getManager();
-        final ProtocolVersion version = ViaForgeCommon.getManager().getTargetVersion();
+        final Minecraft mc = Minecraft.getMinecraft();
+        final ProtocolVersion version = mc.getNetHandler() == null ? null
+                : ((ExtendedNetworkManager) mc.getNetHandler().getNetworkManager()).viaForge$getTrackedVersion();
 
-        if (common.getConfig().isShowProtocolVersionInF3() && version != common.getNativeVersion() && !common.getPlatform().isSingleplayer()) {
+        if (common.getConfig().isShowProtocolVersionInF3() && version != null && !common.getPlatform().isSingleplayer()) {
             cir.getReturnValue().add("");
             cir.getReturnValue().add("ViaForge: " + version.toString());
         }

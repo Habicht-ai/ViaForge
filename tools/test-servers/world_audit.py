@@ -17,6 +17,23 @@ def unexpected(sample):
     return not (sample["name"].endswith("air") and sample.get("actual", {}).get("Name", "").endswith("air"))
 
 
+def on_demand_ready(world, sample):
+    if sample['name'] != 'minecraft:frogspawn' or not sample.get('on_demand'):
+        return False
+    x, y, z = sample['position']
+    if sample.get('trigger_position') != [x + 2, y, z]: return False
+    command = world.block_entity(x + 2, y, z).get('Command')
+    tank = all(world.block(xx, yy, zz).get('Name') == 'minecraft:glass'
+               for xx in range(x - 1, x + 2) for yy in (y - 2, y - 1) for zz in range(z - 1, z + 2)
+               if (xx, yy, zz) != (x, y - 1, z))
+    return (world.block(x, y, z).get('Name') in {'minecraft:air', 'minecraft:frogspawn'}
+            and tank
+            and world.block(x, y - 1, z).get('Name') == 'minecraft:water'
+            and world.block(x + 2, y, z).get('Name') == 'minecraft:command_block'
+            and world.block(x + 2, y + 1, z).get('Name') == 'minecraft:stone_button'
+            and command == f'setblock {x} {y} {z} frogspawn')
+
+
 class NBT(Reader):
     def payload(self, kind, depth=0):
         if depth > 64:
@@ -75,11 +92,13 @@ class World:
             return self.chunks[key]
         region = (x // 32, z // 32)
         if region not in self.regions:
-            self.regions[region] = (self.region / f"r.{region[0]}.{region[1]}.mca").read_bytes()
+            file = self.region / f"r.{region[0]}.{region[1]}.mca"
+            self.regions[region] = file.read_bytes() if file.exists() else b""
         data = self.regions[region]
         location = int.from_bytes(data[4 * (x % 32 + z % 32 * 32):][:4], "big")
         offset = (location >> 8) * 4096
         if not offset:
+            self.chunks[key] = {}
             return {}
         length = int.from_bytes(data[offset:offset + 4], "big")
         compression = data[offset + 4]
@@ -182,9 +201,15 @@ def audit(row, terrain_check=True):
         return {"minecraft:lit_redstone_ore": "minecraft:redstone_ore", "minecraft:lit_redstone_lamp": "minecraft:redstone_lamp",
                 "minecraft:powered_repeater": "minecraft:unpowered_repeater", "minecraft:powered_comparator": "minecraft:unpowered_comparator",
                 "minecraft:lit_furnace": "minecraft:furnace", "minecraft:unlit_redstone_torch": "minecraft:redstone_torch"}.get(name, name)
-    missing, changed = [], []
+    missing, changed, on_demand = [], [], []
     for sample in index["blocks"]:
         actual = world.block(*sample["position"])
+        if on_demand_ready(world, sample):
+            on_demand.append(dict(name=sample['name'], position=sample['position'], actual=actual))
+            continue
+        if sample['name'] == 'minecraft:frogspawn' and sample.get('on_demand'):
+            changed.append(dict(sample, actual=actual, reason='Frogspawn display tank/button damaged'))
+            continue
         if "legacy_id" in actual:
             actual = dict(actual, Name=legacy_names.get(actual["legacy_id"], "unknown:" + str(actual["legacy_id"])))
         absent = actual.get("Name") in {"minecraft:air", "minecraft:cave_air", "minecraft:void_air"} or actual.get("legacy_id") == 0
@@ -194,6 +219,7 @@ def audit(row, terrain_check=True):
             changed.append(dict(sample, actual=actual))
     result = dict(version=row["version"], time=time.time(), samples=len(index["blocks"]),
                   missing=missing, changed_type=changed,
+                  on_demand=on_demand,
                   unexpected=sum(unexpected(s) for s in missing + changed),
                   missing_types=dict(Counter(s["name"] for s in missing)),
                   scope="Saved block identity (normal legacy powered/lit transitions allowed), plus managed sign texts/supports. Does not validate every property/NBT variant or rendering.")
@@ -217,7 +243,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("versions", nargs="?", default="all")
     args = parser.parse_args()
-    results = [audit(row) for row in lab.select(args.versions)]
+    import profiles
+    results = [audit(row) for row in profiles.select(args.versions)]
     lab.save(lab.ROOT / "world-audit-summary.json", [dict(version=r["version"], samples=r["samples"],
              missing=len(r["missing"]), changed_type=len(r["changed_type"]), unexpected=r['unexpected'],
              sign_issues=len(r.get('sign_issues', [])), terrain_intrusions=r['terrain_intrusions'],

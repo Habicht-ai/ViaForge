@@ -37,6 +37,16 @@ def repair(a, sample):
     x, y, z = sample["position"]
     meta = sample.get("metadata", 0)
     props = properties(sample)
+    if name == 'frogspawn':
+        # Frogspawn schedules hatching independently of randomTickSpeed. Present
+        # its real lifecycle with a water tank and a manual replacement button.
+        a.fill(x - 1, y - 2, z - 1, x + 1, y - 1, z + 1, 'glass')
+        a.block(x, y - 1, z, 'water')
+        a.block(x, y, z, 'frogspawn')
+        a.button(x + 2, y, z, ['FROSCHLAICH', 'Kurzlebig', 'Neu einsetzen'],
+                 f'setblock {x} {y} {z} frogspawn')
+        sample.update(on_demand=True, trigger_position=[x + 2, y, z])
+        return
     if sample["name"] in TRANSIENT:
         return
     if name.endswith("concrete_powder") or name in {"sand", "red_sand", "gravel", "anvil", "chipped_anvil", "damaged_anvil", "dragon_egg", "suspicious_sand", "suspicious_gravel"}:

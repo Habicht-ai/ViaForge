@@ -38,6 +38,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -55,6 +56,20 @@ public class MixinNetworkManager implements ExtendedNetworkManager {
 
     @Unique
     private ProtocolVersion viaForge$targetVersion;
+
+    @Inject(method = "exceptionCaught", at = @At("HEAD"))
+    private void logProtocolFailure(io.netty.channel.ChannelHandlerContext context, Throwable failure, CallbackInfo ci) {
+        org.apache.logging.log4j.LogManager.getLogger("ViaForge/Connection").debug(
+                "Network exception using protocol " + viaForge$targetVersion, failure);
+    }
+
+    @Redirect(method = "createNetworkManagerAndConnect", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/util/LazyLoadBase;getValue()Ljava/lang/Object;"))
+    private static Object initializeEventLoops(LazyLoadBase<?> lazy) {
+        // 1.8 LazyLoadBase marks itself loaded BEFORE publishing the value.
+        // Concurrent first pings / login otherwise pass null to Bootstrap.group.
+        synchronized (lazy) { return lazy.getValue(); }
+    }
 
     @Inject(method = "setCompressionTreshold", at = @At("RETURN"))
     public void reorderPipeline(int p_setCompressionTreshold_1_, CallbackInfo ci) {
@@ -81,7 +96,8 @@ public class MixinNetworkManager implements ExtendedNetworkManager {
     @Inject(method = "createNetworkManagerAndConnect", at = @At(value = "INVOKE", target = "Lio/netty/bootstrap/Bootstrap;group(Lio/netty/channel/EventLoopGroup;)Lio/netty/bootstrap/AbstractBootstrap;"), locals = LocalCapture.CAPTURE_FAILHARD)
     private static void setTargetVersion(InetAddress address, int serverPort, boolean useNativeTransport, CallbackInfoReturnable<NetworkManager> cir, NetworkManager networkmanager, Class oclass, LazyLoadBase lazyloadbase) {
         final ExtendedNetworkManager mixinNetworkManager = (ExtendedNetworkManager) networkmanager;
-        mixinNetworkManager.viaForge$setTrackedVersion(VersionTracker.getServerProtocolVersion(address));
+        mixinNetworkManager.viaForge$setTrackedVersion(VersionTracker.currentOr(
+                com.viaversion.viaforge.common.ViaForgeCommon.getManager().getTargetVersion()));
     }
 
     @Override

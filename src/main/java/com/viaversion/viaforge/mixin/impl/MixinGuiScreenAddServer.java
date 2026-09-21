@@ -48,7 +48,7 @@ public class MixinGuiScreenAddServer extends GuiScreen {
             final Pair<Integer, Integer> pos = config.getAddServerScreenButtonPosition().getPosition(this.width, this.height);
 
             final ProtocolVersion target = ((ExtendedServerData) serverData).viaForge$getVersion();
-            buttonList.add(new GuiButton(1_000_000_000, pos.key(), pos.value(), 100, 20, target != null ? target.getName() : "Set Version"));
+            buttonList.add(new GuiButton(1_000_000_000, pos.key(), pos.value(), 100, 20, target != null ? target.getName() : "Global version"));
         }
     }
 
@@ -56,7 +56,7 @@ public class MixinGuiScreenAddServer extends GuiScreen {
     public void actionPerformed(GuiButton button, CallbackInfo ci) {
         if (ViaForgeCommon.getManager().getConfig().isShowAddServerButton()) {
             if (button.id == 1_000_000_000) {
-                mc.displayGuiScreen(new GuiProtocolSelector(this, true, (version, parent) -> {
+                mc.displayGuiScreen(new GuiProtocolSelector(this, ((ExtendedServerData) serverData).viaForge$getVersion(), (version, parent) -> {
                     // Set version and go back to the parent screen.
                     ((ExtendedServerData) serverData).viaForge$setVersion(version);
                     mc.displayGuiScreen(parent);

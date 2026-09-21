@@ -14,7 +14,7 @@ import world_audit
 import world_refine
 import terrain
 
-REVISION = 3
+REVISION = 4
 
 
 def free_play(a):
@@ -49,6 +49,27 @@ def command_checks(row, commands):
     return list(checks.values())
 
 
+def prepare_frogspawn_station(row):
+    """Prepare only this ephemeral exhibit. Caller must back up the stopped world first."""
+    import grim
+    grim.assert_stopped(row)
+    folder = lab.ROOT / row['version']
+    index = read(folder / 'arena-index.json')
+    samples = [s for s in index['blocks'] if s['name'] == 'minecraft:frogspawn']
+    if not samples: return []
+    changes = arena.Arena(row)
+    for sample in samples: world_refine.repair(changes, sample)
+    signs = {tuple(s['position']): s for s in read(folder / 'sign-manifest.json')}
+    signs.update(changes.signs)
+    checks = read(folder / 'control-checks.json')
+    checks = list(dict.fromkeys(checks + command_checks(row, changes.button_commands)))
+    lab.save(folder / 'arena-index.json', index)
+    lab.save(folder / 'sign-manifest.json', list(signs.values()))
+    lab.save(folder / 'control-checks.json', checks)
+    (folder / 'frogspawn-station-commands.txt').write_text('\n'.join(changes.commands) + '\n', encoding='utf-8')
+    return changes.commands
+
+
 def maintain(row, restore=False):
     folder = lab.ROOT / row["version"]
     report_path = folder / "exhibition-maintenance.json"
@@ -70,8 +91,10 @@ def maintain(row, restore=False):
         generated.signs[position] = sign
     changes = arena.Arena(row)
     terrain_before = terrain.inspect(row, generated, index)
-    changes.commands += terrain.boundary_commands(world_audit.World(folder))
+    if terrain_before["missing_chunks"]:
+        raise RuntimeError("Exhibition chunks missing; refusing incomplete repair: " + str(terrain_before["missing_chunks"]))
     changes.commands += terrain.removal_commands(terrain_before["positions"])
+    changes.commands += terrain.boundary_commands(world_audit.World(folder), terrain.protected_positions(generated,index))
     changes.elytra()
     index["stations"] = [s for s in index["stations"] if s["name"] != "elytra_flight"] + changes.index["stations"]
     world = world_audit.World(folder)
@@ -79,6 +102,9 @@ def maintain(row, restore=False):
     if terrain_before["intrusions"]: targets = index["blocks"]
     for sample in targets:
         world_refine.repair(changes, sample)
+    for sample in index['blocks']:
+        if sample['name'] == 'minecraft:frogspawn':
+            world_refine.repair(changes, sample)
     # Restore the separate bed/shulker model gallery too, without respawning any mobs.
     if restore:
         fixture = arena.Arena(row)
@@ -165,9 +191,10 @@ if __name__ == "__main__":
     parser.add_argument("versions", nargs="?", default="all")
     parser.add_argument("--restore", action="store_true")
     args = parser.parse_args()
+    import profiles
     failures = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
-        futures = {pool.submit(maintain, row, args.restore): row for row in lab.select(args.versions)}
+        futures = {pool.submit(maintain, row, args.restore): row for row in profiles.select(args.versions)}
         for future in concurrent.futures.as_completed(futures):
             try:
                 future.result()

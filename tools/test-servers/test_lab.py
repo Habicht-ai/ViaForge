@@ -8,13 +8,41 @@ from unittest.mock import patch
 import arena
 import lab
 import server_list
+import world_audit
 
 
 class TestLab(unittest.TestCase):
+    def test_hatched_frogspawn_requires_intact_replacement_station(self):
+        from unittest.mock import Mock
+        sample = dict(name='minecraft:frogspawn', position=[4, 64, -2], on_demand=True, trigger_position=[6, 64, -2])
+        states = {(x, y, z): 'minecraft:glass' for x in range(3, 6) for y in (62, 63) for z in range(-3, 0)}
+        states.update({(4, 63, -2): 'minecraft:water', (6, 64, -2): 'minecraft:command_block',
+                       (6, 65, -2): 'minecraft:stone_button'})
+        world = Mock()
+        world.block.side_effect = lambda *p: {'Name': states.get(p, 'minecraft:air')}
+        world.block_entity.return_value = {'Command': 'setblock 4 64 -2 frogspawn'}
+        self.assertTrue(world_audit.on_demand_ready(world, sample))
+        states[(6, 65, -2)] = 'minecraft:air'
+        self.assertFalse(world_audit.on_demand_ready(world, sample))
+        states[(6, 65, -2)] = 'minecraft:stone_button'
+        states[(4, 63, -2)] = 'minecraft:stone_bricks'
+        self.assertFalse(world_audit.on_demand_ready(world, sample))
+
+    def test_console_input_and_duplicate_echoes_cannot_confirm_missing_world_check(self):
+        commands = ['execute if block 0 64 0 stone run say VFLAB_BLOCK_OK_0_END',
+                    'execute if entity @e[tag=missing] run say VFLAB_MOB_OK_1_END']
+        output = '\r> ' + commands[0] + '\r> ' + commands[1] + '\n'
+        self.assertEqual([False, False], arena.verified_commands(commands, output))
+        output += '[19:01:56 INFO]: [Not Secure] [Server] VFLAB_BLOCK_OK_0_END\n' * 2
+        self.assertEqual([True, False], arena.verified_commands(commands, output))
+        output += '[Server thread/INFO]: [Server] VFLAB_MOB_OK_1_END\n'
+        self.assertEqual([True, True], arena.verified_commands(commands, output))
+        self.assertEqual([True, True], arena.verified_commands(commands, output.replace('[Server]', '<Server>')))
+
     def test_manifest_exactly_matches_registered_resource_versions(self):
         resources = json.loads((lab.REPO / "src/main/resources/assets/viaforge/block-versions.json").read_text())
-        self.assertEqual(set(resources), {r["version"] for r in lab.VERSIONS})
-        self.assertEqual(len(lab.VERSIONS), len({r["protocol"] for r in lab.VERSIONS}))
+        self.assertEqual(set(resources), {r["version"] for r in lab.VANILLA_VERSIONS})
+        self.assertEqual(len(lab.VANILLA_VERSIONS), len({r["protocol"] for r in lab.VANILLA_VERSIONS}))
         self.assertEqual(2 * len(lab.VERSIONS), len({r[k] for r in lab.VERSIONS for k in ["port", "rcon_port"]}))
         for row in lab.VERSIONS:
             self.assertTrue(row["server"]["url"].startswith("https://piston-data.mojang.com/"))

@@ -19,26 +19,37 @@
 package com.viaversion.viaforge.common.platform;
 
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import com.viaversion.viaforge.common.ViaForgeCommon;
-
-import java.net.InetAddress;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
- * Dirty, but needed to store the server specific version until building the netty pipeline.
+ * Carries a connection's immutable selection into the synchronous NetworkManager
+ * factory. The factory copies it before Netty initializes the channel on another
+ * thread. Neither other connections nor status replies can change this selection.
  */
-public class VersionTracker {
+public final class VersionTracker {
 
-    public static final Map<InetAddress, ProtocolVersion> SERVER_PROTOCOL_VERSIONS = new HashMap<>();
+    private static final ThreadLocal<ProtocolVersion> CONNECTING = new ThreadLocal<>();
 
-    public static void storeServerProtocolVersion(InetAddress address, ProtocolVersion version) {
-        SERVER_PROTOCOL_VERSIONS.put(address, version);
-        ViaForgeCommon.getManager().setTargetVersionSilent(version);
+    public static ProtocolVersion resolve(ProtocolVersion serverOverride, ProtocolVersion global) {
+        return serverOverride != null ? serverOverride : Objects.requireNonNull(global, "Global protocol");
     }
 
-    public static ProtocolVersion getServerProtocolVersion(InetAddress address) {
-        return SERVER_PROTOCOL_VERSIONS.remove(address);
+    public static ProtocolVersion currentOr(ProtocolVersion fallback) {
+        return resolve(CONNECTING.get(), fallback);
     }
 
+    public static <T> T connect(ProtocolVersion version, Supplier<T> factory) {
+        Objects.requireNonNull(version, "Connection protocol");
+        ProtocolVersion previous = CONNECTING.get();
+        CONNECTING.set(version);
+        try {
+            return factory.get();
+        } finally {
+            if (previous == null) CONNECTING.remove();
+            else CONNECTING.set(previous);
+        }
+    }
+
+    private VersionTracker() { }
 }

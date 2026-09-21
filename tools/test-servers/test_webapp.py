@@ -41,7 +41,7 @@ class WebAppTests(unittest.TestCase):
         self.assertIn("frame-ancestors 'none'", headers["Content-Security-Policy"])
         code, body, _ = self.request("GET", "/api/state")
         self.assertEqual(200, code)
-        self.assertEqual(len(lab.VERSIONS), json.loads(body)["profiles"])
+        self.assertEqual(len(lab.VANILLA_VERSIONS), json.loads(body)["profiles"])
         self.assertNotIn(b"password", body)
 
     def test_mutations_require_token_and_same_origin(self):
@@ -67,7 +67,7 @@ class WebAppTests(unittest.TestCase):
 
     def test_only_named_catalog_and_log_routes_are_readable(self):
         with tempfile.TemporaryDirectory() as tmp, patch.object(lab, "ROOT", Path(tmp)):
-            folder = Path(tmp) / "26.2"
+            folder = Path(tmp) / webapp.ROWS['26.2']['version']
             folder.mkdir()
             (folder / "control.json").write_text('{"password":"secret"}')
             (folder / "arena-index.json").write_text('{"blocks":[]}')

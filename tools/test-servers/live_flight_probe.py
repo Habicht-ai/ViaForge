@@ -25,12 +25,20 @@ def probe(row, reuse_running=False):
             handled = set()
             deadline = time.monotonic() + 360
             result = {}
+            timeline = []
+            observations = []
+            last_observation = 0
             while time.monotonic() < deadline:
                 if state.exists():
                     result = json.loads(state.read_text())
                     stage = result['state']
+                    if row.get('grim_version') and time.monotonic() - last_observation > .9:
+                        import grim
+                        observations.append(dict(stage=stage, actual=grim.state(row, running=True)))
+                        last_observation = time.monotonic()
                     if stage in {'FAIL', 'PASS'}: break
                     if stage not in handled:
+                        timeline.append(dict(result))
                         name = result['name']
                         if stage == 'ready':
                             legacy = row['protocol'] < 393
@@ -51,6 +59,15 @@ def probe(row, reuse_running=False):
                         handled.add(stage)
                 if launched.poll() is not None: break
                 time.sleep(.25)
+            if row.get('grim_version'):
+                events = lab.ROOT / row['version'] / 'plugins/ViaForgeLabAC/events.jsonl'
+                records = [json.loads(line) for line in events.read_text(encoding='utf-8').splitlines()]
+                records = [e for e in records if e.get('player', e.get('name')) == result.get('name')]
+                report = dict(server=row, client='ViaForge development client', result=result, stages=timeline,
+                              observations=observations, events=records,
+                              compatibility_pass=result.get('state') == 'PASS' and not any(e['type'] in ('flag','setback') for e in records),
+                              time=time.time())
+                lab.save(state.with_name(state.stem + '-grim.json'), report)
             if result.get('state') != 'PASS': raise RuntimeError('Live flight failed: ' + str(result))
             launched.wait(timeout=60)
             if launched.returncode != 0: raise RuntimeError('Forge process failed')
@@ -59,7 +76,7 @@ def probe(row, reuse_running=False):
                 import shutil
                 shutil.copy2(report, report.with_name(report.name + '.' + str(time.time_ns()) + '.bak'))
             lab.save(report, dict(result, success=True, report=str(state)))
-            print('LIVE FLIGHT PASS', row['version'], flush=True)
+            print('LIVE FLIGHT SEQUENCE PASS', row['version'], '(Grim findings are separate)' if row.get('grim_version') else '', flush=True)
     finally:
         # The development client owns its normal shutdown. Never terminate another client.
         if owned: lab.stop([row])

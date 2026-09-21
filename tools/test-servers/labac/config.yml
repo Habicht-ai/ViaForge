@@ -1,0 +1,4 @@
+# Local laboratory only. Preserved across server restarts. Never changes Grim thresholds.
+enabled: true
+# Optional bounded packet-order observation. Does not alter packets/checks.
+trace-packets: false

@@ -38,6 +38,10 @@ public final class ServerSession {
     public static WaterColors waterColors() { return waterColors; }
     public static long resourceGeneration() { return resourceGeneration; }
     public static boolean awaitingResources() { return profile().extended() && !resourcesLoaded; }
+    public static boolean awaitingWorld(net.minecraft.client.network.NetHandlerPlayClient handler) {
+        return profile().extended() && (awaitingResources()
+            || !((com.viaversion.viaforge.mixin.impl.connect.ClientTerrainReady)handler).viaForge$terrainReady());
+    }
     public static CompatibilityProfile profile() { return SESSION.profile(); }
     public static VersionRules rules() { return Minecraft.getMinecraft().isSingleplayer()?VersionRules.NATIVE:profile().rules(); }
     public static boolean has(ClientFeature feature) { return rules().has(feature); }
@@ -86,6 +90,10 @@ public final class ServerSession {
                     PACK.install(prepared);
                     resourcesInstalled=true;
                     reloadBlockModels(mc);
+                    // Resource baking blocks the game thread. Do not replay its elapsed
+                    // loading time as a burst of player movement in the newly loaded world.
+                    net.minecraft.util.Timer timer=((com.viaversion.viaforge.mixin.impl.items.MinecraftItemTimer)mc).viaForge$itemTimer();
+                    timer.updateTimer();timer.elapsedTicks=0;timer.elapsedPartialTicks=0;
                     resourcesLoaded=true;
                     loadedResourceVersion=profile.resources().version();
                     LOGGER.info("Loaded block resources for Minecraft "+loadedResourceVersion);

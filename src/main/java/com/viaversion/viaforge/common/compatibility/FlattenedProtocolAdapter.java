@@ -37,6 +37,18 @@ public final class FlattenedProtocolAdapter implements PacketAdapter, StorableOb
     /** Called only at declared boundaries by the mixin in AbstractProtocol. */
     public boolean beforeProtocol(Object protocol,PacketWrapper packet) {
         if(!active||failed)return false;
+        if(protocol instanceof com.viaversion.viabackwards.protocol.v1_17to1_16_4.Protocol1_17To1_16_4
+                && packet.getId()==com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ClientboundPackets1_17.PING.getId()) {
+            // ViaBackwards' proxy fallback replies on Netty immediately. A client must
+            // acknowledge only after earlier teleports/world updates ran on its game thread.
+            ByteBuf event=Unpooled.buffer();
+            try {
+                Types.VAR_INT.writePrimitive(event,0x3f);
+                Types.STRING.write(event,OrderedPing.CHANNEL);
+                event.writeInt(packet.read(Types.INT));
+                pending.add(event);packet.cancel();return true;
+            }catch(Exception error){event.release();throw new IllegalStateException("Invalid play ping",error);}
+        }
         boolean original=protocol instanceof Protocol1_13To1_12_2;
         boolean modern=protocol instanceof com.viaversion.viabackwards.protocol.v1_14to1_13_2.Protocol1_14To1_13_2;
         boolean legacy=protocol instanceof Protocol1_12_2To1_12_1;

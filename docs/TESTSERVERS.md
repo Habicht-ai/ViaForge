@@ -1,7 +1,10 @@
 # Lokales ViaForge-Testlabor
 
-Die Sammlung verwendet originale Vanilla-Server f?r alle registrierten Ressourcen-Releases,
-von 1.9 bis 26.3. Die Anzahl wird aus `tools/test-servers/versions.json` abgeleitet. Protokollgleiche Patches
+Die Verwaltung zeigt einen Server je registriertem Ressourcen-Release von 1.9 bis 26.3.
+`tools/test-servers/profiles.json` ordnet jeder Version aus `versions.json` genau eine vorhandene
+Welt zu: Paper mit schaltbarem Grim, soweit startgeprüft, sonst Vanilla mit erklärter Grim-Grenze.
+Derzeit sind es 49 Einträge, davon 41 mit Grim. Die ursprünglichen Vanilla-Welten bleiben archiviert.
+Details zur Umstellung und den frischen Prüfungen: [LAB-PROFILES.md](LAB-PROFILES.md). Protokollgleiche Patches
 teilen ein Profil; beispielsweise ist 1.16.5 der Testserver für Protokoll 754.
 Es handelt sich nicht um einen einzelnen Server mit vorgeschalteter Via-Übersetzung.
 
@@ -11,7 +14,7 @@ echten Serverneustart erfolgreich geprüft: **7.020 Weltprüfungen**, zusätzlic
 Abschlussbericht liegt unter `run/test-servers/FINAL-REPORT.md`. Das bestätigt
 die Testwelten, nicht die fehlerfreie Darstellung im ViaForge-Client.
 
-Die Erweiterung vom 19.09.2026 und ihre Pr?fgrenzen stehen in [UPGRADE-26.3.md](UPGRADE-26.3.md).
+Die Erweiterung vom 19.09.2026 und ihre Prüfgrenzen stehen in [UPGRADE-26.3.md](UPGRADE-26.3.md).
 
 ## Benutzen
 
@@ -46,7 +49,7 @@ zum Neustart wieder `Testserver.vbs` öffnen.
 
 Die Webverwaltung bindet ausschließlich an `127.0.0.1` und benötigt kein Konto.
 
-Die Weboberfläche wurde zusätzlich im Chromium-Browser geprüft: alle 48 Einträge,
+Historische Browserprüfung vor der Profilauswahl: alle damals 48 Einträge,
 Gruppen/Favoriten, Suche, Katalogfilter, Kopieren von Adressen/Teleportbefehlen,
 Serverprotokoll und gemeinsames Starten/Stoppen von 1.12.2 und 26.2. Auch der
 Start über `Testserver.vbs` und die Darstellung bei 390 Pixel Fensterbreite
@@ -72,17 +75,18 @@ ViaForge-Zielversion wählen. Diese häufig gebrauchten Adressen sind fest:
 | Version | Adresse |
 | --- | --- |
 | 1.9 | `127.0.0.1:25590` |
-| 1.12.2 | `127.0.0.1:25599` |
-| 1.13.2 | `127.0.0.1:25602` |
-| 1.21.11 | `127.0.0.1:25635` |
-| 26.1.2 | `127.0.0.1:25636` |
-| 26.2 | `127.0.0.1:25637` |
+| 1.12.2 | `127.0.0.1:27010` |
+| 1.13.2 | `127.0.0.1:27016` |
+| 1.21.11 | `127.0.0.1:27080` |
+| 26.1.2 | `127.0.0.1:27082` |
+| 26.2 | `127.0.0.1:27084` |
 | 26.3 | `127.0.0.1:25638` |
 
 `./Testserver.bat import-list all` ergänzt die Einträge aus dem Manifest in **`run/servers.dat`**
 der Entwicklungsinstanz, einschließlich ViaForge-Versionseinstellung. Vorhandene
-Einträge und unbekannte NBT-Tags bleiben erhalten, eine Sicherung wird angelegt,
-bereits eingetragene Adressen werden nicht dupliziert. Der Import verweigert
+eigene Einträge und unbekannte NBT-Tags bleiben erhalten, eine Sicherung wird angelegt.
+Automatisch erzeugte Laboreinträge mit passendem Namen und bekannter Laboradresse
+werden auf das aktive Profil aktualisiert; bereits eingetragene Adressen werden nicht dupliziert. Der Import verweigert
 Änderungen bei laufendem Minecraft-Client. Andere Launcherprofile werden nicht
 automatisch verändert. `export-list all` erzeugt zusätzlich eine separate
 `run/test-servers/servers-labor.dat` für eine eigene, leere Testinstanz.
@@ -344,3 +348,7 @@ Quellen: [Mojangs Versionsmanifest](https://piston-meta.mojang.com/mc/game/versi
 [offizieller Minecraft-Serverdownload](https://www.minecraft.net/en-us/download/server),
 [Minecraft-EULA](https://www.minecraft.net/eula),
 [Azul OpenJDK-Downloads](https://www.azul.com/downloads/).
+
+## Grim-Varianten, 21.09.2026
+
+Die getrennten Paper-Varianten, Java-Adapter, echten Ein-/Aus-/Verbose-Nachweise und die konkrete Supportmatrix stehen in [GRIM-LAB.md](GRIM-LAB.md). Die ursprünglichen Vanilla-Instanzen bleiben Referenzen. Neuere Prüfergebnisse und offene Kompatibilitätsfehler stehen in [REGRESSIONS-2026-09-21.md](REGRESSIONS-2026-09-21.md).

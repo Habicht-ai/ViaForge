@@ -42,6 +42,7 @@ public class ViaForge implements ViaForgePlatform {
         ClientBlocks.register();
         com.viaversion.viaforge.items.ClientItems.register();
         ServerSession.initialize();
+        com.viaversion.viaforge.compatibility.NativeClientTicks.install();
     }
 
     @Mod.EventHandler

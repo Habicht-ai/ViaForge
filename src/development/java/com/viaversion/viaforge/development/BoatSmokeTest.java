@@ -105,6 +105,9 @@ final class BoatSmokeTest {
         NetHandlerPlayClient handler=new NetHandlerPlayClient(mc,null,new NetworkManager(EnumPacketDirection.CLIENTBOUND),new GameProfile(new UUID(0,889),"Driver")) {
             @Override public void addToSendQueue(Packet packet) { sent.add(packet); }
         };
+        // This constructed fixture has no login/initial teleport; mark its prepared world ready.
+        try {java.lang.reflect.Field ready=NetHandlerPlayClient.class.getDeclaredField("doneLoadingTerrain");ready.setAccessible(true);ready.setBoolean(handler,true);}
+        catch(ReflectiveOperationException ex){throw new AssertionError(ex);}
         net.minecraft.client.entity.EntityPlayerSP driver=new net.minecraft.client.entity.EntityPlayerSP(mc,world,handler,new net.minecraft.stats.StatFileWriter());
         driver.movementInput=new net.minecraft.util.MovementInputFromOptions(mc.gameSettings);
         ServerBoat boat=new ServerBoat(world,profile.protocol());boat.setPosition(8,90,8);

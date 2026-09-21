@@ -19,9 +19,9 @@ def state():
         return json.load(response)
 
 
-def action(row, verb):
+def action(row, verb, backup_id=''):
     request = urllib.request.Request(URL + '/api/actions',
-        json.dumps(dict(action=verb, versions=[row['version']])).encode(),
+        json.dumps(dict(action=verb, versions=[row.get('profile_version', row['version'])], backup_id=backup_id)).encode(),
         {'Content-Type': 'application/json', 'X-Lab-Token': state()['token'], 'Origin': URL})
     with urllib.request.urlopen(request, timeout=15) as response:
         job_id = json.load(response)['id']
@@ -81,4 +81,5 @@ def probe(row):
 
 
 if __name__ == '__main__':
-    for row in lab.select(sys.argv[1] if len(sys.argv) > 1 else '26.3'): probe(row)
+    import profiles
+    for row in profiles.select(sys.argv[1] if len(sys.argv) > 1 else '26.3'): probe(row)

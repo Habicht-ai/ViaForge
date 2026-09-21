@@ -1,0 +1,206 @@
+[
+  {
+    "version": "1.9",
+    "instance": "1.9",
+    "unavailable_reason": "Für diese exakte Minecraft-Version ist kein geprüfter Grim-fähiger Plattform-Build installiert."
+  },
+  {
+    "version": "1.9.1",
+    "instance": "1.9.1",
+    "unavailable_reason": "Für diese exakte Minecraft-Version ist kein geprüfter Grim-fähiger Plattform-Build installiert."
+  },
+  {
+    "version": "1.9.2",
+    "instance": "1.9.2",
+    "unavailable_reason": "Für diese exakte Minecraft-Version ist kein geprüfter Grim-fähiger Plattform-Build installiert."
+  },
+  {
+    "version": "1.9.4",
+    "instance": "1.9.4-grim"
+  },
+  {
+    "version": "1.10.2",
+    "instance": "1.10.2-grim"
+  },
+  {
+    "version": "1.11",
+    "instance": "1.11",
+    "unavailable_reason": "Für diese exakte Minecraft-Version ist kein geprüfter Grim-fähiger Plattform-Build installiert."
+  },
+  {
+    "version": "1.11.2",
+    "instance": "1.11.2-grim"
+  },
+  {
+    "version": "1.12",
+    "instance": "1.12-grim"
+  },
+  {
+    "version": "1.12.1",
+    "instance": "1.12.1-grim"
+  },
+  {
+    "version": "1.12.2",
+    "instance": "1.12.2-grim"
+  },
+  {
+    "version": "1.13",
+    "instance": "1.13",
+    "unavailable_reason": "Grim 2.3.74 kann auf diesem exakten Paper-Build seine Commands nicht initialisieren."
+  },
+  {
+    "version": "1.13.1",
+    "instance": "1.13.1",
+    "unavailable_reason": "Grim 2.3.74 kann auf diesem exakten Paper-Build seine Commands nicht initialisieren."
+  },
+  {
+    "version": "1.13.2",
+    "instance": "1.13.2-grim"
+  },
+  {
+    "version": "1.14",
+    "instance": "1.14-grim"
+  },
+  {
+    "version": "1.14.1",
+    "instance": "1.14.1-grim"
+  },
+  {
+    "version": "1.14.2",
+    "instance": "1.14.2-grim"
+  },
+  {
+    "version": "1.14.3",
+    "instance": "1.14.3-grim"
+  },
+  {
+    "version": "1.14.4",
+    "instance": "1.14.4-grim"
+  },
+  {
+    "version": "1.15",
+    "instance": "1.15-grim"
+  },
+  {
+    "version": "1.15.1",
+    "instance": "1.15.1-grim"
+  },
+  {
+    "version": "1.15.2",
+    "instance": "1.15.2-grim"
+  },
+  {
+    "version": "1.16",
+    "instance": "1.16",
+    "unavailable_reason": "Für diese exakte Minecraft-Version ist kein geprüfter Grim-fähiger Plattform-Build installiert."
+  },
+  {
+    "version": "1.16.1",
+    "instance": "1.16.1-grim"
+  },
+  {
+    "version": "1.16.2",
+    "instance": "1.16.2-grim"
+  },
+  {
+    "version": "1.16.3",
+    "instance": "1.16.3-grim"
+  },
+  {
+    "version": "1.16.5",
+    "instance": "1.16.5-grim"
+  },
+  {
+    "version": "1.17",
+    "instance": "1.17-grim"
+  },
+  {
+    "version": "1.17.1",
+    "instance": "1.17.1-grim"
+  },
+  {
+    "version": "1.18.1",
+    "instance": "1.18.1-grim"
+  },
+  {
+    "version": "1.18.2",
+    "instance": "1.18.2-grim"
+  },
+  {
+    "version": "1.19",
+    "instance": "1.19-grim"
+  },
+  {
+    "version": "1.19.2",
+    "instance": "1.19.2-grim"
+  },
+  {
+    "version": "1.19.3",
+    "instance": "1.19.3-grim"
+  },
+  {
+    "version": "1.19.4",
+    "instance": "1.19.4-grim"
+  },
+  {
+    "version": "1.20.1",
+    "instance": "1.20.1-grim"
+  },
+  {
+    "version": "1.20.2",
+    "instance": "1.20.2-grim"
+  },
+  {
+    "version": "1.20.4",
+    "instance": "1.20.4-grim"
+  },
+  {
+    "version": "1.20.6",
+    "instance": "1.20.6-grim"
+  },
+  {
+    "version": "1.21.1",
+    "instance": "1.21.1-grim"
+  },
+  {
+    "version": "1.21.3",
+    "instance": "1.21.3-grim"
+  },
+  {
+    "version": "1.21.4",
+    "instance": "1.21.4-grim"
+  },
+  {
+    "version": "1.21.5",
+    "instance": "1.21.5-grim"
+  },
+  {
+    "version": "1.21.6",
+    "instance": "1.21.6-grim"
+  },
+  {
+    "version": "1.21.8",
+    "instance": "1.21.8-grim"
+  },
+  {
+    "version": "1.21.10",
+    "instance": "1.21.10-grim"
+  },
+  {
+    "version": "1.21.11",
+    "instance": "1.21.11-grim"
+  },
+  {
+    "version": "26.1.2",
+    "instance": "26.1.2-grim"
+  },
+  {
+    "version": "26.2",
+    "instance": "26.2-grim"
+  },
+  {
+    "version": "26.3",
+    "instance": "26.3",
+    "unavailable_reason": "Der installierte Grim-Build unterstützt höchstens Minecraft 26.2."
+  }
+]

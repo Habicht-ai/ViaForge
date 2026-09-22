@@ -2,3 +2,5 @@
 enabled: true
 # Optional bounded packet-order observation. Does not alter packets/checks.
 trace-packets: false
+# Optional capped per-prediction vehicle diagnostics; OFF still disables checks.
+trace-boats: false

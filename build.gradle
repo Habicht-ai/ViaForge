@@ -274,6 +274,8 @@ tasks.register('sourceArchive', Zip) {
     includeEmptyDirs = false
     from(projectDir) {
         include 'src/**', 'gradle/**', 'docs/**'
+        include 'tools/test-servers/*.py', 'tools/test-servers/*.json'
+        include 'tools/test-servers/labac/**', 'tools/test-servers/native-probe/*.java'
         include '*.gradle', '*.properties', '*.bat', 'gradlew', 'README.md', 'LICENSE'
         include '.editorconfig', '.gitignore', '.github/workflows/build.yml'
     }

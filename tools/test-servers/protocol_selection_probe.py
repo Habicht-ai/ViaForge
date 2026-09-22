@@ -78,6 +78,8 @@ class Forwarder(socketserver.BaseRequestHandler):
 
 
 def run():
+    from boat_probe import assert_no_client
+    assert_no_client()
     stamp = str(time.time_ns())
     folder = lab.ROOT / ('protocol-selection-' + stamp)
     folder.mkdir()
@@ -184,7 +186,7 @@ def run():
         if client is None or client.poll() is not None:
             shutil.copy2(folder / 'viaforge.yml.before', config)
         if server and server.poll() is None:
-            server.stdin.write('save-all flush\nstop\n'); server.stdin.flush(); server.wait(timeout=60)
+            server.stdin.write('save-all\nstop\n'); server.stdin.flush(); server.wait(timeout=60)
         proxy.shutdown(); proxy.server_close()
         game.close(); rcon.close()
 

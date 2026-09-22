@@ -23,7 +23,9 @@ public final class ServerBoat extends Entity {
     private final com.viaversion.viaforge.common.compatibility.VersionRules behavior;
     public int wood, hurtTime, hurtDirection = 1;
     public float damage, deltaRotation, landGlide;
-    public Status status = Status.AIR;
+    // Original EntityBoat leaves this unset until its first environment sample.
+    // A mounted spawn/reconnect in water must not invent an AIR -> WATER entry.
+    public Status status;
     private Status previousStatus;
     private final List<Entity> passengers = new ArrayList<>();
     private final boolean[] paddles = new boolean[2];
@@ -120,9 +122,8 @@ public final class ServerBoat extends Entity {
         riddenByEntity = passengers.isEmpty() ? null : passengers.get(0);
         if (controlled()) {
             lerpSteps = 0;
-            net.minecraft.client.settings.GameSettings keys = Minecraft.getMinecraft().gameSettings;
-            if (Minecraft.getMinecraft().currentScreen == null) input(keys.keyBindLeft.isKeyDown(), keys.keyBindRight.isKeyDown(), keys.keyBindForward.isKeyDown(), keys.keyBindBack.isKeyDown());
-            else input(false, false, false, false);
+            // The passenger samples input after its mount has ticked. Use that
+            // latched input here, as EntityBoat/EntityPlayerSP do in the target.
             physics(); steer();
             BoatPackets.paddles(this);
             moveEntity(motionX, motionY, motionZ);

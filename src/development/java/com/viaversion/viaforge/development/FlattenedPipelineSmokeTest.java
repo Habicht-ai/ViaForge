@@ -500,6 +500,8 @@ final class FlattenedPipelineSmokeTest {
         try{Types.ITEM1_8.write(data,item);return new PacketBuffer(data).readItemStackFromBuffer();}finally{data.release();}
     }
     private void boatInput(WorldClient world)throws Exception {
+        BoatSmokeTest.controls(com.viaversion.viaforge.common.blocks.BlockVersionProfile.V1_12_2,world,
+            new net.minecraft.client.entity.EntityOtherPlayerMP(world,new com.mojang.authlib.GameProfile(new UUID(0,888),"SecondBoatSeat")));
         com.viaversion.viaforge.boats.ServerBoat boat=new com.viaversion.viaforge.boats.ServerBoat(world,target.serverProtocol());
         boat.setPosition(2.5,65,-3.25);boat.rotationYaw=27;boat.rotationPitch=-4;
         boatPacket(com.viaversion.viaforge.boats.BoatPackets.movement(boat));

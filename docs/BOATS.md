@@ -1,8 +1,12 @@
 # Versioned boats (Forge 1.8.9 client)
 
-The modern boat implementation is enabled only on the supported 1.9–1.12.2
-server connections. Native 1.8 connections and singleplayer retain `EntityBoat`,
-its original renderer, one-seat mounting and original movement.
+The implementation originated with the 1.9–1.12.2 profiles. Registered flattened
+and modern adapters also reuse `ServerBoat`; the original scope is not a boundary
+of its current runtime use. `ServerBoat.protocol` describes the internal event
+format. Behavior rules come from the connection's actual `ServerSession` profile.
+Native 1.8 connections and singleplayer retain `EntityBoat`, its original renderer,
+one-seat mounting and original movement. Reuse does not establish complete support
+for later boat types or physics; see the [live Grim boat results](BOAT-GRIM-2026-09-21.md).
 
 ## Appearance and control
 
@@ -25,9 +29,28 @@ avoid ViaRewind's legacy boat height and yaw adjustments.
 | 1.11–1.12.2 | Opposing steering keys cancel the paddle signals unless forward is also held. |
 | 1.12–1.12.2 | Paddle phase advances by 0.3926991 per tick; original water/land rowing sounds play at the stroke threshold. |
 
-The ten tested profiles are 1.9, 1.9.1, 1.9.2, 1.9.4, 1.10.2, 1.11,
+The ten original offline smoke profiles are 1.9, 1.9.1, 1.9.2, 1.9.4, 1.10.2, 1.11,
 1.11.2, 1.12, 1.12.1 and 1.12.2. Releases sharing a protocol use the
 corresponding profile (1.9.3, 1.10/1.10.1 and 1.11.1).
+These smoke results did not test Grim's live vehicle prediction.
+
+The boat consumes input latched at the end of the previous local passenger's
+`onLivingUpdate`. Reading current keys in `ServerBoat.onUpdate` applied thrust
+one tick ahead of the original client and Grim's vehicle input state. The live
+1.12.2 reproduction produced 129 Simulation flags and a setback; identical fresh
+input sequences with passenger-side sampling and with the official 1.12.2 client
+produced none. Physics constants and anticheat thresholds were not changed.
+
+The initial environment is unset, as in the original client. Initializing it to
+AIR invented a water-entry transition when reconnecting already mounted in water;
+the extended live test caught a separate first-tick vertical Simulation flag.
+The regression fixture covers this mounted spawn before its first world tick.
+
+Targets from protocol 768 also require the normal client-tick-end marker while
+riding. The passenger tick now schedules the existing END-event sender, including
+the second seat, without adding a second input or tick marker. A live 26.2 test
+reproduced TickTimer/setbacks before this correction and completed ten driving
+cases afterwards; separate unmounted login flags remain documented.
 
 ## Passengers and placement
 
@@ -64,6 +87,6 @@ item actions. Packet tests cover entity-ID reuse and dimension changes.
 
 The report must begin with `PASS` in `build/logs/block-client-smoke-test.txt`.
 Actual Forge renders are saved as `build/logs/screenshots/boats-<version>.png`.
-The automated fixtures do not replace a two-client live-server session for latency,
-server plugins and anti-cheat behavior. Versions after 1.12.2 are outside this
-boat implementation's scope.
+The automated fixtures do not replace live-server sessions for latency, server
+plugins and anti-cheat behavior. Consult the separate live case/version matrix;
+inherited later adapters need their own evidence.

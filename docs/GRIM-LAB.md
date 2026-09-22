@@ -2,6 +2,11 @@
 
 Stand: 21.09.2026. Die Verwaltung zeigt **einen Server pro Minecraft-Version**, derzeit 49, aus `profiles.json`. Davon verwenden 41 eine startgeprüfte Paper/Grim-Installation; acht bleiben mit konkretem Grund ohne Grim verfügbar. Die ursprünglichen 49 Vanilla-Welten und die 43 zuvor installierten Paper-Welten bleiben auf der Platte erhalten. Ihre internen Instanznamen sind für Archive und Prüfnachweise weiter gültig, aber keine zusätzlichen Einträge in der Verwaltung. Siehe [aktive Profile und vollständige Weltprüfung](LAB-PROFILES.md). **Installiert bedeutet nicht bewegungskompatibel.** Die konkrete Startmatrix folgt unten; ViaForge-Befunde stehen in [REGRESSIONS-2026-09-21.md](REGRESSIONS-2026-09-21.md).
 
+Die [Bootsdiagnose vom 21./22.09.2026](BOAT-GRIM-2026-09-21.md) enthält getrennte
+Vorher-/Nachher-Fahrdaten, Originalclientvergleich und genaue Versionsgrenzen.
+`trace-boats: true` aktiviert im Helper begrenzte Fahrzeug-/Prediction-Aufzeichnungen
+für isolierte Testinstanzen; die normale Konfiguration bleibt bei false.
+
 ## Quellen und Grenzen
 
 - [Offizielles Grim-Repository](https://github.com/GrimAnticheat/Grim), geprüfter Commit `8eb5f2809591c891deb4958bb2927844871e0600`: README nennt Minecraft 1.8–26.2, Java 17+, Bukkit/Spigot/Paper/Folia und Fabric. **26.3 ist nicht unterstützt.** Es gibt keine umbenannte 26.2-Instanz als Ersatz.

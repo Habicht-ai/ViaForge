@@ -28,5 +28,10 @@ public final class NativeClientTicks {
         }
         player.sendQueue.addToSendQueue(new C17PacketCustomPayload(ClientTickPackets.CHANNEL,data));
     }
+    /** Riding bypasses onUpdateWalkingPlayer, but still needs the real tick boundary.
+     * Its passenger-input packet already supplies input through Via. */
+    public static void scheduleEnd(EntityPlayerSP player) {
+        if(ServerSession.profile().serverProtocol()>=768 && !ServerSession.awaitingWorld(player.sendQueue))pending=player;
+    }
     private NativeClientTicks(){}
 }

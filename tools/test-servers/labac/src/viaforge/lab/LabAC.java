@@ -36,6 +36,9 @@ import ac.grim.grimac.shaded.com.github.retrooper.packetevents.PacketEvents;
 import ac.grim.grimac.shaded.com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import ac.grim.grimac.shaded.com.github.retrooper.packetevents.event.PacketListenerPriority;
 import ac.grim.grimac.shaded.com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import ac.grim.grimac.shaded.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientVehicleMove;
+import ac.grim.grimac.shaded.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSteerBoat;
+import ac.grim.grimac.shaded.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSteerVehicle;
 
 /** Local laboratory control. Never changes a check, threshold or cancellation result. */
 public final class LabAC extends JavaPlugin implements Listener {
@@ -48,6 +51,7 @@ public final class LabAC extends JavaPlugin implements Listener {
     private volatile long generation;
     private boolean available;
     private PacketListenerAbstract packetTrace;
+    private boolean traceBoats;
 
     private static final class Sample {
         final AtomicLong predictions = new AtomicLong(), flags = new AtomicLong(), setbacks = new AtomicLong();
@@ -67,6 +71,7 @@ public final class LabAC extends JavaPlugin implements Listener {
             return;
         }
         available = true;
+        traceBoats = getConfig().getBoolean("trace-boats", false);
         if (getConfig().getBoolean("trace-packets", false)) {
             Map<UUID, AtomicLong> counts = new ConcurrentHashMap<>();
             packetTrace = new PacketListenerAbstract(PacketListenerPriority.MONITOR) {
@@ -74,9 +79,22 @@ public final class LabAC extends JavaPlugin implements Listener {
                     if (event.getUser().getUUID() == null) return;
                     String packet = event.getPacketType().toString();
                     if (!Set.of("PLAYER_FLYING","PLAYER_POSITION","PLAYER_ROTATION","PLAYER_POSITION_AND_ROTATION",
-                        "PONG","CLIENT_TICK_END","PLAYER_INPUT","ENTITY_ACTION","TELEPORT_CONFIRM").contains(packet)) return;
-                    if (counts.computeIfAbsent(event.getUser().getUUID(),id -> new AtomicLong()).incrementAndGet() > 1200) return;
-                    logEvent("packet",Map.of("player",event.getUser().getName(),"packet",packet,"cancelled",event.isCancelled()));
+                        "PONG","CLIENT_TICK_END","PLAYER_INPUT","STEER_VEHICLE","STEER_BOAT","VEHICLE_MOVE","ENTITY_ACTION","TELEPORT_CONFIRM").contains(packet)) return;
+                    if (counts.computeIfAbsent(event.getUser().getUUID(),id -> new AtomicLong()).incrementAndGet() > (traceBoats ? 30000 : 1200)) return;
+                    Map<String,Object> record=new LinkedHashMap<>(Map.of("player",event.getUser().getName(),"packet",packet,"cancelled",event.isCancelled()));
+                    if(traceBoats) {
+                        if(packet.equals("VEHICLE_MOVE")) {
+                            WrapperPlayClientVehicleMove move=new WrapperPlayClientVehicleMove(event);
+                            record.put("position",move.getPosition());record.put("yaw",move.getYaw());record.put("pitch",move.getPitch());record.put("ground",move.isOnGround());
+                        } else if(packet.equals("STEER_BOAT")) {
+                            WrapperPlayClientSteerBoat steer=new WrapperPlayClientSteerBoat(event);
+                            record.put("left",steer.isLeftPaddleTurning());record.put("right",steer.isRightPaddleTurning());
+                        } else if(packet.equals("STEER_VEHICLE")) {
+                            WrapperPlayClientSteerVehicle steer=new WrapperPlayClientSteerVehicle(event);
+                            record.put("forward",steer.getForward());record.put("sideways",steer.getSideways());record.put("jump",steer.isJump());record.put("dismount",steer.isUnmount());
+                        }
+                    }
+                    logEvent("packet",record);
                 }
             };
             PacketEvents.getAPI().getEventManager().registerListener(packetTrace);
@@ -95,11 +113,20 @@ public final class LabAC extends JavaPlugin implements Listener {
             (user, check, offset, cancelled) -> {
                 Sample s = samples.computeIfAbsent(user.getUniqueId(), id -> new Sample());
                 long number = s.predictions.incrementAndGet();
-                if (number <= 8 || offset > .001) {
+                if (number <= 8 || offset > .001 || traceBoats && number <= 10000) {
                     GrimPlayer p = (GrimPlayer) user;
-                    logEvent("prediction", Map.of("player",user.getName(),"number",number,"offset",offset,
+                    Map<String,Object> record=new LinkedHashMap<>(Map.of("player",user.getName(),"number",number,"offset",offset,
                         "x",p.x,"y",p.y,"z",p.z,"last_x",p.lastX,"last_y",p.lastY,"last_z",p.lastZ,
                         "transaction",p.lastTransactionReceived.get()));
+                    if(traceBoats) {
+                        record.put("predicted",p.predictedVelocity.vector);record.put("actual",p.actualMovement);
+                        record.put("velocity",p.clientVelocity);record.put("vehicle",p.inVehicle());
+                        record.put("water_level",p.vehicleData.waterLevel);record.put("vehicle_status",p.vehicleData.status);
+                        record.put("old_status",p.vehicleData.oldStatus);record.put("land_friction",p.vehicleData.landFriction);
+                        record.put("input_forward",p.vehicleData.vehicleForward);record.put("input_sideways",p.vehicleData.vehicleHorizontal);
+                        record.put("last_yd",p.vehicleData.lastYd);record.put("box",p.boundingBox);
+                    }
+                    logEvent("prediction",record);
                 }
                 return cancelled;
             });
@@ -134,7 +161,7 @@ public final class LabAC extends JavaPlugin implements Listener {
         if (!available) return;
         if (!permissions.containsKey(player.getUniqueId())) attach(player);
         GrimUser user = api.getGrimUser(player.getUniqueId());
-        if (user == null) return; // status reports pending/untracked, never a false ON
+        if (user == null || ((GrimPlayer)user).platformPlayer == null) return; // early join: retry next observation, never a false ON
         api.getAlertManager().setVerboseEnabled(user, true, true);
         user.updatePermissions();
         Sample sample = samples.get(player.getUniqueId());

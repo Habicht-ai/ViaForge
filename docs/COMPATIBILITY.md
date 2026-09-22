@@ -7,6 +7,11 @@ do not implement every later release's content. Unknown targets keep normal Via
 connectivity without borrowing an older parser. See [flattened families](FLATTENED.md)
 and [modern families, validation status and limits](MODERN.md).
 
+Boat behavior has separate [live Grim evidence and limits](BOAT-GRIM-2026-09-21.md).
+Earlier player/Elytra PASS reports did not cover boats. The 2026-09-21 boat fix
+restores original passenger/vehicle input timing in the shared `ServerBoat` path;
+it does not resolve the previously recorded 26.2 player movement discrepancies.
+
 ## Connection and packet flow
 
 `CompatibilityRegistry` resolves an exact server protocol to an immutable

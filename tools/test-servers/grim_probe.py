@@ -113,14 +113,15 @@ def actual(row):
     return grim.state(row, running=True)
 
 
-def exercise(row, names, report):
+def exercise(row, names, report, commands=None):
+    commands = commands or (lambda values: lab.batch(row, values))
     clients = [Client(row, name) for name in names]
     try:
         wait_for(lambda: all(c.position for c in clients), "Both accounts must log in")
         wait_for(lambda: len(actual(row).get("players", [])) == 2 and all(p.get("verbose") for p in actual(row)["players"]),
                  "Both non-OP accounts need actual Grim verbose")
         for client in clients:
-            lab.batch(row, ["gamemode 0 " + client.name, "tp " + client.name + " -18 64 -83"])
+            commands(["gamemode 0 " + client.name, "tp " + client.name + " -18 64 -83"])
         time.sleep(1)
         for _ in range(45):
             for c in clients: c.move()

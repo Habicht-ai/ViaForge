@@ -98,8 +98,11 @@ final class BoatSmokeTest {
             ServerBoats.clear();
         }
     }
-    private static void controls(BlockVersionProfile profile,WorldClient world,Entity other) {
+    static void controls(BlockVersionProfile profile,WorldClient world,Entity other) {
         Minecraft mc=Minecraft.getMinecraft();net.minecraft.client.entity.EntityPlayerSP previous=mc.thePlayer;
+        WorldClient previousWorld=mc.theWorld;
+        Entity previousView=mc.getRenderViewEntity();
+        net.minecraft.client.multiplayer.PlayerControllerMP previousController=mc.playerController;
         net.minecraft.client.gui.GuiScreen screen=mc.currentScreen;
         boolean forward=mc.gameSettings.keyBindForward.isKeyDown();List<Packet> sent=new ArrayList<>();
         NetHandlerPlayClient handler=new NetHandlerPlayClient(mc,null,new NetworkManager(EnumPacketDirection.CLIENTBOUND),new GameProfile(new UUID(0,889),"Driver")) {
@@ -111,29 +114,75 @@ final class BoatSmokeTest {
         net.minecraft.client.entity.EntityPlayerSP driver=new net.minecraft.client.entity.EntityPlayerSP(mc,world,handler,new net.minecraft.stats.StatFileWriter());
         driver.movementInput=new net.minecraft.util.MovementInputFromOptions(mc.gameSettings);
         ServerBoat boat=new ServerBoat(world,profile.protocol());boat.setPosition(8,90,8);
+        Map<BlockPos,net.minecraft.block.state.IBlockState> initialWater=new HashMap<>();
         try {
-            mc.thePlayer=driver;mc.currentScreen=null;
+            mc.thePlayer=driver;mc.theWorld=world;mc.setRenderViewEntity(driver);mc.playerController=new net.minecraft.client.multiplayer.PlayerControllerMP(mc,handler);mc.currentScreen=null;
             net.minecraft.client.settings.KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(),true);
             driver.setPosition(8,90,8);world.addEntityToWorld(889,driver);world.addEntityToWorld(887,boat);
             boat.seats(Arrays.asList(driver,other));sent.clear();world.updateEntities();
+            tickBoundary(sent);
+            require(boat.posZ==8,"Boat consumes previous passenger input, not this tick's raw key state");
+            require(operations(sent).equals(Arrays.asList(1,2,0)),"First mount tick sends exactly one paddle/input/movement sequence");
+            sent.clear();world.updateEntities();
             require(boat.posZ>8 && operations(sent).equals(Arrays.asList(1,2,0)),"Actual driver tick sends paddles, passenger input and vehicle movement in original order");
+            double velocity=boat.motionZ;
+            net.minecraft.client.settings.KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(),false);
+            sent.clear();world.updateEntities();
+            require(boat.motionZ==velocity*(double).9F+(double).04F,"Release tick retains input sampled by the previous passenger tick");
+            require(operations(sent).equals(Arrays.asList(1,2,0)),"Release tick keeps the original packet order");
+            velocity=boat.motionZ;sent.clear();world.updateEntities();
+            require(boat.motionZ==velocity*(double).9F,"Next tick coasts with original water/air friction and no thrust");
+            require(operations(sent).equals(Arrays.asList(1,2,0)),"Coasting still sends one vehicle update per tick");
             require(Math.abs(driver.posZ-boat.posZ-.2F)<.000001,"Driver seat follows this tick's boat movement without camera lag");
             driver.rotationYaw=boat.rotationYaw;driver.setAngles(2000,0);
             require(Math.abs(MathHelper.wrapAngleTo180_float(driver.rotationYaw-boat.rotationYaw))<=105,"Mouse movement clamps boat view immediately");
             boat.seats(Arrays.asList(other,driver));sent.clear();double x=boat.posX,z=boat.posZ;world.updateEntities();
+            tickBoundary(sent);
             require(boat.posX==x&&boat.posZ==z&&operations(sent).equals(Collections.singletonList(2)),"Actual second passenger tick cannot steer or emit vehicle/paddle packets");
+            boat.seats(Collections.emptyList());world.removeEntityFromWorld(887);
+            for(int bx=7;bx<=9;bx++)for(int bz=7;bz<=9;bz++) {
+                BlockPos pos=new BlockPos(bx,90,bz);initialWater.put(pos,world.getBlockState(pos));
+                world.setBlockState(pos,Blocks.water.getDefaultState(),0);
+            }
+            boat=new ServerBoat(world,profile.protocol());boat.setPosition(8.5,90.6,8.5);
+            world.addEntityToWorld(887,boat);boat.seats(Collections.singletonList(driver));sent.clear();
+            world.updateEntities();
+            require(boat.status==ServerBoat.Status.WATER&&boat.motionY<0&&boat.posY==90.6+boat.motionY,
+                "First mounted tick in water uses buoyancy, without an invented air-entry position snap on reconnect");
+            require(operations(sent).equals(Arrays.asList(1,2,0)),"Mounted water spawn ticks and sends movement once");
         } finally {
-            boat.seats(Collections.emptyList());mc.thePlayer=previous;mc.currentScreen=screen;
+            boat.seats(Collections.emptyList());mc.thePlayer=previous;mc.theWorld=previousWorld;mc.setRenderViewEntity(previousView);mc.playerController=previousController;mc.currentScreen=screen;
             world.removeEntityFromWorld(887);world.removeEntityFromWorld(889);
             net.minecraft.client.settings.KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(),forward);
+            for(Map.Entry<BlockPos,net.minecraft.block.state.IBlockState> entry:initialWater.entrySet())world.setBlockState(entry.getKey(),entry.getValue(),0);
         }
+    }
+    private static void tickBoundary(List<Packet> sent) {
+        try {
+            java.lang.reflect.Constructor<com.viaversion.viaforge.compatibility.NativeClientTicks> constructor=
+                com.viaversion.viaforge.compatibility.NativeClientTicks.class.getDeclaredConstructor();constructor.setAccessible(true);
+            com.viaversion.viaforge.compatibility.NativeClientTicks observer=constructor.newInstance();
+            int before=sent.size();
+            observer.end(new net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent(net.minecraftforge.fml.common.gameevent.TickEvent.Phase.END));
+            boolean modern=com.viaversion.viaforge.compatibility.ServerSession.profile().serverProtocol()>=768;
+            require(sent.size()==before+(modern?1:0),"Ridden player schedules exactly one real client tick boundary on modern targets");
+            if(modern) {
+                C17PacketCustomPayload end=(C17PacketCustomPayload)sent.get(before);
+                require(end.getChannelName().equals("VF|tick")&&end.getBufferData().readableBytes()==1
+                    &&end.getBufferData().getByte(end.getBufferData().readerIndex())==1,"Tick end does not synthesize another passenger input");
+            }
+            int after=sent.size();observer.end(new net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent(net.minecraftforge.fml.common.gameevent.TickEvent.Phase.END));
+            require(sent.size()==after,"Already completed riding tick cannot send a duplicate boundary");
+        } catch(ReflectiveOperationException error) {throw new AssertionError(error);}
     }
     private static List<Integer> operations(List<Packet> sent) {
         List<Integer> operations=new ArrayList<>();
         for(Packet packet:sent) {
             require(!(packet instanceof net.minecraft.network.play.client.C0CPacketInput),"Modern passenger input bypasses Via's old synthesized paddles");
-            if(packet instanceof C17PacketCustomPayload && BoatPackets.CHANNEL.equals(((C17PacketCustomPayload)packet).getChannelName())) {
-                PacketBuffer data=((C17PacketCustomPayload)packet).getBufferData();operations.add((int)data.getUnsignedByte(data.readerIndex()));data.release();
+            if(packet instanceof C17PacketCustomPayload) {
+                PacketBuffer data=((C17PacketCustomPayload)packet).getBufferData();
+                if(BoatPackets.CHANNEL.equals(((C17PacketCustomPayload)packet).getChannelName()))operations.add((int)data.getUnsignedByte(data.readerIndex()));
+                data.release();
             }
         }
         return operations;

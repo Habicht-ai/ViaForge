@@ -1,5 +1,6 @@
 """Verified official 1.12.2 client preparation for the boat comparison."""
 import concurrent.futures
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -13,6 +14,8 @@ def command(folder, port, name=None):
     base=lab.ROOT/'native-clients/1.12.2'
     if not (base/'prepared.json').exists(): prepare()
     prepared=json.loads((base/'prepared.json').read_text())
+    client=Path(prepared['classpath'][0])
+    assert hashlib.sha1(client.read_bytes()).hexdigest()==prepared['client']['sha1']
     asm=next((Path.home()/'.gradle/caches/modules-2/files-2.1/org.ow2.asm/asm/9.9.1').rglob('asm-9.9.1.jar'))
     gson=next(Path(p) for p in prepared['classpath'] if 'gson' in p)
     classes=lab.REPO/'build/native-boat/classes';classes.mkdir(parents=True,exist_ok=True)
@@ -28,6 +31,8 @@ def command(folder, port, name=None):
         for p in classes.rglob('*.class'):jar.write(p,p.relative_to(classes).as_posix())
     import time
     name=name or 'NativeB'+str(time.time_ns())[-8:]
+    lab.save(folder/'native-source.json',dict(version='1.12.2',client=prepared['client'],
+        client_sha256=hashlib.sha256(client.read_bytes()).hexdigest(),agent_sha256=hashlib.sha256(agent.read_bytes()).hexdigest()))
     (folder/'options.txt').write_text('pauseOnLostFocus:false\nrenderDistance:16\nmaxFps:60\nautoJump:false\n')
     return [lab.java({'java':8}),'-Xmx1G','-XX:ActiveProcessorCount=2','-Dboat.name='+name,
         '-Djava.library.path='+prepared['natives'],f'-javaagent:{agent}={folder}','-cp',os.pathsep.join(prepared['classpath']),

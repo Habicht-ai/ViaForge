@@ -90,3 +90,8 @@ Actual Forge renders are saved as `build/logs/screenshots/boats-<version>.png`.
 The automated fixtures do not replace live-server sessions for latency, server
 plugins and anti-cheat behavior. Consult the separate live case/version matrix;
 inherited later adapters need their own evidence.
+
+The subsequent [entity-push correction](ENTITY-PUSH.md) retains original
+coordinates for living contact partners and restores their client-side push
+step. Boat motion, rowing and passenger scheduling retain their separate path.
+Shared-vehicle passengers are excluded from the added proximity impulse.

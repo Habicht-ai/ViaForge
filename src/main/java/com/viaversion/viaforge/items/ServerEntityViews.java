@@ -28,7 +28,7 @@ public final class ServerEntityViews {
     }
     private static WorldClient world;
     private static final Map<Integer, View> VIEWS = new HashMap<>();
-    public static void clear() { ServerElytraFlight.clear(); VIEWS.clear(); world = null; com.viaversion.viaforge.blocks.ServerEditorPermissions.clear(); ServerTotemAnimation.clear(); ServerCombatState.clear(); ServerItemCooldowns.clear(); com.viaversion.viaforge.hands.Offhand.clear(); com.viaversion.viaforge.mobs.ServerMobs.clear(); com.viaversion.viaforge.boats.ServerBoats.clear(); }
+    public static void clear() { com.viaversion.viaforge.compatibility.ClientEntityMotion.clear(); ServerElytraFlight.clear(); VIEWS.clear(); world = null; com.viaversion.viaforge.blocks.ServerEditorPermissions.clear(); ServerTotemAnimation.clear(); ServerCombatState.clear(); ServerItemCooldowns.clear(); com.viaversion.viaforge.hands.Offhand.clear(); com.viaversion.viaforge.mobs.ServerMobs.clear(); com.viaversion.viaforge.boats.ServerBoats.clear(); }
     public static View get(int id) { return world == Minecraft.getMinecraft().theWorld ? VIEWS.get(id) : null; }
     public static boolean blocking(EntityLivingBase entity, boolean offhand, ItemStack stack) {
         if (!ClientItems.is(stack, com.viaversion.viaforge.common.blocks.LegacyItemCatalog.Kind.SHIELD)) return false;
@@ -44,6 +44,7 @@ public final class ServerEntityViews {
         WorldClient current = Minecraft.getMinecraft().theWorld;
         if (world != current || operation == 0) { clear(); world = current; }
         if (operation == 28) { com.viaversion.viaforge.blocks.ServerEditorPermissions.accept(input); return; }
+        if (operation == 29) { com.viaversion.viaforge.compatibility.ClientEntityPush.team(input); return; }
         if (!ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.ENTITY_VISUALS)) return;
         if (operation == 6) {
             ServerItemCooldowns.clear(); ServerElytraFlight.clear();
@@ -56,6 +57,7 @@ public final class ServerEntityViews {
         }
         // A same-dimension respawn retains the native world and its tracked entities.
         if (world == null || operation == 0 || operation == 6) return;
+        if (operation >= 30 && operation <= 33) { com.viaversion.viaforge.compatibility.ClientEntityMotion.motion(world,operation,input); return; }
         if (operation == 7) {
             int event = input.readInt();
             net.minecraft.util.BlockPos pos = net.minecraft.util.BlockPos.fromLong(input.readLong());
@@ -104,7 +106,10 @@ public final class ServerEntityViews {
                 break;
             }
             case 5:
-                input.skipBytes(42); // UUID, position and rotation
+                input.skipBytes(16);
+                double x=input.readDouble(),y=input.readDouble(),z=input.readDouble();
+                float yaw=input.readByte()*360F/256F,pitch=input.readByte()*360F/256F;
+                com.viaversion.viaforge.compatibility.ClientEntityMotion.spawn(world.getEntityByID(entityId),x,y,z,yaw,pitch);
                 VIEWS.put(entityId, new View(-1));
                 metadata(entityId, first, (protocol >= 335 ? Types.ENTITY_DATA_LIST1_12 : Types.ENTITY_DATA_LIST1_9).read(input));
                 break;
@@ -126,6 +131,7 @@ public final class ServerEntityViews {
             case 4:
                 int count = Types.VAR_INT.readPrimitive(input);
                 for (int i = 0; i < count; i++) {
+                    com.viaversion.viaforge.compatibility.ClientEntityMotion.remove(Types.VAR_INT.readPrimitive(input.duplicate()));
                     int id = Types.VAR_INT.readPrimitive(input); VIEWS.remove(id); com.viaversion.viaforge.hands.Offhand.remove(id); com.viaversion.viaforge.mobs.ServerMobs.remove(id); com.viaversion.viaforge.boats.ServerBoats.remove(world, id);
                 }
                 break;

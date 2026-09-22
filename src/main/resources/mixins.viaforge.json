@@ -5,6 +5,10 @@
   "package": "com.viaversion.viaforge.mixin.impl",
   "refmap": "mixins.viaforge.refmap.json",
   "client": [
+    "compatibility.MixinEntityPush",
+    "compatibility.MixinEntityMotionPackets",
+    "compatibility.MixinRemoteEntityPush",
+    "compatibility.MixinCollisionTeam",
     "MixinGuiMainMenu",
     "MixinGuiMultiplayer",
     "MixinGuiOverlayDebug",

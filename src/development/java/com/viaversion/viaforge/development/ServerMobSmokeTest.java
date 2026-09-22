@@ -16,6 +16,17 @@ final class ServerMobSmokeTest {
         int first = profile.protocol() >= 210 ? 12 : 11, id = 800;
         List<Integer> spawned = new ArrayList<>();
         try {
+            // A sub-1/32 delta used to disappear before the native collision box.
+            ByteBuf precise=packet(profile,"ADD_MOB");Types.VAR_INT.writePrimitive(precise,899);precise.writeLong(0).writeLong(899);
+            if(profile.protocol()>=315)Types.VAR_INT.writePrimitive(precise,90);else precise.writeByte(90);
+            precise.writeDouble(.9001).writeDouble(200).writeDouble(.5).writeByte(0).writeByte(0).writeByte(0).writeShort(0).writeShort(0).writeShort(0);
+            precise.writeByte(0).writeByte(0).writeByte(0).writeByte(255);
+            send(client,server,handler,precise);spawned.add(899);
+            Entity precisePig=world.getEntityByID(899);
+            require(precisePig.posX==.9001&&precisePig.getUniqueID().equals(new UUID(0,899)),"Native pig retains original spawn position and UUID");
+            precise=packet(profile,"MOVE_ENTITY_POS");Types.VAR_INT.writePrimitive(precise,899);precise.writeShort(1).writeShort(0).writeShort(0).writeBoolean(true);
+            send(client,server,handler,precise);for(int tick=0;tick<3;tick++)precisePig.onUpdate();
+            require(Math.abs(precisePig.posX-3687/4096D)<1e-12,"Original short relative delta interpolates once without 1/32 truncation");
             for (MobKind kind : MobKind.values()) {
                 if (kind.protocol > profile.protocol()) continue;
                 int mobId = ++id; spawned.add(mobId);
@@ -27,6 +38,7 @@ final class ServerMobSmokeTest {
                 send(client,server,handler,add);
                 Entity entity = world.getEntityByID(mobId);
                 require(entity != null,"Mob spawn "+kind+" "+profile);
+                require(entity.getUniqueID().equals(new UUID(0,mobId)),"Original UUID survives native fallback spawn for mob teams "+kind);
                 require(ServerMobs.get(entity) != null && ServerMobs.get(entity).kind == kind,"Original mob identity "+kind);
                 if (kind == MobKind.ENDER_DRAGON) {
                     net.minecraft.entity.boss.EntityDragon dragon=(net.minecraft.entity.boss.EntityDragon)entity;

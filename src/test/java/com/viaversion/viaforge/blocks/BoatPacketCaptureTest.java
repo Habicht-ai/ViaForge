@@ -12,7 +12,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class BoatPacketCaptureTest {
-    @Test public void onlyBoatMotionIsPreservedAndRemovalClearsReusedIds() {
+    @Test public void trackedMotionAndRemovalClearReusedBoatIds() {
         for (BlockVersionProfile profile : BlockVersionProfile.values()) {
             LegacyEntityPackets capture = new LegacyEntityPackets(profile);
             spawn(profile,capture,1);
@@ -25,7 +25,15 @@ public class BoatPacketCaptureTest {
             spawn(profile,capture,1); spawn(profile,capture,2); motion(profile,capture,false);
             spawn(profile,capture,1);
             ByteBuf mob=packet(profile,"ADD_MOB");Types.VAR_INT.writePrimitive(mob,88);assertCaptured(capture,mob,true);
-            motion(profile,capture,false);
+            ByteBuf move=packet(profile,"MOVE_ENTITY_POS");Types.VAR_INT.writePrimitive(move,88);
+            ByteBuf result=capture.capture(move);
+            try {
+                assertNotNull(result);Types.VAR_INT.readPrimitive(result);Types.STRING.read(result);
+                assertEquals(30,com.viaversion.viaforge.common.compatibility.ClientEventEnvelope.read(result).operation);
+                assertEquals(0,move.readerIndex());
+            } finally {move.release();if(result!=null)result.release();}
+            // A reused living ID must never be routed to the old boat event.
+            spawn(profile,capture,2);motion(profile,capture,false);
         }
     }
     @Test public void sameDimensionRespawnKeepsBoatsButWorldChangeAndLoginClearThem() {

@@ -110,3 +110,9 @@ ist damit nicht belegt.
 ## Grim-Befunde vom 21.09.2026
 
 Echte Survival-Verbindungen deckten zusätzliche Timing- und Bewegungsabweichungen auf. Neu sind die zielversionsabhängige Restgeschwindigkeitsschwelle 0,003 statt 0,005, die frühere Positions-Erinnerung und geordnete moderne Pong-/Input-/Tick-End-Pakete. Das bedeutet noch keine vollständige moderne Bewegungstreue; insbesondere 26.2 hat weiterhin Grim-Befunde. Ablauf, Nachweise und Grenzen: [REGRESSIONS-2026-09-21.md](REGRESSIONS-2026-09-21.md).
+
+Der [Originalvergleich beim Umgebungsschub](ENTITY-PUSH.md) vom 22.09.2026
+belegt zusätzlich die Grenze ab 1.21.5: Bei Spielern gilt horizontal
+X²+Z² < 0,003² statt zweier unabhängiger Achsschwellen. Y bleibt separat.
+Die Korrektur und ihre Welt-/Livetests beheben diesen nachgewiesenen Unterschied;
+die übrigen dokumentierten Elytra-/26.2-Befunde bleiben offen.

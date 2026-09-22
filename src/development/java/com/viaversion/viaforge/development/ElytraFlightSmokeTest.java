@@ -37,11 +37,14 @@ final class ElytraFlightSmokeTest {
         NetworkManager manager=new NetworkManager(EnumPacketDirection.CLIENTBOUND){@Override public void sendPacket(Packet packet){sent.add(packet);}};
         NetHandlerPlayClient handler=new NetHandlerPlayClient(mc,null,manager,new GameProfile(new UUID(0,912),"FlightTest"));
         java.lang.reflect.Field worldField=NetHandlerPlayClient.class.getDeclaredField("clientWorldController");worldField.setAccessible(true);worldField.set(handler,world);
+        java.lang.reflect.Field ready=NetHandlerPlayClient.class.getDeclaredField("doneLoadingTerrain");ready.setAccessible(true);ready.set(handler,true);
         mc.theWorld=world;mc.thePlayer=new EntityPlayerSP(mc,world,handler,new StatFileWriter());mc.playerController=new PlayerControllerMP(mc,handler);
         // WorldClient resolves the local player directly via Minecraft.thePlayer.
         // addEntityToWorld would find and kill that same player as a duplicate.
         EntityPlayerSP player=mc.thePlayer;player.movementInput=new net.minecraft.util.MovementInput();player.setEntityId(1);
         try {
+            EntityPushSmokeTest.verify(world,player);
+            sent.clear();
             ServerEntityViews.clear();player.setHealth(20);player.setPosition(5,200,5);player.motionY=-.2;player.onGround=false;
             PacketBuffer attributes=new PacketBuffer(io.netty.buffer.Unpooled.buffer());
             try {

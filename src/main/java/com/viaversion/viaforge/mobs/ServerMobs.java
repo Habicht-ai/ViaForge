@@ -42,9 +42,12 @@ public final class ServerMobs {
             double vx = input.readShort() / 8000D, vy = input.readShort() / 8000D, vz = input.readShort() / 8000D;
             MobState state = new MobState(protocol, type);
             state.update((protocol >= 335 ? Types.ENTITY_DATA_LIST1_12 : Types.ENTITY_DATA_LIST1_9).read(input));
-            if (state.kind == null) return;
-            MOBS.put(id, state);
             Entity entity = world.getEntityByID(id);
+            // Native 1.8 spawn packets omit UUIDs. Team membership of nonplayers
+            // uses the original UUID, not the random identity of that fallback.
+            if (entity != null) ((com.viaversion.viaforge.mixin.impl.mobs.MobSizeAccess) entity).viaForge$identity(uuid);
+            if (state.kind == null) { com.viaversion.viaforge.compatibility.ClientEntityMotion.spawn(entity,x,y,z,yaw,pitch); return; }
+            MOBS.put(id, state);
             if (state.kind.custom()) {
                 ServerMob mob = new ServerMob(world, state, uuid);
                 mob.setPositionAndRotation(x, y, z, yaw, pitch);
@@ -60,6 +63,7 @@ public final class ServerMobs {
                 // setGrowingAge preserves the native child's scale after changing the adult dimensions.
                 ((EntityRabbit)entity).setGrowingAge(state.flag(state.first) ? -24000 : 0);
             }
+            com.viaversion.viaforge.compatibility.ClientEntityMotion.spawn(world.getEntityByID(id),x,y,z,yaw,pitch);
         } else if (operation == 12) {
             Entity entity = world.getEntityByID(input.readInt()); int status = input.readUnsignedByte();
             // 1.8 processes the shared statuses itself; Via cancels the later additions.

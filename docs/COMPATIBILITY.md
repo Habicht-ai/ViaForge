@@ -199,3 +199,12 @@ See [UPGRADE-26.3.md](UPGRADE-26.3.md) for the explicit protocol 777 boundary, c
 [ELYTRA-MOVEMENT.md](ELYTRA-MOVEMENT.md) documents local start prediction since 1.15,
 server-owned landing flags, collision-aware size changes and crawling since 1.14.
 These are independent named behavior rules, not tests against packet-layout revisions.
+
+## Proximity collision and original entity coordinates
+
+[ENTITY-PUSH.md](ENTITY-PUSH.md) documents the reproduced missing client-side
+push from mobs/players, original team-rule and UUID retention, precise living
+entity positions, and the target-specific impulse/coasting rules. Local 1.8
+behavior is unchanged. In particular, the horizontal cutoff for players changes
+to a combined X/Z magnitude in 1.21.5. The live case matrix and original-client
+comparisons are separate from connectivity and the resource-profile smoke.

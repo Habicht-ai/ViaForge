@@ -33,7 +33,7 @@ public final class LiveBoatProbe {
     private LiveBoatProbe(String path) {
         folder=Paths.get(path); protocol=Integer.parseInt(System.getenv("VIAFORGE_BOAT_PROTOCOL"));
         port=Integer.parseInt(System.getenv("VIAFORGE_BOAT_PORT"));
-        name="VFboat"+protocol+System.currentTimeMillis()%1000000;
+        name=("1".equals(System.getenv("VIAFORGE_PUSH_PROBE"))?"VFpush":"VFboat")+protocol+System.currentTimeMillis()%1000000;
     }
     public static boolean installIfRequested() {
         String path=System.getenv("VIAFORGE_BOAT_PROBE"); if(path==null)return false;
@@ -127,6 +127,22 @@ public final class LiveBoatProbe {
             JsonObject j=new JsonObject();j.addProperty("phase",event.phase.toString());j.addProperty("action",action);j.addProperty("action_tick",actionTick);
             j.addProperty("player_tick",mc.thePlayer.ticksExisted);j.addProperty("gamemode",mc.playerController.getCurrentGameType().toString());
             j.addProperty("player_x",mc.thePlayer.posX);j.addProperty("player_y",mc.thePlayer.posY);j.addProperty("player_z",mc.thePlayer.posZ);
+            if("1".equals(System.getenv("VIAFORGE_PUSH_PROBE"))) {
+                j.addProperty("player_vx",mc.thePlayer.motionX);j.addProperty("player_vy",mc.thePlayer.motionY);j.addProperty("player_vz",mc.thePlayer.motionZ);
+                j.addProperty("player_alive",mc.thePlayer.isEntityAlive());j.addProperty("player_health",mc.thePlayer.getHealth());
+                j.addProperty("player_box",mc.thePlayer.getEntityBoundingBox().toString());j.addProperty("ground",mc.thePlayer.onGround);
+                j.addProperty("ladder",mc.thePlayer.isOnLadder());j.addProperty("spectator",mc.thePlayer.isSpectator());
+                JsonArray nearby=new JsonArray();
+                for(Object value:mc.theWorld.loadedEntityList) {
+                    Entity e=(Entity)value;if(e==mc.thePlayer||mc.thePlayer.getDistanceSqToEntity(e)>16)continue;
+                    JsonObject n=new JsonObject();n.addProperty("id",e.getEntityId());n.addProperty("type",e.getClass().getSimpleName());
+                    n.addProperty("x",e.posX);n.addProperty("y",e.posY);n.addProperty("z",e.posZ);
+                    n.addProperty("vx",e.motionX);n.addProperty("vz",e.motionZ);n.addProperty("box",e.getEntityBoundingBox().toString());
+                    n.addProperty("overlap",e.getEntityBoundingBox().intersectsWith(mc.thePlayer.getEntityBoundingBox()));
+                    nearby.add(n);
+                }
+                j.add("nearby",nearby);
+            }
             j.addProperty("input_forward",mc.thePlayer.movementInput.moveForward);j.addProperty("input_strafe",mc.thePlayer.movementInput.moveStrafe);
             if(event.phase==TickEvent.Phase.END&&tick%20==0) {
                 JsonObject setup=new JsonObject();setup.addProperty("tick",tick);setup.addProperty("time_ms",System.currentTimeMillis());

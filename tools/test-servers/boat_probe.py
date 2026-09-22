@@ -49,12 +49,12 @@ def assert_no_client():
         raise RuntimeError('Existing Minecraft client: ' + found)
 
 
-def run(version, label, client_type='viaforge', extended=False, baseline=False, reconnect=False, controls=False):
+def run(version, label, client_type='viaforge', extended=False, baseline=False, reconnect=False, controls=False, scenario='boat', baseline_stage=None):
     assert_no_client()
     source_row = next(r for r in lab.GRIM_VERSIONS if r['minecraft_version'] == version)
-    if (client_type=='native' or extended or controls) and version!='1.12.2':
+    if (client_type=='native' or extended or controls) and version!='1.12.2' and not (scenario=='push' and version=='26.2' and not extended and not controls):
         raise ValueError('Native/extended script is currently mapped to exact 1.12.2')
-    folder = lab.ROOT / ('boat-' + version + '-' + label + '-' + str(time.time_ns()))
+    folder = lab.ROOT / (scenario + '-' + version + '-' + label + '-' + str(time.time_ns()))
     folder.mkdir()
     source = lab.ROOT / source_row['version']
     original = source / source_row['launch_jar']
@@ -109,7 +109,13 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
     for p in config_files:
         if p.exists(): shutil.copy2(p, folder / (p.name + '.before'))
     development=lab.REPO/'run/mods/ViaForge-development.jar'
-    if baseline:
+    if baseline and (scenario=='push' or baseline_stage=='push'):
+        old=lab.REPO/'build/backups/entity-push-20260922-143245/ViaForge-baseline-with-probe.jar'
+        if not old.exists():raise RuntimeError('Explicit pre-push baseline archive missing')
+        shutil.copy2(development,folder/'development-fixed.jar')
+        shutil.copy2(old,development)
+        lab.save(folder/'baseline-classes.json',dict(source=str(old),source_sha256=grim.digest(old),description='Pre-push production with observation probe only'))
+    elif baseline:
         old=lab.REPO/'build/backups/boats-20260921-195746/ViaForge-development.jar'
         if not old.exists():raise RuntimeError('Explicit a24ca9c baseline archive missing')
         shutil.copy2(development,folder/'development-fixed.jar')
@@ -127,7 +133,7 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
     server = client = companion = None
     companion_dir = None
     cases = []
-    report = dict(server=source_row, row=row, label=label, client=client_type, baseline=baseline, started=time.time(), cases=cases, completed=False)
+    report = dict(server=source_row, row=row, label=label, client=client_type, baseline=baseline, started=time.time(), cases=cases, completed=False, scenario=scenario)
     client_dir = folder / client_type
     client_dir.mkdir()
     server_log = folder / 'server-console.log'
@@ -195,17 +201,27 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
             # changes that can stall resource/chunk conversion during setup.
             console(['forceload add -48 -48 48 48'])
             time.sleep(2)
-            console(['fill -48 62 -48 48 62 48 stone','fill -48 63 -48 48 64 48 water',
-                'fill 32 63 -48 48 64 48 stone','fill -48 65 -48 48 67 48 air'])
+            if scenario=='boat':
+                console(['fill -48 62 -48 48 62 48 stone','fill -48 63 -48 48 64 48 water',
+                    'fill 32 63 -48 48 64 48 stone','fill -48 65 -48 48 67 48 air'])
+            else:
+                console(['fill -8 63 -8 8 63 8 stone','fill -8 64 -8 8 69 8 air'])
+        if scenario=='push':
+            console(['fill -8 63 -8 8 63 8 stone','fill -8 64 -8 8 69 8 air',
+                     'gamerule spawnRadius 0','setworldspawn 0 64 0'])
         grim.control(row, 'on')
         env = dict(os.environ, VIAFORGE_NO_PAUSE='1', JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4',
-                   VIAFORGE_BOAT_PROBE=str(client_dir), VIAFORGE_BOAT_PROTOCOL=str(row['protocol']), VIAFORGE_BOAT_PORT=str(row['port']))
+                   VIAFORGE_PUSH_PROBE='1' if scenario=='push' else '0', VIAFORGE_BOAT_PROBE=str(client_dir), VIAFORGE_BOAT_PROTOCOL=str(row['protocol']), VIAFORGE_BOAT_PORT=str(row['port']))
         for key in ('VIAFORGE_BLOCK_SMOKE_TEST', 'VIAFORGE_SMOKE_PROTOCOL', 'VIAFORGE_PROTOCOL_PROBE', 'VIAFORGE_LIVE_FLIGHT'):
             env.pop(key, None)
         with (client_dir / 'console.log').open('w') as log:
             if client_type=='native':
-                import native_boat_probe
-                launch=native_boat_probe.command(client_dir,row['port'])
+                if scenario=='push' and version=='26.2':
+                    import native_push_probe
+                    launch=native_push_probe.command(client_dir,row['port'])
+                else:
+                    import native_boat_probe
+                    launch=native_boat_probe.command(client_dir,row['port'])
             else:
                 launch=['cmd.exe', '/d', '/c', r'.\build.bat', 'runClient', '-x', 'preRunClient']
                 if baseline:launch += ['-x','installDevelopmentJar']
@@ -224,131 +240,143 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
                 boat_sources={str(p.relative_to(lab.REPO)):grim.digest(p) for p in [
                     lab.REPO/'src/main/java/com/viaversion/viaforge/boats/ServerBoat.java',
                     lab.REPO/'src/main/java/com/viaversion/viaforge/mixin/impl/boats/MixinBoatPlayer.java']})
-        action('Creative login', 'idle', 3)
-        console(['tp ' + name + ' -32 66 0 -90 20'])
-        action('Load fixture chunks', 'idle', 3)
-        if row['protocol']<393:
-            console(['fill -48 62 -48 48 62 48 stone','fill -48 63 -48 48 64 48 water', 'fill 32 63 -48 48 64 48 stone',
-                     'fill -48 65 -48 48 67 48 air'])
-        action('Settle fixture water', 'idle', 2)
-        legacy=row['protocol']<393
-        fixture = console(['testforblock 0 64 0 water 0', 'testforblock 0 64 0 flowing_water 0', 'testforblock 32 64 0 stone'] if legacy else
-            ['execute if block 0 64 0 water[level=0] run say BOAT_WATER_OK','execute if block 32 64 0 stone run say BOAT_SHORE_OK'])
-        if not (fixture.count('Successfully found the block') == 2 if legacy else '[Server] BOAT_WATER_OK' in fixture and '[Server] BOAT_SHORE_OK' in fixture):
-            raise RuntimeError('Fixture not loaded/confirmed: ' + fixture)
-        boat_id='Boat' if row['protocol']<315 else 'boat' if row['protocol']<768 else 'oak_boat'
-        console(['gamemode '+('0' if legacy else 'survival')+' ' + name, 'tp ' + name + ' -32 65 0 -90 20',
-                 'summon '+boat_id+' -31 64.6 0 {Rotation:[-90f,0f]}'])
-        if extended:console(['entitydata @e[type=boat] {CustomName:"BoatProbe"}'])
-        if client_type=='viaforge':
-            deadline=time.monotonic()+60
-            while time.monotonic()<deadline:
-                setup=read_json(client_dir/'setup.json')
-                if setup.get('gamemode')=='SURVIVAL' and setup.get('fixture_water') and setup.get('boat_present') and time.time()*1000-setup.get('time_ms',0)<2000:
-                    report['client_fixture_confirmed']=setup;break
-                if read_json(client_dir/'client-state.json').get('state')=='FAIL' or client.poll() is not None:
-                    raise RuntimeError('Client failed before loaded Survival boat fixture')
-                time.sleep(.2)
-            else:raise TimeoutError('Client did not confirm loaded Survival water/boat fixture: '+repr(setup))
-        action('Survival boarding', 'board', 3)
-        for label, value, seconds in [('Rest in water','idle',4), ('Accelerate','forward',4), ('Full coast','idle',20),
-            ('Left curve','forward-left',3), ('After turn','idle',20), ('Right curve','forward-right',3),
-            ('Reverse','back',3), ('Combined directions','forward-back-left',3), ('Final rest','idle',20),
-            ('Dismount','dismount',1), ('Reboard','board',3), ('Reboard rest','idle',3)]:
-            action(label, value, seconds)
-        if extended:
-            def reset_boat(label, x, y, z, yaw, nbt=''):
-                action(label+' dismount','dismount',.6)
-                console(['kill @e[type=boat,name=BoatProbe]',
-                    'tp '+name+f' {x-1} {y+1} {z} {yaw} 20',
-                    f'summon boat {x} {y} {z} {{Rotation:[{yaw}f,0f],CustomName:"BoatProbe"'+nbt+'}'])
-                action(label+' board','board',3)
-                action(label+' settle','idle',2)
-            reset_boat('Shore collision',25,64.6,0,-90)
-            action('Water into solid shore','forward',5)
-            action('Rest at shore','idle',5)
-            reset_boat('Land to water',38,65,0,90)
-            action('Stone to water','forward',7)
-            action('Coast after land to water','idle',6)
-            action('Prepare ice dismount','dismount',.6)
-            console(['fill 32 64 -16 48 64 16 ice','testforblock 38 64 0 ice'])
-            reset_boat('Ice to water',38,65,0,90,',Type:"spruce"')
-            action('Ice accelerate and enter water','forward',3)
-            action('Ice/water coast','idle',7)
-            reset_boat('Immersion',-20,64.6,12,-90,',Type:"birch"')
-            console(['fill -22 65 10 -18 66 14 water'])
-            action('Submerge while driving','forward',1)
-            console(['fill -28 65 4 -10 67 20 air'])
-            action('Drive after immersion','forward',3)
-            action('Rest after immersion','idle',5)
-            reset_boat('Flowing water',-20,64.6,12,-90,',Type:"jungle"')
-            console(['fill -22 65 10 -18 66 14 flowing_water 1'])
-            action('Flowing water drive','forward',1)
-            console(['fill -28 65 4 -10 67 20 air'])
-            action('Flowing water rest','idle',5)
-            reset_boat('Animal passenger',-20,64.6,-12,-90,',Passengers:[{id:"pig",NoAI:1b,Invulnerable:1b}]')
-            action('Driver with animal passenger','forward-left',3)
-            action('Rest with animal passenger','idle',3)
-            action('Leave second seat','dismount',1)
-            console(['kill @e[type=pig]'])
-            reset_boat('Server teleport',-20,64.6,0,-90,',Type:"dark_oak"')
-            action('Drive before server teleport','forward',2)
-            console(['tp '+name+' -20 65 0 -90 20'])
-            action('Authoritative player teleport','idle',3)
-            console(['tp '+name+' @e[type=boat,name=BoatProbe,c=1]'])
-            action('Board after teleport','board',3)
-            action('Drive after teleport','forward-right',2)
-            action('Coast after teleport','idle',5)
+            if scenario=='push':
+                relative=['compatibility/ClientEntityPush.java','compatibility/ClientEntityMotion.java',
+                          'common/compatibility/EntityPushRules.java','common/compatibility/EntityPositionRules.java',
+                          'common/compatibility/LegacyCompatibility.java','common/blocks/LegacyEntityPackets.java',
+                          'mobs/ServerMobs.java','mixin/impl/compatibility/MixinEntityPush.java',
+                          'mixin/impl/compatibility/MixinRemoteEntityPush.java','mixin/impl/compatibility/MixinEntityMotionPackets.java',
+                          'mixin/impl/connect/MixinMotionThreshold.java']
+                report['client_artifact']['push_sources']={s:grim.digest(lab.REPO/'src/main/java/com/viaversion/viaforge'/s) for s in relative}
+        if scenario=='push':
+            import push_probe
+            push_probe.exercise(row,folder,report,name,action,console)
+        else:
+            action('Creative login', 'idle', 3)
+            console(['tp ' + name + ' -32 66 0 -90 20'])
+            action('Load fixture chunks', 'idle', 3)
+            if row['protocol']<393:
+                console(['fill -48 62 -48 48 62 48 stone','fill -48 63 -48 48 64 48 water', 'fill 32 63 -48 48 64 48 stone',
+                         'fill -48 65 -48 48 67 48 air'])
+            action('Settle fixture water', 'idle', 2)
+            legacy=row['protocol']<393
+            fixture = console(['testforblock 0 64 0 water 0', 'testforblock 0 64 0 flowing_water 0', 'testforblock 32 64 0 stone'] if legacy else
+                ['execute if block 0 64 0 water[level=0] run say BOAT_WATER_OK','execute if block 32 64 0 stone run say BOAT_SHORE_OK'])
+            if not (fixture.count('Successfully found the block') == 2 if legacy else '[Server] BOAT_WATER_OK' in fixture and '[Server] BOAT_SHORE_OK' in fixture):
+                raise RuntimeError('Fixture not loaded/confirmed: ' + fixture)
+            boat_id='Boat' if row['protocol']<315 else 'boat' if row['protocol']<768 else 'oak_boat'
+            console(['gamemode '+('0' if legacy else 'survival')+' ' + name, 'tp ' + name + ' -32 65 0 -90 20',
+                     'summon '+boat_id+' -31 64.6 0 {Rotation:[-90f,0f]}'])
+            if extended:console(['entitydata @e[type=boat] {CustomName:"BoatProbe"}'])
             if client_type=='viaforge':
-                import native_boat_probe
-                companion_dir=folder/'native-companion';companion_dir.mkdir()
-                with (companion_dir/'console.log').open('w') as log:
-                    companion=subprocess.Popen(native_boat_probe.command(companion_dir,row['port']),cwd=companion_dir,
-                        stdout=log,stderr=subprocess.STDOUT,creationflags=lab.NO_WINDOW)
-                deadline=time.monotonic()+120
+                deadline=time.monotonic()+60
                 while time.monotonic()<deadline:
-                    other=read_json(companion_dir/'client-state.json')
-                    if other.get('state')=='ready':break
-                    if other.get('state')=='FAIL' or companion.poll() is not None:raise RuntimeError('Companion failed: '+repr(other))
+                    setup=read_json(client_dir/'setup.json')
+                    if setup.get('gamemode')=='SURVIVAL' and setup.get('fixture_water') and setup.get('boat_present') and time.time()*1000-setup.get('time_ms',0)<2000:
+                        report['client_fixture_confirmed']=setup;break
+                    if read_json(client_dir/'client-state.json').get('state')=='FAIL' or client.poll() is not None:
+                        raise RuntimeError('Client failed before loaded Survival boat fixture')
                     time.sleep(.2)
-                else:raise TimeoutError('Companion login')
-                report['companion']=other
-                action('Prepare two players','dismount',1)
-                console(['kill @e[type=boat,name=BoatProbe]','gamemode 0 '+other['name'],
-                    'tp '+other['name']+' -21 65 -12 -90 20','tp '+name+' -19 65 -12 90 20',
-                    'summon boat -20 64.6 -12 {Rotation:[-90f,0f],CustomName:"BoatProbe",Type:"acacia"}'])
-                write_action(companion_dir, 'board');action('Native driver boards','idle',3)
-                write_action(companion_dir, 'idle');action('Second player boards','board',3)
-                action('Second player passenger','forward-left',3)
-                write_action(companion_dir, 'forward-right');action('Passenger during native driving','back',3)
-                write_action(companion_dir, 'idle');action('Passenger coast','idle',5)
-                write_action(companion_dir, 'dismount');action('Native driver leaves','idle',2)
-                write_action(companion_dir, 'idle');action('Driver after seat transfer','forward',3)
-                action('Rest after seat transfer','idle',6)
-                write_action(companion_dir, 'stop');companion.wait(timeout=45)
-            if client_type=='viaforge':
-                action('Reconnect same account','reconnect',8)
-                reset_boat('After reconnect',-20,64.6,0,-90)
-                action('Drive after reconnect','forward',3)
+                else:raise TimeoutError('Client did not confirm loaded Survival water/boat fixture: '+repr(setup))
+            action('Survival boarding', 'board', 3)
+            for label, value, seconds in [('Rest in water','idle',4), ('Accelerate','forward',4), ('Full coast','idle',20),
+                ('Left curve','forward-left',3), ('After turn','idle',20), ('Right curve','forward-right',3),
+                ('Reverse','back',3), ('Combined directions','forward-back-left',3), ('Final rest','idle',20),
+                ('Dismount','dismount',1), ('Reboard','board',3), ('Reboard rest','idle',3)]:
+                action(label, value, seconds)
+            if extended:
+                def reset_boat(label, x, y, z, yaw, nbt=''):
+                    action(label+' dismount','dismount',.6)
+                    console(['kill @e[type=boat,name=BoatProbe]',
+                        'tp '+name+f' {x-1} {y+1} {z} {yaw} 20',
+                        f'summon boat {x} {y} {z} {{Rotation:[{yaw}f,0f],CustomName:"BoatProbe"'+nbt+'}'])
+                    action(label+' board','board',3)
+                    action(label+' settle','idle',2)
+                reset_boat('Shore collision',25,64.6,0,-90)
+                action('Water into solid shore','forward',5)
+                action('Rest at shore','idle',5)
+                reset_boat('Land to water',38,65,0,90)
+                action('Stone to water','forward',7)
+                action('Coast after land to water','idle',6)
+                action('Prepare ice dismount','dismount',.6)
+                console(['fill 32 64 -16 48 64 16 ice','testforblock 38 64 0 ice'])
+                reset_boat('Ice to water',38,65,0,90,',Type:"spruce"')
+                action('Ice accelerate and enter water','forward',3)
+                action('Ice/water coast','idle',7)
+                reset_boat('Immersion',-20,64.6,12,-90,',Type:"birch"')
+                console(['fill -22 65 10 -18 66 14 water'])
+                action('Submerge while driving','forward',1)
+                console(['fill -28 65 4 -10 67 20 air'])
+                action('Drive after immersion','forward',3)
+                action('Rest after immersion','idle',5)
+                reset_boat('Flowing water',-20,64.6,12,-90,',Type:"jungle"')
+                console(['fill -22 65 10 -18 66 14 flowing_water 1'])
+                action('Flowing water drive','forward',1)
+                console(['fill -28 65 4 -10 67 20 air'])
+                action('Flowing water rest','idle',5)
+                reset_boat('Animal passenger',-20,64.6,-12,-90,',Passengers:[{id:"pig",NoAI:1b,Invulnerable:1b}]')
+                action('Driver with animal passenger','forward-left',3)
+                action('Rest with animal passenger','idle',3)
+                action('Leave second seat','dismount',1)
+                console(['kill @e[type=pig]'])
+                reset_boat('Server teleport',-20,64.6,0,-90,',Type:"dark_oak"')
+                action('Drive before server teleport','forward',2)
+                console(['tp '+name+' -20 65 0 -90 20'])
+                action('Authoritative player teleport','idle',3)
+                console(['tp '+name+' @e[type=boat,name=BoatProbe,c=1]'])
+                action('Board after teleport','board',3)
+                action('Drive after teleport','forward-right',2)
+                action('Coast after teleport','idle',5)
+                if client_type=='viaforge':
+                    import native_boat_probe
+                    companion_dir=folder/'native-companion';companion_dir.mkdir()
+                    with (companion_dir/'console.log').open('w') as log:
+                        companion=subprocess.Popen(native_boat_probe.command(companion_dir,row['port']),cwd=companion_dir,
+                            stdout=log,stderr=subprocess.STDOUT,creationflags=lab.NO_WINDOW)
+                    deadline=time.monotonic()+120
+                    while time.monotonic()<deadline:
+                        other=read_json(companion_dir/'client-state.json')
+                        if other.get('state')=='ready':break
+                        if other.get('state')=='FAIL' or companion.poll() is not None:raise RuntimeError('Companion failed: '+repr(other))
+                        time.sleep(.2)
+                    else:raise TimeoutError('Companion login')
+                    report['companion']=other
+                    action('Prepare two players','dismount',1)
+                    console(['kill @e[type=boat,name=BoatProbe]','gamemode 0 '+other['name'],
+                        'tp '+other['name']+' -21 65 -12 -90 20','tp '+name+' -19 65 -12 90 20',
+                        'summon boat -20 64.6 -12 {Rotation:[-90f,0f],CustomName:"BoatProbe",Type:"acacia"}'])
+                    write_action(companion_dir, 'board');action('Native driver boards','idle',3)
+                    write_action(companion_dir, 'idle');action('Second player boards','board',3)
+                    action('Second player passenger','forward-left',3)
+                    write_action(companion_dir, 'forward-right');action('Passenger during native driving','back',3)
+                    write_action(companion_dir, 'idle');action('Passenger coast','idle',5)
+                    write_action(companion_dir, 'dismount');action('Native driver leaves','idle',2)
+                    write_action(companion_dir, 'idle');action('Driver after seat transfer','forward',3)
+                    action('Rest after seat transfer','idle',6)
+                    write_action(companion_dir, 'stop');companion.wait(timeout=45)
+                if client_type=='viaforge':
+                    action('Reconnect same account','reconnect',8)
+                    reset_boat('After reconnect',-20,64.6,0,-90)
+                    action('Drive after reconnect','forward',3)
+                    action('Coast after reconnect','idle',6)
+            if reconnect and not extended:
+                if client_type=='native':
+                    before=grim.state(row,True);start=time.time()
+                    write_action(client_dir, 'stop');client.wait(timeout=60)
+                    write_action(client_dir, 'idle')
+                    with (client_dir/'console.log').open('a') as log:
+                        client=subprocess.Popen(native_boat_probe.command(client_dir,row['port'],name=name),
+                            cwd=client_dir,env=env,stdout=log,stderr=subprocess.STDOUT,creationflags=lab.NO_WINDOW)
+                    deadline=time.monotonic()+120
+                    while time.monotonic()<deadline:
+                        if read_json(client_dir/'client-state.json').get('state')=='ready':break
+                        if client.poll() is not None:raise RuntimeError('Native reconnect exited')
+                        time.sleep(.2)
+                    else:raise TimeoutError('Native reconnect')
+                    time.sleep(8)
+                    cases.append(dict(case='Reconnect same account',action='reconnect',start=start,end=time.time(),before=before,after=grim.state(row,True)))
+                else:action('Reconnect same account','reconnect',8)
                 action('Coast after reconnect','idle',6)
-        if reconnect and not extended:
-            if client_type=='native':
-                before=grim.state(row,True);start=time.time()
-                write_action(client_dir, 'stop');client.wait(timeout=60)
-                write_action(client_dir, 'idle')
-                with (client_dir/'console.log').open('a') as log:
-                    client=subprocess.Popen(native_boat_probe.command(client_dir,row['port'],name=name),
-                        cwd=client_dir,env=env,stdout=log,stderr=subprocess.STDOUT,creationflags=lab.NO_WINDOW)
-                deadline=time.monotonic()+120
-                while time.monotonic()<deadline:
-                    if read_json(client_dir/'client-state.json').get('state')=='ready':break
-                    if client.poll() is not None:raise RuntimeError('Native reconnect exited')
-                    time.sleep(.2)
-                else:raise TimeoutError('Native reconnect')
-                time.sleep(8)
-                cases.append(dict(case='Reconnect same account',action='reconnect',start=start,end=time.time(),before=before,after=grim.state(row,True)))
-            else:action('Reconnect same account','reconnect',8)
-            action('Coast after reconnect','idle',6)
         write_action(client_dir, 'stop'); client.wait(timeout=60)
         report['completed'] = read_json(client_dir / 'client-state.json').get('state') == 'DONE'
         if controls:
@@ -408,7 +436,10 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
         poses_file = client_dir / 'client.jsonl'
         poses = [json.loads(s) for s in poses_file.read_text().splitlines()] if poses_file.exists() else []
         for case in cases:
-            case.update(summarize(case,poses,events,report.get('name'),row['protocol']))
+            if scenario=='push':
+                import push_probe
+                case.update(push_probe.summarize(case,poses,events,report.get('name'),row['protocol']))
+            else:case.update(summarize(case,poses,events,report.get('name'),row['protocol']))
         report['ended'] = time.time(); report['events'] = events
         lab.save(folder / 'report.json', report)
         print('REPORT', folder / 'report.json', flush=True)
@@ -420,6 +451,9 @@ if __name__ == '__main__':
     parser.add_argument('--client', choices=['viaforge','native'],default='viaforge')
     parser.add_argument('--extended',action='store_true')
     parser.add_argument('--baseline',action='store_true',help='Use preserved a24ca9c boat classes with the same development input probe')
+    parser.add_argument('--baseline-stage',choices=['boats','push'],help='Select the preserved pre-boat or pre-push production baseline (requires --baseline)')
     parser.add_argument('--reconnect',action='store_true',help='Reconnect while mounted after the core sequence, including the original-client comparison')
     parser.add_argument('--controls',action='store_true',help='After driving: genuine verbose negative controls and persistent ON/OFF on this isolated 1.12.2 server')
-    args = parser.parse_args(); run(args.version, args.label,args.client,args.extended,args.baseline,args.reconnect,args.controls)
+    args = parser.parse_args()
+    if args.baseline_stage and not args.baseline:parser.error('--baseline-stage requires --baseline')
+    run(args.version, args.label,args.client,args.extended,args.baseline,args.reconnect,args.controls,baseline_stage=args.baseline_stage)

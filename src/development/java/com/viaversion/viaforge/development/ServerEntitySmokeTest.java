@@ -82,6 +82,16 @@ final class ServerEntitySmokeTest {
             require(!ServerEntityViews.blocking(player, true, view.offhand), "Remote shield released");
             equipment = packet(profile, "SET_EQUIPPED_ITEM"); Types.VAR_INT.writePrimitive(equipment, 612); Types.VAR_INT.writePrimitive(equipment, 1); Types.ITEM1_8.write(equipment, null);
             send(client, server, handler, equipment); require(view.offhand == null, "Empty equipment clears remote shield");
+            for(int action:new int[]{0,2}) {
+                ByteBuf team=packet(profile,"SET_PLAYER_TEAM");Types.STRING.write(team,"collision_test");team.writeByte(action);
+                for(int i=0;i<3;i++)Types.STRING.write(team,"");team.writeByte(0);Types.STRING.write(team,"always");
+                Types.STRING.write(team,action==0?"never":"pushOtherTeams");team.writeByte(-1);if(action==0)Types.VAR_INT.writePrimitive(team,0);
+                send(client,server,handler,team);
+                require(((com.viaversion.viaforge.compatibility.CollisionTeam)world.getScoreboard().getTeam("collision_test")).viaForge$collisionRule()
+                    ==(action==0?com.viaversion.viaforge.common.compatibility.EntityPushRules.TeamRule.NEVER:com.viaversion.viaforge.common.compatibility.EntityPushRules.TeamRule.PUSH_OTHER_TEAMS),"Ordered team creation/update retains original collision rule through Via");
+            }
+            ByteBuf removeTeam=packet(profile,"SET_PLAYER_TEAM");Types.STRING.write(removeTeam,"collision_test");removeTeam.writeByte(1);send(client,server,handler,removeTeam);
+            require(world.getScoreboard().getTeam("collision_test")==null,"Original team removal is native and discards collision state");
             ElytraFlightSmokeTest.verify(world,new ElytraFlightSmokeTest.Wire(){
                 public void use(net.minecraft.network.play.client.C17PacketCustomPayload packet,boolean swing,int hand)throws Exception {
                     OffhandSmokeTest.wire(profile,client,packet,swing?"SWING":"USE_ITEM",b->require(Types.VAR_INT.readPrimitive(b)==hand,"Actual input preserves selected hand on target wire"));
@@ -134,7 +144,7 @@ final class ServerEntitySmokeTest {
                 int id = Types.VAR_INT.readPrimitive(received);
                 // Player construction uses a local profile fixture; the visual data
                 // still comes from the actual ADD_PLAYER packet through the pipeline.
-                if (id != 0x0e && id != 0x0f && id != 0x15 && id != 0x17 && id != 0x18 && id != 0x19 && id != 0x1b && id != 0x1c && id != 0x13 && id != 0x3f && id != 0x04 && id != 0x12 && id != 0x1a && id != 0x23 && id != 0x35 && id != 0x24 && id != 0x21 && id != 0x2d && id != 0x2f && id != 0x30) continue;
+                if (id != 0x0e && id != 0x0f && id != 0x15 && id != 0x17 && id != 0x18 && id != 0x19 && id != 0x1b && id != 0x1c && id != 0x13 && id != 0x3f && id != 0x04 && id != 0x12 && id != 0x1a && id != 0x23 && id != 0x35 && id != 0x24 && id != 0x21 && id != 0x2d && id != 0x2f && id != 0x30 && id != 0x3e) continue;
                 Packet nativePacket = EnumConnectionState.PLAY.getPacket(EnumPacketDirection.CLIENTBOUND, id);
                 nativePacket.readPacketData(new PacketBuffer(received)); nativePacket.processPacket(handler);
             } finally { received.release(); }

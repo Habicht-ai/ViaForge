@@ -14,6 +14,7 @@ public final class LegacyEntityPackets {
     private final BlockVersionProfile profile;
     private final ClientboundPacketType[] packets;
     private final java.util.Set<Integer> boats = new java.util.HashSet<>();
+    private final java.util.Set<Integer> living = new java.util.HashSet<>();
     private Integer dimension;
     public LegacyEntityPackets(BlockVersionProfile profile) {
         this.profile = profile;
@@ -21,7 +22,7 @@ public final class LegacyEntityPackets {
                 : profile.protocol() >= 335 ? ClientboundPackets1_12.values()
                 : profile.protocol() >= 110 ? ClientboundPackets1_9_3.values() : ClientboundPackets1_9.values();
     }
-    public void clear() { boats.clear();dimension=null; }
+    public void clear() { boats.clear();living.clear();dimension=null; }
     public ByteBuf capture(ByteBuf source) {
         ByteBuf input = source.duplicate();
         int id = Types.VAR_INT.readPrimitive(input);
@@ -29,17 +30,18 @@ public final class LegacyEntityPackets {
         int operation;
         switch (packets[id].getName()) {
             case "LOGIN":
-                boats.clear();
+                boats.clear();living.clear();
                 ByteBuf login = input.duplicate(); login.skipBytes(5);
                 dimension = profile.hasIntJoinDimension() ? login.readInt() : (int)login.readByte();
                 operation = 0; break;
             case "RESPAWN":
                 int nextDimension = input.getInt(input.readerIndex());
-                if (dimension == null || dimension != nextDimension) boats.clear();
+                if (dimension == null || dimension != nextDimension) { boats.clear();living.clear(); }
                 dimension = nextDimension; operation = 6; break;
             case "ADD_ENTITY":
                 ByteBuf probe = input.duplicate(); int entityId = Types.VAR_INT.readPrimitive(probe); probe.skipBytes(16);
                 boats.remove(entityId);
+                living.remove(entityId);
                 int type = probe.readUnsignedByte();
                 if (type == 1) { boats.add(entityId); operation = 20; break; }
                 if (type == 67 || type == 93 || (type == 68 || type == 79) && profile.protocol() >= 315) { operation = 16; break; }
@@ -49,11 +51,11 @@ public final class LegacyEntityPackets {
             case "SET_EQUIPPED_ITEM": operation = 3; break;
             case "REMOVE_ENTITIES":
                 ByteBuf removed = input.duplicate(); int count = Types.VAR_INT.readPrimitive(removed);
-                for (int i = 0; i < count; i++) boats.remove(Types.VAR_INT.readPrimitive(removed));
+                for (int i = 0; i < count; i++) { int removedId=Types.VAR_INT.readPrimitive(removed);boats.remove(removedId);living.remove(removedId); }
                 operation = 4; break;
-            case "ADD_PLAYER": boats.remove(Types.VAR_INT.readPrimitive(input.duplicate())); operation = 5; break;
+            case "ADD_PLAYER": int playerId=Types.VAR_INT.readPrimitive(input.duplicate());boats.remove(playerId);living.add(playerId);operation = 5; break;
             case "UPDATE_ATTRIBUTES": operation = 10; break;
-            case "ADD_MOB": boats.remove(Types.VAR_INT.readPrimitive(input.duplicate())); operation = 11; break;
+            case "ADD_MOB": int mobId=Types.VAR_INT.readPrimitive(input.duplicate());boats.remove(mobId);living.add(mobId);operation = 11; break;
             case "ENTITY_EVENT": operation = 12; break;
             case "SET_PASSENGERS": operation = 13; break;
             case "MOVE_ENTITY_POS": operation = 21; break;
@@ -62,6 +64,15 @@ public final class LegacyEntityPackets {
             case "TELEPORT_ENTITY": operation = 24; break;
             case "MOVE_VEHICLE": operation = 25; break;
             case "COOLDOWN": operation = 19; break;
+            case "SET_PLAYER_TEAM":
+                String team=Types.STRING.read(input);int action=input.readUnsignedByte();
+                if(action!=0&&action!=2)return null;
+                for(int i=0;i<3;i++)Types.STRING.read(input); // display name, prefix, suffix
+                input.readByte();Types.STRING.read(input); // friendly flags, name visibility
+                String collision=Types.STRING.read(input); // ViaRewind discards this next
+                ByteBuf rule=source.alloc().buffer();
+                try {Types.STRING.write(rule,team);Types.STRING.write(rule,collision);return message(source,rule,29);}
+                finally {rule.release();}
             case "CONTAINER_SET_CONTENT":
                 ByteBuf content=input.duplicate();int window=content.readUnsignedByte();
                 if(window!=0)return null;
@@ -79,7 +90,11 @@ public final class LegacyEntityPackets {
                 operation = packets[id].getName().equals("UPDATE_MOB_EFFECT") ? 17 : 18; break;
             default: return null;
         }
-        if (operation >= 21 && operation <= 24 && !boats.contains(Types.VAR_INT.readPrimitive(input.duplicate()))) return null;
+        if (operation >= 21 && operation <= 24) {
+            int movingId=Types.VAR_INT.readPrimitive(input.duplicate());
+            if(living.contains(movingId))operation+=9;
+            else if(!boats.contains(movingId))return null;
+        }
         return message(source, input, operation);
     }
 

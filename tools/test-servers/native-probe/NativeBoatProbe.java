@@ -79,6 +79,18 @@ public final class NativeBoatProbe {
             }
             Map<String,Object> j=new LinkedHashMap<>();j.put("time_ms",System.currentTimeMillis());j.put("tick",tick);j.put("phase",end?"END":"START");j.put("action",action);j.put("action_tick",actionTicks);
             j.put("player_x",entity(player,"p"));j.put("player_y",entity(player,"q"));j.put("player_z",entity(player,"r"));
+            j.put("player_vx",entity(player,"s"));j.put("player_vy",entity(player,"t"));j.put("player_vz",entity(player,"u"));
+            List<Map<String,Object>> nearby=new ArrayList<>();Object playerBox=call(player,"bw");
+            for(Object e:(List<?>)field(field(mc,"f"),"e")) {
+                if(e==player)continue;
+                double dx=(Double)entity(e,"p")-(Double)entity(player,"p"),dy=(Double)entity(e,"q")-(Double)entity(player,"q"),dz=(Double)entity(e,"r")-(Double)entity(player,"r");
+                if(dx*dx+dy*dy+dz*dz>16)continue;
+                Map<String,Object> n=new LinkedHashMap<>();n.put("type",e.getClass().getName());
+                n.put("x",entity(e,"p"));n.put("y",entity(e,"q"));n.put("z",entity(e,"r"));
+                Object box=call(e,"bw");n.put("box",box.toString());
+                n.put("overlap",box.getClass().getMethod("c",box.getClass()).invoke(box,playerBox));nearby.add(n);
+            }
+            j.put("nearby",nearby);
             Object boat=call(player,"bJ");
             if(boat!=null&&boat.getClass().getName().equals("afd")){
                 j.put("boat",call(boat,"S"));j.put("driver",call(boat,"bI"));j.put("boat_tick",entity(boat,"T"));

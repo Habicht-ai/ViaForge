@@ -11,4 +11,10 @@ public abstract class MixinHandInput {
     private void bothHands(CallbackInfo ci){if(Offhand.active()){rightClickDelayTimer=4;HandActions.rightClick();ci.cancel();}}
     @Inject(method="clickMouse",at=@At("HEAD"))
     private void attackHand(CallbackInfo ci){if(Offhand.active())Offhand.swingHand=0;}
+    @ModifyArg(method="middleClickMouse",at=@At(value="INVOKE",target="Lnet/minecraft/client/multiplayer/PlayerControllerMP;sendSlotPacket(Lnet/minecraft/item/ItemStack;I)V"),index=1)
+    private int pickedSlot(int original) {
+        // 1.8 derives the hotbar from the final nine container slots. Our appended
+        // offhand is slot 45; the main hotbar still occupies slots 36 through 44.
+        return Offhand.active()?36+Minecraft.getMinecraft().thePlayer.inventory.currentItem:original;
+    }
 }

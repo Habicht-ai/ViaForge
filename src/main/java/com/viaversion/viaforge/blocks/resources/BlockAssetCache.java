@@ -82,7 +82,7 @@ public final class BlockAssetCache {
                 if (entry.isDirectory() || !name.startsWith("assets/minecraft/")) continue;
                 String path = name.substring("assets/minecraft/".length());
                 if (!(path.startsWith("textures/blocks/") || path.startsWith("textures/block/") || path.startsWith("textures/item/") || path.startsWith("models/block/") || path.startsWith("blockstates/")
-                        || path.startsWith("textures/entity/") || path.startsWith("textures/models/armor/") || path.equals("sounds.json")
+                        || path.startsWith("textures/entity/") || path.startsWith("textures/mob_effect/") || path.startsWith("textures/models/armor/") || path.equals("sounds.json")
                         || path.startsWith("items/") || path.startsWith("models/item/") || path.startsWith("textures/entity/shulker/") || path.startsWith("textures/entity/bed/")
                         || path.equals("textures/entity/end_portal.png") || path.equals("textures/environment/end_sky.png")
                         || path.startsWith("textures/items/") || path.startsWith("textures/entity/shield/")

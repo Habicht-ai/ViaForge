@@ -20,11 +20,12 @@ final class ServerPotions extends Potion {
     static void register() {
         add(24, "glowing", false, 9740385); add(25, "levitation", true, 0xceffff);
         add(26, "luck", false, 0x339900); add(27, "unluck", true, 12624973);
+        add(28, "slow_falling", false, 16773073); add(29, "conduit_power", false, 1950417); add(30, "dolphins_grace", false, 8954814);
     }
     private static void add(int id, String name, boolean bad, int color) { if (Potion.potionTypes[id] == null) new ServerPotions(id, name, bad, color); }
     static void accept(WorldClient world, int operation, ByteBuf input) {
         int entityId = Types.VAR_INT.readPrimitive(input), id = input.readUnsignedByte();
-        if (id < 24 || id > 27 || !(Potion.potionTypes[id] instanceof ServerPotions)) return;
+        if (id < 24 || id > 30 || !(Potion.potionTypes[id] instanceof ServerPotions)) return;
         Entity entity = world.getEntityByID(entityId);
         if (entity == null && Minecraft.getMinecraft().thePlayer != null && Minecraft.getMinecraft().thePlayer.getEntityId() == entityId) entity = Minecraft.getMinecraft().thePlayer;
         if (!(entity instanceof EntityLivingBase)) return;
@@ -39,6 +40,17 @@ final class ServerPotions extends Potion {
     @Override public boolean shouldRender(PotionEffect effect) { return ServerSession.has(com.viaversion.viaforge.common.compatibility.ClientFeature.ENTITY_VISUALS); }
     @Override public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
         if (ServerSession.getLoadedResourceVersion() == null) return;
+        if(getId()>=28) {
+            if(ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.DOUBLE_SWIM_INPUT)) {
+                String name=getId()==28?"slow_falling":getId()==29?"conduit_power":"dolphins_grace";
+                mc.getTextureManager().bindTexture(new ResourceLocation("viaforge","textures/mob_effect/"+name+".png"));
+                GlStateManager.color(1,1,1,1);Gui.drawModalRectWithCustomSizedTexture(x+6,y+7,0,0,18,18,18,18);
+            }else {
+                mc.getTextureManager().bindTexture(ICONS);GlStateManager.color(1,1,1,1);
+                Gui.drawModalRectWithCustomSizedTexture(x+6,y+7,(getId()-20)*18,198,18,18,256,256);
+            }
+            return;
+        }
         // These slots are absent from the 1.8 inventory atlas. Use the target
         // atlas in Forge's custom icon hook while retaining the native text/timer.
         int column = getId() == 25 ? 3 : getId() == 24 ? 4 : getId() == 26 ? 5 : 6;

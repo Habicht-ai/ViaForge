@@ -44,6 +44,8 @@ final class ElytraFlightSmokeTest {
         EntityPlayerSP player=mc.thePlayer;player.movementInput=new net.minecraft.util.MovementInput();player.setEntityId(1);
         try {
             EntityPushSmokeTest.verify(world,player);
+            SwimmingSmokeTest.verify(world);
+            PickBlockSmokeTest.verify(world,sent);
             sent.clear();
             ServerEntityViews.clear();player.setHealth(20);player.setPosition(5,200,5);player.motionY=-.2;player.onGround=false;
             PacketBuffer attributes=new PacketBuffer(io.netty.buffer.Unpooled.buffer());
@@ -130,7 +132,7 @@ final class ElytraFlightSmokeTest {
             HandUseSmokeTest.shields(sent,wire);
             HandUseSmokeTest.presentation(sent);
             model.setRotationAngles(0,1,0,0,30,.0625F,player);
-            require(Math.abs(model.bipedHead.rotateAngleX-(float)Math.PI/6)<1e-6&&Math.abs(model.bipedRightLeg.rotateAngleX-1.4F)<1e-6,"Walking model restored after flight ends");
+            require(Math.abs(model.bipedHead.rotateAngleX-(float)Math.PI/6)<1e-6&&Math.abs(model.bipedRightLeg.rotateAngleX-1.4F)<1e-6,"Walking model restored after flight ends: head="+model.bipedHead.rotateAngleX+", leg="+model.bipedRightLeg.rotateAngleX+", height="+player.height+", swimming="+com.viaversion.viaforge.compatibility.ServerSwimming.swimming(player)+", pose="+com.viaversion.viaforge.compatibility.ServerSwimming.pose(player)+", blend="+ServerElytraVisuals.crawlAmount(player,1)+", flying="+ServerElytraFlight.flying(player));
             wire.flag(1,true,handler);player.inventory.armorInventory[2].setItemDamage(431);ServerElytraFlight.input(player);
             require(!ServerElytraFlight.flying(player),"Broken elytra stops flight");
             player.inventory.armorInventory[2].setItemDamage(0);wire.flag(1,true,handler);

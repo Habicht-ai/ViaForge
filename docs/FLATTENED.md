@@ -114,6 +114,11 @@ The subsequent adapter implementation is documented in [MODERN.md](MODERN.md),
 including its exact protocols, current verification status and original resource
 conversion. It preserves the inherited catalog across later chunk, registry,
 metadata and item-component boundaries. It does not supply full modern world
-heights, new aquatic/village content, swimming/waterlogging, all modern mob
+heights, all new aquatic/village content, all modern mob
 geometry or every later gameplay mechanic. No unknown target is exposed as
 1.12.2 or enabled solely because a Via path exists.
+
+[Player swimming](SWIMMING.md) subsequently added version-specific water physics,
+poses and original fluid states before lossy translation. Its live test matrix
+is separate from these inherited block/content checks; unimplemented collision
+shapes do not become accurate merely by retaining their water content.

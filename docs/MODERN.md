@@ -162,8 +162,9 @@ flattened target's complete pipeline, including the later ground flag.
   and rendering/interaction need further work below 0 and above 255.
 - Content added after the inherited 1.12.2 catalog still uses Via's fallback
   behavior unless separately implemented. A registered family is not full
-  emulation of that release. Waterlogging/swimming and later mechanics are not
-  certified by the inherited catalog tests.
+  emulation of that release. [Player swimming and retained fluid states](SWIMMING.md)
+  now have separate implementation and live evidence; the inherited catalog tests
+  do not certify every waterlogged collision shape or later mechanic.
 - Villager biome/hat geometry, the zombified-piglin mesh, and later baby/variant
   models are incomplete. Loading their original texture does not certify geometry.
 - Arbitrary later item-definition expressions and component gameplay semantics

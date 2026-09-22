@@ -37,7 +37,25 @@ public final class LiveBoatProbe {
     }
     public static boolean installIfRequested() {
         String path=System.getenv("VIAFORGE_BOAT_PROBE"); if(path==null)return false;
-        FMLCommonHandler.instance().bus().register(new LiveBoatProbe(path));return true;
+        LiveBoatProbe probe=new LiveBoatProbe(path);
+        FMLCommonHandler.instance().bus().register(probe);
+        if("1".equals(System.getenv("VIAFORGE_HOTBAR_PROBE")))net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(probe);
+        return true;
+    }
+    @SubscribeEvent public void sound(net.minecraftforge.client.event.sound.PlaySoundEvent event) {
+        if(finished||tick>=10000||event.sound==null)return;
+        JsonObject j=new JsonObject();j.addProperty("phase","sound");j.addProperty("sound",event.sound.getSoundLocation().toString());
+        j.addProperty("x",event.sound.getXPosF());j.addProperty("y",event.sound.getYPosF());j.addProperty("z",event.sound.getZPosF());
+        j.addProperty("volume",event.sound.getVolume());j.addProperty("pitch",event.sound.getPitch());
+        j.addProperty("category",event.category==null?"unknown":event.category.toString());
+        j.addProperty("registered",Minecraft.getMinecraft().getSoundHandler().getSound(event.sound.getSoundLocation())!=null);
+        try{log(j);}catch(Exception failure){throw new IllegalStateException(failure);}
+    }
+    @SubscribeEvent public void soundSource(net.minecraftforge.client.event.sound.PlaySoundSourceEvent event) {
+        if(finished||tick>=10000||event.sound==null)return;
+        JsonObject j=new JsonObject();j.addProperty("phase","sound_source");j.addProperty("sound",event.sound.getSoundLocation().toString());
+        j.addProperty("x",event.sound.getXPosF());j.addProperty("y",event.sound.getYPosF());j.addProperty("z",event.sound.getZPosF());
+        try{log(j);}catch(Exception failure){throw new IllegalStateException(failure);}
     }
     private synchronized void log(JsonObject data) throws Exception {
         data.addProperty("time_ms",System.currentTimeMillis());data.addProperty("tick",tick);
@@ -85,6 +103,8 @@ public final class LiveBoatProbe {
                 mc.getNetHandler().getNetworkManager().channel().pipeline().addBefore("packet_handler","boat_probe",new ChannelDuplexHandler(){
                     @Override public void write(ChannelHandlerContext ctx,Object msg,ChannelPromise promise)throws Exception {
                         JsonObject j=new JsonObject();j.addProperty("phase","send");j.addProperty("packet",msg.getClass().getSimpleName());
+                        if(msg instanceof net.minecraft.network.play.client.C09PacketHeldItemChange)j.addProperty("slot",((net.minecraft.network.play.client.C09PacketHeldItemChange)msg).getSlotId());
+                        if(msg instanceof net.minecraft.network.play.client.C10PacketCreativeInventoryAction){net.minecraft.network.play.client.C10PacketCreativeInventoryAction p=(net.minecraft.network.play.client.C10PacketCreativeInventoryAction)msg;j.addProperty("slot",p.getSlotId());j.add("item",LiveHotbarActions.item(p.getStack()));}
                         if(msg instanceof C17PacketCustomPayload){C17PacketCustomPayload p=(C17PacketCustomPayload)msg;j.addProperty("channel",p.getChannelName());
                             if(p.getChannelName().equals("VF|boat")){net.minecraft.network.PacketBuffer b=p.getBufferData();j.addProperty("op",b.getUnsignedByte(b.readerIndex()));}}
                         if(tick<10000)log(j);super.write(ctx,msg,promise);
@@ -120,13 +140,36 @@ public final class LiveBoatProbe {
                         java.lang.reflect.Method click=Minecraft.class.getDeclaredMethod("rightClickMouse");click.setAccessible(true);click.invoke(mc);
                     }
                 }
+                LiveHotbarActions.act(action,actionTick);
                 key(mc.gameSettings.keyBindForward,action.contains("forward"));key(mc.gameSettings.keyBindBack,action.contains("back"));
                 key(mc.gameSettings.keyBindLeft,action.contains("left"));key(mc.gameSettings.keyBindRight,action.contains("right"));
-                key(mc.gameSettings.keyBindSneak,action.equals("dismount"));
+                key(mc.gameSettings.keyBindSneak,action.equals("dismount")||action.contains("sneak"));
+                key(mc.gameSettings.keyBindSprint,action.contains("sprint"));key(mc.gameSettings.keyBindJump,action.contains("jump"));
             }
             JsonObject j=new JsonObject();j.addProperty("phase",event.phase.toString());j.addProperty("action",action);j.addProperty("action_tick",actionTick);
             j.addProperty("player_tick",mc.thePlayer.ticksExisted);j.addProperty("gamemode",mc.playerController.getCurrentGameType().toString());
             j.addProperty("player_x",mc.thePlayer.posX);j.addProperty("player_y",mc.thePlayer.posY);j.addProperty("player_z",mc.thePlayer.posZ);
+            if("1".equals(System.getenv("VIAFORGE_HOTBAR_PROBE")))LiveHotbarActions.observe(j);
+            if("1".equals(System.getenv("VIAFORGE_SWIM_PROBE"))) {
+                j.addProperty("water",mc.thePlayer.isInWater());j.addProperty("eye_water",mc.thePlayer.isInsideOfMaterial(net.minecraft.block.material.Material.water));
+                j.addProperty("sprinting",mc.thePlayer.isSprinting());j.addProperty("height",mc.thePlayer.height);j.addProperty("eye_height",mc.thePlayer.getEyeHeight());
+                j.addProperty("yaw",mc.thePlayer.rotationYaw);j.addProperty("pitch",mc.thePlayer.rotationPitch);
+                j.addProperty("animation",mc.thePlayer.limbSwing);j.addProperty("swim_amount",com.viaversion.viaforge.items.ServerElytraVisuals.crawlAmount(mc.thePlayer,1));
+                j.addProperty("swimming",com.viaversion.viaforge.compatibility.ServerSwimming.swimming(mc.thePlayer));
+                j.addProperty("water_depth",com.viaversion.viaforge.compatibility.ServerSwimming.depth(mc.thePlayer));
+                j.addProperty("dolphins_grace",mc.thePlayer.isPotionActive(30));
+                j.addProperty("conduit_power",mc.thePlayer.isPotionActive(29));j.addProperty("air",mc.thePlayer.getAir());
+                j.addProperty("depth_strider",net.minecraft.enchantment.EnchantmentHelper.getDepthStriderModifier(mc.thePlayer));
+                if(event.phase==TickEvent.Phase.END) {
+                    JsonArray fluids=new JsonArray();net.minecraft.util.AxisAlignedBB box=mc.thePlayer.getEntityBoundingBox().contract(.001,.001,.001);
+                    for(net.minecraft.util.BlockPos pos:net.minecraft.util.BlockPos.getAllInBox(new net.minecraft.util.BlockPos(box.minX,box.minY,box.minZ),new net.minecraft.util.BlockPos(box.maxX,box.maxY,box.maxZ))) {
+                        JsonObject cell=new JsonObject();cell.addProperty("x",pos.getX());cell.addProperty("y",pos.getY());cell.addProperty("z",pos.getZ());
+                        cell.addProperty("fluid",com.viaversion.viaforge.compatibility.ServerSwimming.fluids.get(pos.getX(),pos.getY(),pos.getZ()));
+                        cell.addProperty("block",mc.theWorld.getBlockState(pos).toString());fluids.add(cell);
+                    }
+                    j.add("fluids",fluids);
+                }
+            }
             if("1".equals(System.getenv("VIAFORGE_PUSH_PROBE"))) {
                 j.addProperty("player_vx",mc.thePlayer.motionX);j.addProperty("player_vy",mc.thePlayer.motionY);j.addProperty("player_vz",mc.thePlayer.motionZ);
                 j.addProperty("player_alive",mc.thePlayer.isEntityAlive());j.addProperty("player_health",mc.thePlayer.getHealth());

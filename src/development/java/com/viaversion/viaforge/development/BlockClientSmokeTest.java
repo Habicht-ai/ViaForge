@@ -79,6 +79,7 @@ public final class BlockClientSmokeTest {
                     ServerBlockSession.unload();
                     RenderResourceSmokeTest.restored();
                     DropItemSmokeTest.nativeBehavior();
+                    PickBlockSmokeTest.nativeBehavior();
                     require(ServerBlockSession.getLoadedResourceVersion() == null, "Resources cleared on unload");
                     require(!com.viaversion.viaforge.items.InventoryEntityPreview.enabled(), "Disconnect restores native inventory preview");
                     require(!Minecraft.getMinecraft().getResourceManager().getResource(new net.minecraft.util.ResourceLocation("minecraft:textures/blocks/stone.png"))
@@ -86,6 +87,7 @@ public final class BlockClientSmokeTest {
                     checkFallbackModels();
                     checks.add("All profiles: original dropped Purpur/seed/shield/sword matrices and native stone scale; pending resource HUD avoids missing-texture caching; native resources restored after disconnect");
                     checks.add("Selected profiles: Elytra head/limb poses and walking restoration; versioned wing animation; original Ogg resource and flight sound envelope; original rocket spawn/attachment metadata, invisible model, player/hand trail, offhand side, detach and no duplicate boost PASS");
+                    checks.add("Selected 1.13+ profiles: actual remote player swimming dimensions/eyes, full animation blend, original 26-phase arm stroke, sleeve following, phase advance and restoration after leaving water PASS (live physics is verified separately by swim_probe)");
                     checks.add("Selected profiles: actual mouse rocket/shield use, both hands/main-hand preferences, Creative/Survival, target use/swing packets, no 26.3 use PUNCH, native/custom equip reset, cooldowns, grounded rejection, actual first-person shield render transitions, original third-person look clamps and sleeves PASS");
                     checks.add("Selected profiles: neutral first-person arms during crouch/crawl, subsequent third-person pose retained, rocket target model/texture and .68 grip scale through actual first-person entry point with empty/occupied opposite hand PASS; landing confirmation does not become crawling or cancel sprint PASS");
                     checks.add("Selected profiles: actual Survival/Creative inventory flight and standing previews, original versioned GL matrices, visible pixels and bounded-region isolation, restored player movement/angles/camera/flight state, nested clipping; 26.3 GUI scales 1/2/3 PASS");

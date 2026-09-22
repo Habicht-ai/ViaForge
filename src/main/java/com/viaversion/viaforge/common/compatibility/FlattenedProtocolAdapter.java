@@ -54,12 +54,23 @@ public final class FlattenedProtocolAdapter implements PacketAdapter, StorableOb
         boolean legacy=protocol instanceof Protocol1_12_2To1_12_1;
         if(flattened==null)flattened=new FlattenedBlockData(waterColors);
         Class<?> type=protocol.getClass();
-        if(!modernFamilies.containsKey(type))modernFamilies.put(type,ModernBlockFamilies.create(protocol,flattened,packet.user()));
+        if(!modernFamilies.containsKey(type)) {
+            VillageBlockData next=ModernBlockFamilies.create(protocol,flattened,packet.user());
+            if(next!=null)next.fluidRegistry(SwimmingFluidRegistry.forBoundary(type));
+            modernFamilies.put(type,next);
+        }
         VillageBlockData family=modernFamilies.get(type);
         if(!original&&!legacy&&!modern&&family==null)return false;
         ByteBuf snapshot=null,normalized=null;
         try {
             snapshot=snapshot(packet);
+            if(protocol instanceof com.viaversion.viabackwards.protocol.v1_21to1_20_5.Protocol1_21To1_20_5) {
+                ByteBuf attributes=SwimmingPackets.attributes(snapshot);if(attributes!=null)pending.add(attributes);
+            }
+            if(original||modern) {
+                ByteBuf swimming=SwimmingPackets.capture(snapshot,modern);
+                if(swimming!=null)pending.add(swimming);
+            }
             if(family!=null) {
                 normalized=captured.contains(packet)?null:family.normalize(snapshot);
                 if(normalized!=null){captureBlocks(packet,normalized);captured.add(packet);}
@@ -84,7 +95,10 @@ public final class FlattenedProtocolAdapter implements PacketAdapter, StorableOb
         }catch(Exception error) {
             clear();failed=true;
             Logger.getLogger("ViaForge/Compatibility").log(Level.WARNING,"Flattened adapter failed; retaining ordinary Via translation",error);
-        }finally{if(normalized!=null)normalized.release();if(snapshot!=null)snapshot.release();}
+        }finally{
+            if(flattened!=null){pending.addAll(flattened.fluidUpdates);flattened.fluidUpdates.clear();}
+            if(normalized!=null)normalized.release();if(snapshot!=null)snapshot.release();
+        }
         return false;
     }
     private void captureCloudParticle(ByteBuf source,Protocol1_13To1_12_2 protocol)throws Exception {
@@ -132,7 +146,7 @@ public final class FlattenedProtocolAdapter implements PacketAdapter, StorableOb
         active=false;captured.clear();replaced.clear();
         List<ByteBuf> result=new ArrayList<>(pending);pending.clear();return result;
     }
-    public void clear(){active=false;waterColors.clear();blocks.world().clear();entities.clear();captured.clear();replaced.clear();for(ByteBuf packet:pending)packet.release();pending.clear();}
+    public void clear(){active=false;waterColors.clear();blocks.world().clear();entities.clear();captured.clear();replaced.clear();for(ByteBuf packet:pending)packet.release();pending.clear();if(flattened!=null){for(ByteBuf packet:flattened.fluidUpdates)packet.release();flattened.fluidUpdates.clear();}}
     public static final class Factory implements ProtocolAdapterFactory {
         private final int protocol;
         public Factory(int protocol){if(protocol!=393&&protocol!=401&&protocol!=404&&protocol!=477&&protocol!=480&&protocol!=485&&protocol!=490&&protocol!=498&&protocol!=573&&protocol!=575&&protocol!=578&&protocol!=735&&protocol!=736&&protocol!=751&&protocol!=753&&protocol!=754&&protocol!=755&&protocol!=756&&protocol!=757&&protocol!=758&&protocol!=759&&protocol!=760&&protocol!=761&&protocol!=762&&protocol!=763&&protocol!=764&&protocol!=765&&protocol!=766&&protocol!=767&&protocol!=768&&protocol!=769&&protocol!=770&&protocol!=771&&protocol!=772&&protocol!=773&&protocol!=774&&protocol!=775&&protocol!=776&&protocol!=777)throw new IllegalArgumentException("Unverified flattened target "+protocol);this.protocol=protocol;}

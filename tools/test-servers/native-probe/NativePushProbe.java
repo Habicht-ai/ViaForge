@@ -64,7 +64,7 @@ public final class NativePushProbe {
                 ticks++;Object options=field(mc,"options");
                 key(options,"keyUp",action.contains("forward"));key(options,"keyDown",action.contains("back"));
                 key(options,"keyLeft",action.contains("left"));key(options,"keyRight",action.contains("right"));
-                key(options,"keyShift",false);key(options,"keyJump",false);key(options,"keySprint",false);
+                key(options,"keyShift",action.contains("sneak"));key(options,"keyJump",action.contains("jump"));key(options,"keySprint",action.contains("sprint"));
             }
             Map<String,Object> j=new LinkedHashMap<>();j.put("time_ms",System.currentTimeMillis());j.put("tick",ticks);j.put("phase",end?"END":"START");j.put("action",action);
             double x=(Double)call(player,"getX"),y=(Double)call(player,"getY"),z=(Double)call(player,"getZ");
@@ -72,6 +72,17 @@ public final class NativePushProbe {
             Object velocity=call(player,"getDeltaMovement");j.put("player_vx",field(velocity,"x"));j.put("player_vy",field(velocity,"y"));j.put("player_vz",field(velocity,"z"));
             j.put("player_ground",call(player,"onGround"));j.put("player_spectator",call(player,"isSpectator"));
             j.put("player_alive",call(player,"isAlive"));j.put("player_health",call(player,"getHealth"));
+            if("1".equals(System.getenv("VIAFORGE_SWIM_PROBE"))) {
+                j.put("swimming",call(player,"isSwimming"));j.put("height",call(player,"getBbHeight"));
+                j.put("water",call(player,"isInWater"));j.put("eye_water",call(player,"isUnderWater"));
+                j.put("sprint",call(player,"isSprinting"));j.put("yaw",call(player,"getYRot"));j.put("pitch",call(player,"getXRot"));
+                Class<?> effects=Class.forName("net.minecraft.world.effect.MobEffects");Object dolphin=effects.getField("DOLPHINS_GRACE").get(null);
+                j.put("dolphins_grace",player.getClass().getMethod("hasEffect",Class.forName("net.minecraft.core.Holder")).invoke(player,dolphin));
+                j.put("conduit_power",player.getClass().getMethod("hasEffect",Class.forName("net.minecraft.core.Holder")).invoke(player,effects.getField("CONDUIT_POWER").get(null)));
+                j.put("air",call(player,"getAirSupply"));
+                Object efficiency=Class.forName("net.minecraft.world.entity.ai.attributes.Attributes").getField("WATER_MOVEMENT_EFFICIENCY").get(null);
+                j.put("water_efficiency",player.getClass().getMethod("getAttributeValue",Class.forName("net.minecraft.core.Holder")).invoke(player,efficiency));
+            }
             j.put("loaded",call(field(player,"connection"),"hasClientLoaded"));j.put("paused",call(mc,"isPaused"));
             Object playerBox=call(player,"getBoundingBox");j.put("player_box",playerBox.toString());
             List<Map<String,Object>> nearby=new ArrayList<>();

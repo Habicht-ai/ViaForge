@@ -14,8 +14,8 @@ public abstract class MixinElytraPose {
         if (!ServerElytraFlight.flying(entity)) {
             float crawl=com.viaversion.viaforge.items.ServerElytraVisuals.crawlAmount(entity,partial);
             if(crawl>0) {
-                GlStateManager.rotate(-90*crawl,1,0,0);
-                if(ServerElytraFlight.crawling(entity))GlStateManager.translate(0,-1,.3F);
+                GlStateManager.rotate((-90-(entity.isInWater()?entity.rotationPitch:0))*crawl,1,0,0);
+                if(ServerElytraFlight.crawling(entity)||com.viaversion.viaforge.compatibility.ServerSwimming.pose(entity))GlStateManager.translate(0,-1,.3F);
             }
             return;
         }

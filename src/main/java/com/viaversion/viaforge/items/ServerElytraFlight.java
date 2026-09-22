@@ -13,6 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.C17PacketCustomPayload;
 import net.minecraft.util.Vec3;
+import com.viaversion.viaforge.compatibility.ServerSwimming;
 
 /** Main-thread vanilla flight prediction, reconciled by the original server metadata. */
 public final class ServerElytraFlight {
@@ -50,17 +51,20 @@ public final class ServerElytraFlight {
     public static int ticks() { return flyingTicks; }
     /** Run before native creative double-tap handling, without changing any abilities. */
     public static void beforeInput(EntityPlayerSP player) {
+        ServerSwimming.beforeInput(player);
         creativeBeforeInput = player.capabilities.isFlying;
     }
     public static void slowInput(EntityPlayerSP player) {
-        if (ServerSession.rule(ClientRule.CRAWLING_POSE) && !flying(player)
+        ServerSwimming.afterInput(player);
+        if (ServerSession.rule(ClientRule.CRAWLING_POSE) && !flying(player) && !ServerSwimming.swimming(player)
                 && (crawling(player) || !player.capabilities.isFlying && fits(player,1.5F) && !fits(player,1.8F))
-                && !player.movementInput.sneak) {
+                && !player.movementInput.sneak && !(ServerSwimming.enabled(player)&&player.isInWater())) {
             player.movementInput.moveForward *= .3F;
             player.movementInput.moveStrafe *= .3F;
         }
     }
     public static void input(EntityPlayerSP player) {
+        ServerSwimming.input(player);
         if (!ServerSession.has(ClientFeature.ELYTRA)) { if (owner != null) clear(); return; }
         if (owner != player) { clear(); owner = player; }
         boolean jump = player.movementInput.jump;
@@ -83,7 +87,7 @@ public final class ServerElytraFlight {
     }
     public static boolean crawling(Entity entity) {
         return entity == owner && ServerSession.rule(ClientRule.CRAWLING_POSE)
-                && crawlingPose && !flying(entity) && entity.isEntityAlive();
+                && crawlingPose && !entity.isInWater() && !flying(entity) && entity.isEntityAlive();
     }
     public static boolean compact(Entity entity) {
         return entity == owner && ServerSession.has(ClientFeature.ELYTRA) && entity.height == .6F;
@@ -91,7 +95,7 @@ public final class ServerElytraFlight {
     public static boolean crouching(Entity entity) {
         return entity == owner && ServerSession.has(ClientFeature.ELYTRA) && (entity.height == 1.5F || entity.height == 1.65F);
     }
-    private static boolean fits(EntityPlayer player, float height) {
+    public static boolean fits(EntityPlayer player, float height) {
         double r = player.width / 2.0;
         net.minecraft.util.AxisAlignedBB box = new net.minecraft.util.AxisAlignedBB(
                 player.posX-r,player.posY,player.posZ-r,player.posX+r,player.posY+height,player.posZ+r);
@@ -101,7 +105,7 @@ public final class ServerElytraFlight {
         if (!ServerSession.has(ClientFeature.ELYTRA) || !player.isEntityAlive() || player.isPlayerSleeping()) return;
         boolean modern = ServerSession.rule(ClientRule.CRAWLING_POSE);
         float crouch = modern ? 1.5F : 1.65F;
-        float height = flying(player) ? .6F : player.isSneaking() && !player.capabilities.isFlying ? crouch : 1.8F;
+        float height = flying(player) || ServerSwimming.swimming(player) ? .6F : player.isSneaking() && !player.capabilities.isFlying ? crouch : 1.8F;
         if (modern && !player.isSpectator() && !player.isRiding()) {
             if (!fits(player,.6F)) return;
             if (!fits(player,height)) height = fits(player,crouch) ? crouch : .6F;
@@ -113,6 +117,8 @@ public final class ServerElytraFlight {
         // latter is crawling. A received landing flag does not change the pose
         // until this post-travel update. Inferring it from height prematurely
         // slows the input and cancels sprint during successive landing/jumps.
+        // Retain the SWIMMING pose separately from the current swimming flag.
+        // On the first dry tick vanilla still has this pose and uses crawling input.
         crawlingPose = modern && height == .6F && !flying(player);
     }
     public static boolean move(EntityPlayer player) {

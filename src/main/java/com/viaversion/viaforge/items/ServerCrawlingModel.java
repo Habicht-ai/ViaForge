@@ -13,13 +13,14 @@ public final class ServerCrawlingModel {
         float amount=ServerElytraVisuals.crawlAmount(entity,MathHelper.clamp_float(age-entity.ticksExisted,0,1));
         if(amount<=0||ServerElytraFlight.flying(entity))return;
         EntityPlayer player=(EntityPlayer)entity;
-        if(ServerElytraFlight.crawling(entity)||com.viaversion.viaforge.compatibility.ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.FIXED_CRAWLING_HEAD))
+        if(ServerElytraFlight.crawling(entity)||com.viaversion.viaforge.compatibility.ServerSwimming.pose(entity)||com.viaversion.viaforge.compatibility.ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.FIXED_CRAWLING_HEAD))
             model.bipedHead.rotateAngleX=rotate(amount,model.bipedHead.rotateAngleX,-.7853982F);
         ModelBiped.copyModelAngles(model.bipedHead,model.bipedHeadwear);
-        if(!player.isUsingItem()) {
+        boolean modern=com.viaversion.viaforge.compatibility.ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.DOUBLE_SWIM_INPUT);
+        if(!modern||!player.isUsingItem()) {
             boolean swingLeft=(com.viaversion.viaforge.hands.Offhand.swingHand==1)^com.viaversion.viaforge.hands.Offhand.mainLeft(player);
-            float left=player.isSwingInProgress&&swingLeft?0:amount;
-            float right=player.isSwingInProgress&&!swingLeft?0:amount;
+            float left=modern&&player.isSwingInProgress&&swingLeft?0:amount;
+            float right=player.isSwingInProgress&&(!modern||!swingLeft)?0:amount;
             float phase=animation%26, x, lz, rz;
             if(phase<14) {
                 x=0;float arc=1.8707964F*(-65*phase+phase*phase)/(-65*14+14*14);
@@ -27,7 +28,7 @@ public final class ServerCrawlingModel {
             } else if(phase<22) {
                 float t=(phase-14)/8;x=1.5707964F*t;
                 lz=5.012389F-1.8707964F*t;rz=1.2707963F+1.8707964F*t;
-            } else {x=1.5707964F*(1-(phase-22)/4);lz=rz=(float)Math.PI;}
+            } else {x=1.5707964F-1.5707964F*((phase-22)/4);lz=rz=(float)Math.PI;}
             arm(model.bipedLeftArm,left,x,lz,true);arm(model.bipedRightArm,right,x,rz,false);
         }
         model.bipedLeftLeg.rotateAngleX=lerp(amount,model.bipedLeftLeg.rotateAngleX,.3F*MathHelper.cos(animation*.33333334F+(float)Math.PI));

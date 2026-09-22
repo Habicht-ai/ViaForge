@@ -49,13 +49,19 @@ def assert_no_client():
         raise RuntimeError('Existing Minecraft client: ' + found)
 
 
-def run(version, label, client_type='viaforge', extended=False, baseline=False, reconnect=False, controls=False, scenario='boat', baseline_stage=None):
+def run(version, label, client_type='viaforge', extended=False, baseline=False, reconnect=False, controls=False, scenario='boat', baseline_stage=None, world_template=None, swim_transitions=False):
     assert_no_client()
     source_row = next(r for r in lab.GRIM_VERSIONS if r['minecraft_version'] == version)
-    if (client_type=='native' or extended or controls) and version!='1.12.2' and not (scenario=='push' and version=='26.2' and not extended and not controls):
+    if (client_type=='native' or extended or controls) and version!='1.12.2' and not (scenario in ('push','swim') and version=='26.2' and not extended and not controls):
         raise ValueError('Native/extended script is currently mapped to exact 1.12.2')
     folder = lab.ROOT / (scenario + '-' + version + '-' + label + '-' + str(time.time_ns()))
     folder.mkdir()
+    if world_template is not None:
+        # Copy a stopped, explicitly selected fixture; never open the source world.
+        template=Path(world_template).resolve()
+        if not (template/'level.dat').is_file():raise ValueError('Not a saved world: '+str(template))
+        shutil.copytree(template,folder/'world')
+        lab.save(folder/'world-template.json',dict(source=str(template),files={str(p.relative_to(template)):grim.digest(p) for p in template.rglob('*') if p.is_file()}))
     source = lab.ROOT / source_row['version']
     original = source / source_row['launch_jar']
     assert grim.digest(original) == source_row['platform_download']['checksums']['sha256']
@@ -109,7 +115,12 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
     for p in config_files:
         if p.exists(): shutil.copy2(p, folder / (p.name + '.before'))
     development=lab.REPO/'run/mods/ViaForge-development.jar'
-    if baseline and (scenario=='push' or baseline_stage=='push'):
+    if baseline and scenario=='swim':
+        old=lab.REPO/'build/backups/swimming-20260922-205857/ViaForge-baseline-with-probe.jar'
+        if not old.exists():raise RuntimeError('Explicit pre-swimming baseline archive missing')
+        shutil.copy2(development,folder/'development-fixed.jar');shutil.copy2(old,development)
+        lab.save(folder/'baseline-classes.json',dict(source=str(old),source_sha256=grim.digest(old),description='Pre-swimming production with observation probe only'))
+    elif baseline and (scenario=='push' or baseline_stage=='push'):
         old=lab.REPO/'build/backups/entity-push-20260922-143245/ViaForge-baseline-with-probe.jar'
         if not old.exists():raise RuntimeError('Explicit pre-push baseline archive missing')
         shutil.copy2(development,folder/'development-fixed.jar')
@@ -133,7 +144,7 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
     server = client = companion = None
     companion_dir = None
     cases = []
-    report = dict(server=source_row, row=row, label=label, client=client_type, baseline=baseline, started=time.time(), cases=cases, completed=False, scenario=scenario)
+    report = dict(server=source_row, row=row, label=label, client=client_type, baseline=baseline, started=time.time(), cases=cases, completed=False, scenario=scenario,swim_transitions=swim_transitions)
     client_dir = folder / client_type
     client_dir.mkdir()
     server_log = folder / 'server-console.log'
@@ -194,8 +205,9 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
         shutil.copytree(folder / 'world', backup / 'world')
         lab.save(backup / 'manifest.json', {str(p.relative_to(backup)): grim.digest(p) for p in (backup / 'world').rglob('*') if p.is_file()})
         server = start_server()
-        console(['gamerule doDaylightCycle false', 'gamerule doMobSpawning false', 'gamerule doWeatherCycle false', 'time set 6000',
-                 'setworldspawn -32 66 0'])
+        console((['gamerule advance_time false','gamerule spawn_mobs false','gamerule advance_weather false'] if row['protocol']>=774 else
+                 ['gamerule doDaylightCycle false','gamerule doMobSpawning false','gamerule doWeatherCycle false'])+
+                ['time set 6000','setworldspawn -32 66 0'])
         if row['protocol']>=393:
             # Send finished chunks on join, not thousands of individual block
             # changes that can stall resource/chunk conversion during setup.
@@ -209,14 +221,21 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
         if scenario=='push':
             console(['fill -8 63 -8 8 63 8 stone','fill -8 64 -8 8 69 8 air',
                      'gamerule spawnRadius 0','setworldspawn 0 64 0'])
+        if scenario=='swim':
+            console(['fill -24 60 -24 24 60 24 stone','fill -24 61 -24 24 66 24 water',
+                     'fill -24 67 -24 24 71 24 air','setworldspawn 0 67 0'])
+        if scenario=='hotbar':
+            console(['fill -8 63 -8 8 63 8 stone','fill -8 64 -8 8 69 8 air','setworldspawn 0 64 -3'])
         grim.control(row, 'on')
         env = dict(os.environ, VIAFORGE_NO_PAUSE='1', JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4',
-                   VIAFORGE_PUSH_PROBE='1' if scenario=='push' else '0', VIAFORGE_BOAT_PROBE=str(client_dir), VIAFORGE_BOAT_PROTOCOL=str(row['protocol']), VIAFORGE_BOAT_PORT=str(row['port']))
+                   VIAFORGE_PUSH_PROBE='1' if scenario in ('push','swim') else '0', VIAFORGE_SWIM_PROBE='1' if scenario=='swim' else '0',
+                   VIAFORGE_HOTBAR_PROBE='1' if scenario=='hotbar' else '0',
+                   VIAFORGE_BOAT_PROBE=str(client_dir), VIAFORGE_BOAT_PROTOCOL=str(row['protocol']), VIAFORGE_BOAT_PORT=str(row['port']))
         for key in ('VIAFORGE_BLOCK_SMOKE_TEST', 'VIAFORGE_SMOKE_PROTOCOL', 'VIAFORGE_PROTOCOL_PROBE', 'VIAFORGE_LIVE_FLIGHT'):
             env.pop(key, None)
         with (client_dir / 'console.log').open('w') as log:
             if client_type=='native':
-                if scenario=='push' and version=='26.2':
+                if scenario in ('push','swim') and version=='26.2':
                     import native_push_probe
                     launch=native_push_probe.command(client_dir,row['port'])
                 else:
@@ -224,7 +243,7 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
                     launch=native_boat_probe.command(client_dir,row['port'])
             else:
                 launch=['cmd.exe', '/d', '/c', r'.\build.bat', 'runClient', '-x', 'preRunClient']
-                if baseline:launch += ['-x','installDevelopmentJar']
+                if baseline:launch += ['-x','installDevelopmentJar','-x','compileJava','-x','processResources','-x','compileDevelopmentJava']
             client = subprocess.Popen(launch,
                 cwd=lab.REPO, env=env, stdout=log, stderr=subprocess.STDOUT, creationflags=lab.NO_WINDOW)
         deadline = time.monotonic() + 240
@@ -248,7 +267,23 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
                           'mixin/impl/compatibility/MixinRemoteEntityPush.java','mixin/impl/compatibility/MixinEntityMotionPackets.java',
                           'mixin/impl/connect/MixinMotionThreshold.java']
                 report['client_artifact']['push_sources']={s:grim.digest(lab.REPO/'src/main/java/com/viaversion/viaforge'/s) for s in relative}
-        if scenario=='push':
+            if scenario=='swim':
+                relative=['compatibility/ServerSwimming.java','common/compatibility/SwimmingPhysics.java',
+                          'common/compatibility/SwimmingPackets.java','common/compatibility/SwimmingFluids.java',
+                          'common/compatibility/LegacyCompatibility.java','mixin/impl/connect/MixinPlayerLoading.java']
+                report['client_artifact']['swim_sources']={s:grim.digest(lab.REPO/'src/main/java/com/viaversion/viaforge'/s) for s in relative}
+            if scenario=='hotbar':
+                relative=['src/development/java/com/viaversion/viaforge/development/LiveHotbarActions.java',
+                          'src/development/java/com/viaversion/viaforge/development/HotbarTrace.java',
+                          'tools/test-servers/hotbar_probe.py']
+                report['client_artifact']['hotbar_sources']={s:grim.digest(lab.REPO/s) for s in relative}
+        if scenario=='hotbar':
+            import hotbar_probe
+            hotbar_probe.exercise(row,folder,report,name,action,console)
+        elif scenario=='swim':
+            import swim_probe
+            swim_probe.exercise(row,folder,report,name,action,console)
+        elif scenario=='push':
             import push_probe
             push_probe.exercise(row,folder,report,name,action,console)
         else:
@@ -436,13 +471,21 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
         poses_file = client_dir / 'client.jsonl'
         poses = [json.loads(s) for s in poses_file.read_text().splitlines()] if poses_file.exists() else []
         for case in cases:
-            if scenario=='push':
+            if scenario=='hotbar':
+                import hotbar_probe
+                case.update(hotbar_probe.summarize(case,poses,events,report.get('name'),row['protocol']))
+            elif scenario=='swim':
+                import swim_probe
+                case.update(swim_probe.summarize(case,poses,events,report.get('name'),row['protocol']))
+            elif scenario=='push':
                 import push_probe
                 case.update(push_probe.summarize(case,poses,events,report.get('name'),row['protocol']))
             else:case.update(summarize(case,poses,events,report.get('name'),row['protocol']))
         report['ended'] = time.time(); report['events'] = events
+        if scenario=='swim':report['swimming_summary']=swim_probe.total(report,events)
         lab.save(folder / 'report.json', report)
         print('REPORT', folder / 'report.json', flush=True)
+    return report
 
 
 if __name__ == '__main__':

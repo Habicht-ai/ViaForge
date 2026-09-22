@@ -100,10 +100,11 @@ Entwicklungsproben sind nicht darin enthalten.
 ## Verbleibende Grenzen
 
 Dies ist keine vollständige Portierung aller neueren Bewegungsarten oder
-Attribute (etwa Wasserschwimmen oder beliebige per Server gesetzte Skalierung).
-Die Kriechergänzung betrifft zunächst den lokalen Spieler; fremde Spieler
-benötigen für ihre zusätzliche Schwimmpose weiterhin eine eigene Anbindung
-der Pose-Metadaten. Die niedrige Tunnelpassage wird automatisiert in Forge
+Attribute (etwa beliebige per Server gesetzte Skalierung).
+Das inzwischen ergänzte [versionsabhängige Schwimmen](SWIMMING.md) besitzt eine
+eigene Fluidphysik sowie die Anbindung fremder Schwimmflags und Pose-Metadaten.
+Es teilt die Größen-/Modellübergänge mit dem Kriech- und Elytrapfad, ohne
+zusätzliche Bewegungsticks auszuführen. Die niedrige Tunnelpassage wird in Forge
 geprüft; eine vollständige Video-Gegenüberstellung sämtlicher Zielclients
 ist damit nicht belegt.
 

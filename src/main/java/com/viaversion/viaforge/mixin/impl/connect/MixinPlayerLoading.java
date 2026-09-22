@@ -8,6 +8,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /** Do not simulate the placeholder spawn while the actual world/first teleport is loading. */
 @Mixin(EntityPlayerSP.class)
 public abstract class MixinPlayerLoading {
+    @ModifyConstant(method="onUpdateWalkingPlayer",constant=@Constant(doubleValue=9.0E-4),require=1)
+    private double movementDistance(double nativeValue) {
+        // 1.18.2 reduced the position threshold from 0.03 to 0.0002 blocks.
+        return ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.PRECISE_MOVEMENT_PACKETS)?2.0E-4*2.0E-4:nativeValue;
+    }
     @ModifyConstant(method="onUpdateWalkingPlayer",constant=@Constant(intValue=20),require=1)
     private int positionReminder(int nativeValue) {
         return ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.EARLY_POSITION_REMINDER)?19:nativeValue;

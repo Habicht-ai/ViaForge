@@ -29,7 +29,7 @@ public final class ServerElytraVisuals {
         State state = STATES.computeIfAbsent(player, ignored -> new State());
         state.flightTicks = ServerElytraFlight.flying(player) ? state.flightTicks + 1 : 0;
         state.previousCrawl = state.crawl;
-        state.crawl = ServerElytraFlight.crawling(player) ? Math.min(1,state.crawl+.09F) : Math.max(0,state.crawl-.09F);
+        state.crawl = ServerElytraFlight.crawling(player)||com.viaversion.viaforge.compatibility.ServerSwimming.pose(player) ? Math.min(1,state.crawl+.09F) : Math.max(0,state.crawl-.09F);
         if (ServerSession.rule(ClientRule.TICKED_ELYTRA_WINGS)) {
             float[] target = target(player);
             for (int i = 0; i < 3; i++) {
@@ -37,7 +37,7 @@ public final class ServerElytraVisuals {
                 state.angles[i] += (target[i] - state.angles[i]) * .3F;
             }
         }
-        if (player == Minecraft.getMinecraft().thePlayer) ServerElytraSound.tick(player);
+        if (player == Minecraft.getMinecraft().thePlayer) { ServerElytraSound.tick(player); com.viaversion.viaforge.compatibility.SwimmingSound.tick(player); }
     }
     private static float[] target(Entity entity) {
         float x = .2617994F, y = 0, z = -.2617994F;

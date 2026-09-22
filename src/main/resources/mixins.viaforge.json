@@ -6,6 +6,10 @@
   "refmap": "mixins.viaforge.refmap.json",
   "client": [
     "compatibility.MixinEntityPush",
+    "compatibility.MixinSwimmingWater",
+    "compatibility.MixinSwimmingInput",
+    "compatibility.MixinSwimmingCamera",
+    "compatibility.MixinSwimmingLiving",
     "compatibility.MixinEntityMotionPackets",
     "compatibility.MixinRemoteEntityPush",
     "compatibility.MixinCollisionTeam",
@@ -17,6 +21,7 @@
     "MixinNetHandlerPlayClient",
     "MixinServerData",
     "blocks.MinecraftResourcePacks",
+    "blocks.MixinPlacementSound",
     "blocks.VersionTextureCache",
     "blocks.MixinBannerTextureCache",
     "blocks.MixinBannerDyeColors",

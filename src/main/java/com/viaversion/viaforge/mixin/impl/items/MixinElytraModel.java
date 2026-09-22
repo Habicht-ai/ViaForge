@@ -23,7 +23,7 @@ public abstract class MixinElytraModel {
         }
         viaForge$flightLimbScale = ServerElytraVisuals.limbAmount(entity, 1);
         viaForge$flightHead = ServerElytraVisuals.ticks(entity) > 4;
-        if(com.viaversion.viaforge.items.ServerElytraFlight.flying(entity)||com.viaversion.viaforge.items.ServerElytraFlight.crawling(entity))
+        if(com.viaversion.viaforge.items.ServerElytraFlight.flying(entity)||com.viaversion.viaforge.items.ServerElytraFlight.crawling(entity)||com.viaversion.viaforge.compatibility.ServerSwimming.pose(entity))
             ((ModelBiped)(Object)this).isSneak=false;
         else if(com.viaversion.viaforge.items.ServerElytraFlight.crouching(entity))((ModelBiped)(Object)this).isSneak=true;
     }

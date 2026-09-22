@@ -6,6 +6,9 @@ Die anschließende versionsabhängige Korrektur der Flugansicht im Survival- und
 Creative-Inventar ist in [INVENTORY-PREVIEW.md](INVENTORY-PREVIEW.md) dokumentiert.
 Die Korrektur von Sprint-Sprung, Aufstiegsaktivierung, Bodenkontakt und
 Kriechpose folgt in [ELYTRA-MOVEMENT.md](ELYTRA-MOVEMENT.md).
+Das später ergänzte [Schwimmen ab 1.13](SWIMMING.md) verwendet dieselben
+Modellübergänge mit eigener Wasserphysik und erhaltener fremder Schwimmpose.
+Seine Live-Nachweise sind von den historischen Elytra-Läufen unten getrennt.
 
 Die bisherige Darstellung drehte den Körper, ließ aber die native 1.8-Laufpose
 weiterlaufen. Außerdem stieg die native Feuerwerksentität unabhängig vom

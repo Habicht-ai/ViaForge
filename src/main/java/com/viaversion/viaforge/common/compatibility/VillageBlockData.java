@@ -32,6 +32,7 @@ final class VillageBlockData {
     private final int fallingBlock;
     private IntFunction<String> blockEntityNames;
     private boolean sectionLightFlag=true,lowPrecisionMovement;
+    private IntUnaryOperator originalFluids=SwimmingFluidRegistry.forVersion("1.14");
     VillageBlockData(FlattenedBlockData legacy) {
         this(legacy, ClientboundPackets1_14.values(), ChunkType1_14.TYPE,
                 id -> id, id -> id, EntityTypes1_14.FALLING_BLOCK.getId());
@@ -46,6 +47,7 @@ final class VillageBlockData {
         this.sourceStates = sourceStates; this.sourceBlocks = sourceBlocks; this.fallingBlock = fallingBlock;
     }
     VillageBlockData sectionedEntities(IntFunction<String> names) { this.blockEntityNames = names; return this; }
+    VillageBlockData fluidRegistry(IntUnaryOperator fluids) { this.originalFluids=fluids;return this; }
 
     VillageBlockData lowPrecisionMovement(){lowPrecisionMovement=true;return this;}
     VillageBlockData withoutSectionLightFlag(){sectionLightFlag=false;return this;}
@@ -54,6 +56,9 @@ final class VillageBlockData {
         int village = sourceStates.applyAsInt(modern);
         int patch = village < 0 ? -1 : states.getNewId(village);
         return patch < 0 ? 65535 : legacy.state(patchStates.getNewId(patch));
+    }
+    private int fluid(int modern) {
+        return originalFluids.applyAsInt(modern);
     }
 
     ByteBuf normalize(ByteBuf source) throws Exception {
@@ -100,6 +105,7 @@ final class VillageBlockData {
                         chunk.setSections(visible); chunk.setBitmask(mask); chunk.setChunkMask(null);
                         chunk.getBlockEntities().removeIf(tag -> tag.getInt("y") < 0 || tag.getInt("y") > 255);
                     }
+                    legacy.fluidUpdates.add(SwimmingFluids.chunk(chunk,this::fluid));
                     for (ChunkSection section : chunk.getSections()) if (section != null) {
                         DataPalette palette = section.palette(PaletteType.BLOCKS);
                         for (int i = 0; i < palette.size(); i++) palette.setIdByIndex(i, state(palette.idByIndex(i)));
@@ -117,14 +123,15 @@ final class VillageBlockData {
                     if(name.equals("LEVEL_CHUNK_WITH_LIGHT"))input.skipBytes(input.readableBytes()); // Via alone owns the light tail.
                     break;
                 }
-                case "BLOCK_UPDATE":
-                    Types.BLOCK_POSITION1_8.write(output, Types.BLOCK_POSITION1_14.read(input));
-                    Types.VAR_INT.writePrimitive(output, state(Types.VAR_INT.readPrimitive(input)));
-                    break;
+                case "BLOCK_UPDATE": {
+                    com.viaversion.viaversion.api.minecraft.BlockPosition pos=Types.BLOCK_POSITION1_14.read(input);int block=Types.VAR_INT.readPrimitive(input);
+                    Types.BLOCK_POSITION1_8.write(output,pos);Types.VAR_INT.writePrimitive(output,state(block));
+                    if(pos.y()>=0&&pos.y()<256)legacy.fluidUpdates.add(SwimmingFluids.block(pos,fluid(block)));break;
+                }
                 case "CHUNK_BLOCKS_UPDATE": {
-                    output.writeInt(input.readInt()).writeInt(input.readInt());
+                    int x=input.readInt(),z=input.readInt();output.writeInt(x).writeInt(z);
                     BlockChangeRecord[] records = Types.BLOCK_CHANGE_ARRAY.read(input);
-                    for (BlockChangeRecord record : records) record.setBlockId(state(record.getBlockId()));
+                    for (BlockChangeRecord record : records) {legacy.fluidUpdates.add(SwimmingFluids.block(new com.viaversion.viaversion.api.minecraft.BlockPosition((x<<4)+record.getSectionX(),record.getY(),(z<<4)+record.getSectionZ()),fluid(record.getBlockId())));record.setBlockId(state(record.getBlockId()));}
                     Types.BLOCK_CHANGE_ARRAY.write(output, records);
                     break;
                 }
@@ -137,6 +144,7 @@ final class VillageBlockData {
                     BlockChangeRecord[] legacyRecords=new BlockChangeRecord[records.length];
                     for(int i=0;i<records.length;i++) {
                         BlockChangeRecord record=records[i];
+                        legacy.fluidUpdates.add(SwimmingFluids.block(new com.viaversion.viaversion.api.minecraft.BlockPosition((x<<4)+record.getSectionX(),record.getY(y),(z<<4)+record.getSectionZ()),fluid(record.getBlockId())));
                         legacyRecords[i]=new com.viaversion.viaversion.api.minecraft.BlockChangeRecord1_8(record.getSectionX(),record.getY(y),record.getSectionZ(),state(record.getBlockId()));
                     }
                     Types.BLOCK_CHANGE_ARRAY.write(output,legacyRecords);break;

@@ -20,6 +20,9 @@ public final class FlattenedBlockData {
     private final Map<Integer,Integer> eventBlocks = new HashMap<>();
     private int dimension;
     final WaterColors waterColors;
+    final List<ByteBuf> fluidUpdates=new ArrayList<>();
+    private final Map<Integer,Integer> fluids=new HashMap<>();
+    int fluid(int state){return fluids.getOrDefault(state,0);}
     boolean overworld() { return dimension == 0; }
     int eventBlock(int id) { return eventBlocks.getOrDefault(id,4095); }
     public FlattenedBlockData() {
@@ -29,7 +32,7 @@ public final class FlattenedBlockData {
         this.waterColors = waterColors;
         final String[] last = {""}; final int[] block = {-1};
         BlockStates1_13.forEach(MappingDataLoader.INSTANCE.loadNBT("blockstates-1.13.nbt"), (key,id) -> {
-            names.put(id,key);
+            names.put(id,key);fluids.put(id,SwimmingFluids.descriptor(key));
             String name = key.split("\\[",2)[0];
             if (!name.equals(last[0])) {
                 last[0]=name; block[0]++;
@@ -81,6 +84,7 @@ public final class FlattenedBlockData {
                 case "LEVEL_CHUNK": {
                     Chunk chunk=new ChunkType1_13(dimension==0).read(input);
                     waterColors.capture(chunk,0);
+                    fluidUpdates.add(SwimmingFluids.chunk(chunk,this::fluid));
                     for(ChunkSection section:chunk.getSections()) if(section!=null) {
                         DataPalette palette=section.palette(PaletteType.BLOCKS);
                         for(int i=0;i<palette.size();i++)palette.setIdByIndex(i,state(palette.idByIndex(i)));
@@ -91,13 +95,15 @@ public final class FlattenedBlockData {
                         if("minecraft:bed".equals(tag.getString("id")))tag.remove("color");
                     new ChunkType1_9_3(dimension==0).write(output,chunk);break;
                 }
-                case "BLOCK_UPDATE":
-                    Types.BLOCK_POSITION1_8.write(output,Types.BLOCK_POSITION1_8.read(input));
-                    Types.VAR_INT.writePrimitive(output,state(Types.VAR_INT.readPrimitive(input)));break;
+                case "BLOCK_UPDATE": {
+                    com.viaversion.viaversion.api.minecraft.BlockPosition pos=Types.BLOCK_POSITION1_8.read(input);int block=Types.VAR_INT.readPrimitive(input);
+                    Types.BLOCK_POSITION1_8.write(output,pos);Types.VAR_INT.writePrimitive(output,state(block));
+                    fluidUpdates.add(SwimmingFluids.block(pos,fluid(block)));break;
+                }
                 case "CHUNK_BLOCKS_UPDATE": {
-                    output.writeInt(input.readInt()).writeInt(input.readInt());
+                    int x=input.readInt(),z=input.readInt();output.writeInt(x).writeInt(z);
                     BlockChangeRecord[] records=Types.BLOCK_CHANGE_ARRAY.read(input);
-                    for(BlockChangeRecord record:records)record.setBlockId(state(record.getBlockId()));
+                    for(BlockChangeRecord record:records){fluidUpdates.add(SwimmingFluids.block(new com.viaversion.viaversion.api.minecraft.BlockPosition((x<<4)+record.getSectionX(),record.getY(),(z<<4)+record.getSectionZ()),fluid(record.getBlockId())));record.setBlockId(state(record.getBlockId()));}
                     Types.BLOCK_CHANGE_ARRAY.write(output,records);break;
                 }
                 case "BLOCK_EVENT":
@@ -110,6 +116,7 @@ public final class FlattenedBlockData {
                     output.writeBytes(input,26);int data=input.readInt();
                     if(type==70){int legacy=state(data);data=(legacy>>4)|((legacy&15)<<12);}
                     output.writeInt(data);break;
+                case "FORGET_LEVEL_CHUNK":fluidUpdates.add(SwimmingFluids.unload(input.getInt(input.readerIndex()),input.getInt(input.readerIndex()+4)));break;
                 default:break;
             }
             output.writeBytes(input);return output;

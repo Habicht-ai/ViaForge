@@ -7,6 +7,16 @@ do not implement every later release's content. Unknown targets keep normal Via
 connectivity without borrowing an older parser. See [flattened families](FLATTENED.md)
 and [modern families, validation status and limits](MODERN.md).
 
+Player swimming from 1.13 has separate [version rules, original-client evidence,
+test cases and limits](SWIMMING.md). Its preserved fluid/pose events use the
+internal 340 format; behavior follows the actual negotiated server protocol.
+
+The clarified Creative middle-click hotbar desync is reproduced and corrected:
+the added offhand slot shifted the original pick-block packet's slot calculation.
+Local placement sounds also use the target resource catalog. See
+[the reproducer, correction and tested limits](PICK-BLOCK-SOUND-2026-09-23.md);
+the earlier Creative catalog investigation is retained as historical evidence.
+
 Boat behavior has separate [live Grim evidence and limits](BOAT-GRIM-2026-09-21.md).
 Earlier player/Elytra PASS reports did not cover boats. The 2026-09-21 boat fix
 restores original passenger/vehicle input timing in the shared `ServerBoat` path;

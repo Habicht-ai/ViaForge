@@ -11,6 +11,7 @@ public abstract class MixinCombatTick {
     @Inject(method = "onUpdate", at = @At("RETURN"))
     private void attackTimer(CallbackInfo ci) {
         ServerCombatState.tick((EntityPlayer)(Object)this);
+        com.viaversion.viaforge.compatibility.ServerSwimming.remotePose((EntityPlayer)(Object)this);
         com.viaversion.viaforge.items.ServerItemCooldowns.tick((EntityPlayer)(Object)this);
         com.viaversion.viaforge.hands.Offhand.tick((EntityPlayer)(Object)this);
         com.viaversion.viaforge.items.ServerElytraVisuals.tick((EntityPlayer)(Object)this);

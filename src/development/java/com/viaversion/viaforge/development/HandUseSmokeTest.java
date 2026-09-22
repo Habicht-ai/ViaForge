@@ -77,7 +77,9 @@ final class HandUseSmokeTest {
         }finally {
             renderer.set(mc.getItemRenderer(),original);GlStateManager.popMatrix();
             ((com.viaversion.viaforge.mixin.impl.mobs.MobSizeAccess)p).viaForge$size(.6F,height);p.movementInput.sneak=sneak;
-            for(int i=0;i<12;i++)ServerElytraVisuals.tick(p);
+            // Twelve ticks clear the current .09/tick blend; the previous value
+            // needs the thirteenth tick before a partial=0 model draw is neutral.
+            for(int i=0;i<13;i++)ServerElytraVisuals.tick(p);
             hold(oldMain);Offhand.set(oldOff);HandRenderer.clear();config.set(ViaForgeConfig.LEFT_MAIN_HAND,oldLeft);sent.clear();
         }
     }

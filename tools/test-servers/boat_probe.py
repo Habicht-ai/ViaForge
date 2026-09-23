@@ -49,10 +49,10 @@ def assert_no_client():
         raise RuntimeError('Existing Minecraft client: ' + found)
 
 
-def run(version, label, client_type='viaforge', extended=False, baseline=False, reconnect=False, controls=False, scenario='boat', baseline_stage=None, world_template=None, swim_transitions=False):
+def run(version, label, client_type='viaforge', extended=False, baseline=False, reconnect=False, controls=False, scenario='boat', baseline_stage=None, world_template=None, swim_transitions=False, sneak_extended=False, sneak_attributes=False, sneak_swift=False, sneak_timing=False):
     assert_no_client()
     source_row = next(r for r in lab.GRIM_VERSIONS if r['minecraft_version'] == version)
-    if (client_type=='native' or extended or controls) and version!='1.12.2' and not (scenario in ('push','swim') and version=='26.2' and not extended and not controls):
+    if (client_type=='native' or extended or controls) and version!='1.12.2' and not (scenario in ('push','swim','sneak') and version=='26.2' and not extended and not controls):
         raise ValueError('Native/extended script is currently mapped to exact 1.12.2')
     folder = lab.ROOT / (scenario + '-' + version + '-' + label + '-' + str(time.time_ns()))
     folder.mkdir()
@@ -115,7 +115,12 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
     for p in config_files:
         if p.exists(): shutil.copy2(p, folder / (p.name + '.before'))
     development=lab.REPO/'run/mods/ViaForge-development.jar'
-    if baseline and scenario=='swim':
+    if baseline and scenario=='sneak':
+        old=lab.REPO/'build/backups/sneak-20260923-initial/ViaForge-initial-with-probe.jar'
+        if not old.exists():raise RuntimeError('Explicit pre-sneak baseline archive missing')
+        shutil.copy2(development,folder/'development-fixed.jar');shutil.copy2(old,development)
+        lab.save(folder/'baseline-classes.json',dict(source=str(old),source_sha256=grim.digest(old),description='d1d531c production with keyboard/observation probe only'))
+    elif baseline and scenario=='swim':
         old=lab.REPO/'build/backups/swimming-20260922-205857/ViaForge-baseline-with-probe.jar'
         if not old.exists():raise RuntimeError('Explicit pre-swimming baseline archive missing')
         shutil.copy2(development,folder/'development-fixed.jar');shutil.copy2(old,development)
@@ -144,7 +149,7 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
     server = client = companion = None
     companion_dir = None
     cases = []
-    report = dict(server=source_row, row=row, label=label, client=client_type, baseline=baseline, started=time.time(), cases=cases, completed=False, scenario=scenario,swim_transitions=swim_transitions)
+    report = dict(server=source_row, row=row, label=label, client=client_type, baseline=baseline, started=time.time(), cases=cases, completed=False, scenario=scenario,swim_transitions=swim_transitions,sneak_extended=sneak_extended,sneak_attributes=sneak_attributes,sneak_swift=sneak_swift,sneak_timing=sneak_timing)
     client_dir = folder / client_type
     client_dir.mkdir()
     server_log = folder / 'server-console.log'
@@ -226,16 +231,20 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
                      'fill -24 67 -24 24 71 24 air','setworldspawn 0 67 0'])
         if scenario=='hotbar':
             console(['fill -8 63 -8 8 63 8 stone','fill -8 64 -8 8 69 8 air','setworldspawn 0 64 -3'])
+        if scenario=='sneak':
+            import sneak_probe
+            sneak_probe.fixture(console,row['protocol'],sneak_extended or sneak_swift=='water')
         grim.control(row, 'on')
         env = dict(os.environ, VIAFORGE_NO_PAUSE='1', JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4',
-                   VIAFORGE_PUSH_PROBE='1' if scenario in ('push','swim') else '0', VIAFORGE_SWIM_PROBE='1' if scenario=='swim' else '0',
+                   VIAFORGE_PUSH_PROBE='1' if scenario in ('push','swim','sneak') else '0', VIAFORGE_SWIM_PROBE='1' if scenario in ('swim','sneak') else '0',
                    VIAFORGE_HOTBAR_PROBE='1' if scenario=='hotbar' else '0',
                    VIAFORGE_BOAT_PROBE=str(client_dir), VIAFORGE_BOAT_PROTOCOL=str(row['protocol']), VIAFORGE_BOAT_PORT=str(row['port']))
+        if scenario=='sneak':env['VIAFORGE_SNEAK_PROBE']=str(client_dir)
         for key in ('VIAFORGE_BLOCK_SMOKE_TEST', 'VIAFORGE_SMOKE_PROTOCOL', 'VIAFORGE_PROTOCOL_PROBE', 'VIAFORGE_LIVE_FLIGHT'):
             env.pop(key, None)
         with (client_dir / 'console.log').open('w') as log:
             if client_type=='native':
-                if scenario in ('push','swim') and version=='26.2':
+                if scenario in ('push','swim','sneak') and version=='26.2':
                     import native_push_probe
                     launch=native_push_probe.command(client_dir,row['port'])
                 else:
@@ -272,6 +281,12 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
                           'common/compatibility/SwimmingPackets.java','common/compatibility/SwimmingFluids.java',
                           'common/compatibility/LegacyCompatibility.java','mixin/impl/connect/MixinPlayerLoading.java']
                 report['client_artifact']['swim_sources']={s:grim.digest(lab.REPO/'src/main/java/com/viaversion/viaforge'/s) for s in relative}
+            if scenario=='sneak' and not baseline:
+                relative=['compatibility/ServerSwimming.java','common/compatibility/SwimmingPhysics.java',
+                          'common/compatibility/SwimmingPackets.java','common/compatibility/LegacyCompatibility.java',
+                          'items/ServerElytraFlight.java','mixin/impl/compatibility/MixinSwimmingInput.java',
+                          'mixin/impl/compatibility/MixinSwimmingLiving.java']
+                report['client_artifact']['sneak_sources']={s:grim.digest(lab.REPO/'src/main/java/com/viaversion/viaforge'/s) for s in relative}
             if scenario=='hotbar':
                 relative=['src/development/java/com/viaversion/viaforge/development/LiveHotbarActions.java',
                           'src/development/java/com/viaversion/viaforge/development/HotbarTrace.java',
@@ -280,6 +295,9 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
         if scenario=='hotbar':
             import hotbar_probe
             hotbar_probe.exercise(row,folder,report,name,action,console)
+        elif scenario=='sneak':
+            import sneak_probe
+            sneak_probe.exercise(row,folder,report,name,action,console)
         elif scenario=='swim':
             import swim_probe
             swim_probe.exercise(row,folder,report,name,action,console)
@@ -474,6 +492,9 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
             if scenario=='hotbar':
                 import hotbar_probe
                 case.update(hotbar_probe.summarize(case,poses,events,report.get('name'),row['protocol']))
+            elif scenario=='sneak':
+                import sneak_probe
+                case.update(sneak_probe.summarize(case,poses,events,report.get('name'),row['protocol']))
             elif scenario=='swim':
                 import swim_probe
                 case.update(swim_probe.summarize(case,poses,events,report.get('name'),row['protocol']))
@@ -482,6 +503,7 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
                 case.update(push_probe.summarize(case,poses,events,report.get('name'),row['protocol']))
             else:case.update(summarize(case,poses,events,report.get('name'),row['protocol']))
         report['ended'] = time.time(); report['events'] = events
+        if scenario=='sneak':report['sneaking_summary']=sneak_probe.total(report,events)
         if scenario=='swim':report['swimming_summary']=swim_probe.total(report,events)
         lab.save(folder / 'report.json', report)
         print('REPORT', folder / 'report.json', flush=True)

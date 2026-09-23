@@ -137,7 +137,8 @@ shadeDowngradedApi {
 tasks.register('developmentJar', Jar) {
     destinationDirectory = layout.buildDirectory.dir('intermediates/development')
     archiveClassifier = 'dev'
-    manifest.from tasks.jar.manifest
+    manifest.attributes(tasks.jar.manifest.attributes)
+    manifest.attributes('FMLCorePlugin': 'com.viaversion.viaforge.development.MovementProbeLoader')
     from(tasks.named('shadowJar').flatMap { it.archiveFile }.map { zipTree(it) }) {
         exclude 'META-INF/MANIFEST.MF'
     }

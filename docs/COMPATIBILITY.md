@@ -11,6 +11,10 @@ Player swimming from 1.13 has separate [version rules, original-client evidence,
 test cases and limits](SWIMMING.md). Its preserved fluid/pose events use the
 internal 340 format; behavior follows the actual negotiated server protocol.
 
+Land sneak/sprint transitions have a separate [reproduction, original-client
+comparison and version boundaries](SNEAK-SPRINT.md). The correction shares the
+original input stages with swimming and preserves modern sneak-speed attributes.
+
 The clarified Creative middle-click hotbar desync is reproduced and corrected:
 the added offhand slot shifted the original pick-block packet's slot calculation.
 Local placement sounds also use the target resource catalog. See

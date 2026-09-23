@@ -12,6 +12,9 @@ import java.util.List;
 /** Retains swim flags, poses and aquatic effects before Via's lossy boundaries. */
 public final class SwimmingPackets {
     public static ByteBuf attributes(ByteBuf source) throws Exception {
+        return attributes(source,id->com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21.MAPPINGS.getAttributeMappings().mappedIdentifier(id));
+    }
+    public static ByteBuf attributes(ByteBuf source,java.util.function.IntFunction<String> identifiers) throws Exception {
         ByteBuf input=source.duplicate();
         if(Types.VAR_INT.readPrimitive(input)!=com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPackets1_21.UPDATE_ATTRIBUTES.getId())return null;
         int entity=Types.VAR_INT.readPrimitive(input),count=Types.VAR_INT.readPrimitive(input);
@@ -19,11 +22,12 @@ public final class SwimmingPackets {
         try {
             for(int i=0;i<count;i++) {
                 int id=Types.VAR_INT.readPrimitive(input);
-                String key=com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21.MAPPINGS.getAttributeMappings().mappedIdentifier(id);
+                String key=identifiers.apply(id);
                 double base=input.readDouble();int modifiers=Types.VAR_INT.readPrimitive(input);
                 double[] amounts=new double[modifiers];int[] operations=new int[modifiers];
                 for(int j=0;j<modifiers;j++){Types.STRING.read(input);amounts[j]=input.readDouble();operations[j]=input.readUnsignedByte();}
-                int kind=key!=null&&key.endsWith("water_movement_efficiency")?0:key!=null&&key.endsWith("gravity")?1:-1;
+                int kind=key!=null&&key.endsWith("water_movement_efficiency")?0:key!=null&&key.endsWith("gravity")?1:
+                        key!=null&&key.endsWith("sneaking_speed")?2:-1;
                 if(kind<0)continue;
                 for(int j=0;j<modifiers;j++)if(operations[j]==0)base+=amounts[j];
                 double value=base;

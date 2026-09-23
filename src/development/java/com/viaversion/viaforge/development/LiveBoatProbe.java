@@ -103,6 +103,7 @@ public final class LiveBoatProbe {
                 mc.getNetHandler().getNetworkManager().channel().pipeline().addBefore("packet_handler","boat_probe",new ChannelDuplexHandler(){
                     @Override public void write(ChannelHandlerContext ctx,Object msg,ChannelPromise promise)throws Exception {
                         JsonObject j=new JsonObject();j.addProperty("phase","send");j.addProperty("packet",msg.getClass().getSimpleName());
+                        if(msg instanceof net.minecraft.network.play.client.C0BPacketEntityAction)j.addProperty("action",((net.minecraft.network.play.client.C0BPacketEntityAction)msg).getAction().toString());
                         if(msg instanceof net.minecraft.network.play.client.C09PacketHeldItemChange)j.addProperty("slot",((net.minecraft.network.play.client.C09PacketHeldItemChange)msg).getSlotId());
                         if(msg instanceof net.minecraft.network.play.client.C10PacketCreativeInventoryAction){net.minecraft.network.play.client.C10PacketCreativeInventoryAction p=(net.minecraft.network.play.client.C10PacketCreativeInventoryAction)msg;j.addProperty("slot",p.getSlotId());j.add("item",LiveHotbarActions.item(p.getStack()));}
                         if(msg instanceof C17PacketCustomPayload){C17PacketCustomPayload p=(C17PacketCustomPayload)msg;j.addProperty("channel",p.getChannelName());
@@ -141,21 +142,33 @@ public final class LiveBoatProbe {
                     }
                 }
                 LiveHotbarActions.act(action,actionTick);
-                key(mc.gameSettings.keyBindForward,action.contains("forward"));key(mc.gameSettings.keyBindBack,action.contains("back"));
-                key(mc.gameSettings.keyBindLeft,action.contains("left"));key(mc.gameSettings.keyBindRight,action.contains("right"));
-                key(mc.gameSettings.keyBindSneak,action.equals("dismount")||action.contains("sneak"));
-                key(mc.gameSettings.keyBindSprint,action.contains("sprint"));key(mc.gameSettings.keyBindJump,action.contains("jump"));
+                String keys=sequenceInput(action,actionTick);
+                key(mc.gameSettings.keyBindForward,keys.contains("forward"));key(mc.gameSettings.keyBindBack,keys.contains("back"));
+                key(mc.gameSettings.keyBindLeft,keys.contains("left"));key(mc.gameSettings.keyBindRight,keys.contains("right"));
+                key(mc.gameSettings.keyBindSneak,action.equals("dismount")||keys.contains("sneak"));
+                key(mc.gameSettings.keyBindSprint,keys.contains("sprint"));key(mc.gameSettings.keyBindJump,keys.contains("jump"));
             }
             JsonObject j=new JsonObject();j.addProperty("phase",event.phase.toString());j.addProperty("action",action);j.addProperty("action_tick",actionTick);
             j.addProperty("player_tick",mc.thePlayer.ticksExisted);j.addProperty("gamemode",mc.playerController.getCurrentGameType().toString());
             j.addProperty("player_x",mc.thePlayer.posX);j.addProperty("player_y",mc.thePlayer.posY);j.addProperty("player_z",mc.thePlayer.posZ);
             if("1".equals(System.getenv("VIAFORGE_HOTBAR_PROBE")))LiveHotbarActions.observe(j);
             if("1".equals(System.getenv("VIAFORGE_SWIM_PROBE"))) {
+                j.addProperty("loaded",mc.theWorld.isBlockLoaded(new net.minecraft.util.BlockPos(mc.thePlayer)));
+                j.addProperty("paused",mc.isGamePaused());
                 j.addProperty("water",mc.thePlayer.isInWater());j.addProperty("eye_water",mc.thePlayer.isInsideOfMaterial(net.minecraft.block.material.Material.water));
+                j.addProperty("sneaking",mc.thePlayer.isSneaking());j.addProperty("input_sneak",mc.thePlayer.movementInput.sneak);
+                j.addProperty("key_sneak",mc.gameSettings.keyBindSneak.isKeyDown());j.addProperty("key_sprint",mc.gameSettings.keyBindSprint.isKeyDown());
+                j.addProperty("speed_attribute",mc.thePlayer.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.movementSpeed).getAttributeValue());
+                j.addProperty("collision_h",mc.thePlayer.isCollidedHorizontally);j.addProperty("collision_v",mc.thePlayer.isCollidedVertically);
+                j.addProperty("crawling",com.viaversion.viaforge.items.ServerElytraFlight.crawling(mc.thePlayer));
+                j.addProperty("crouching",com.viaversion.viaforge.items.ServerElytraFlight.crouching(mc.thePlayer));
+                j.addProperty("floor",mc.theWorld.getBlockState(new net.minecraft.util.BlockPos(mc.thePlayer.posX,mc.thePlayer.posY-.01,mc.thePlayer.posZ)).toString());
                 j.addProperty("sprinting",mc.thePlayer.isSprinting());j.addProperty("height",mc.thePlayer.height);j.addProperty("eye_height",mc.thePlayer.getEyeHeight());
                 j.addProperty("yaw",mc.thePlayer.rotationYaw);j.addProperty("pitch",mc.thePlayer.rotationPitch);
                 j.addProperty("animation",mc.thePlayer.limbSwing);j.addProperty("swim_amount",com.viaversion.viaforge.items.ServerElytraVisuals.crawlAmount(mc.thePlayer,1));
                 j.addProperty("swimming",com.viaversion.viaforge.compatibility.ServerSwimming.swimming(mc.thePlayer));
+                j.addProperty("sneak_speed",com.viaversion.viaforge.compatibility.ServerSwimming.sneakSpeed(mc.thePlayer));
+                if(tick%20==0)j.addProperty("leggings_tag",String.valueOf(mc.thePlayer.getCurrentArmor(1)==null?null:mc.thePlayer.getCurrentArmor(1).getTagCompound()));
                 j.addProperty("water_depth",com.viaversion.viaforge.compatibility.ServerSwimming.depth(mc.thePlayer));
                 j.addProperty("dolphins_grace",mc.thePlayer.isPotionActive(30));
                 j.addProperty("conduit_power",mc.thePlayer.isPotionActive(29));j.addProperty("air",mc.thePlayer.getAir());
@@ -212,6 +225,15 @@ public final class LiveBoatProbe {
             }
             if(tick<10000)log(j);
         }catch(Throwable t){try{state("FAIL",t.toString());}catch(Exception ignored){}t.printStackTrace();finished=true;mc.shutdown();}
+    }
+    private static String sequenceInput(String action,int tick) {
+        if(!action.startsWith("sequence:"))return action;
+        String last="idle";
+        for(String step:action.substring(9).split("\\|")) {
+            int separator=step.indexOf(':');int count=Integer.parseInt(step.substring(0,separator));last=step.substring(separator+1);
+            if(tick<count)return last;tick-=count;
+        }
+        return last;
     }
     private static void key(KeyBinding key,boolean down){KeyBinding.setKeyBindState(key.getKeyCode(),down);}
     private ChannelInboundHandlerAdapter wire(final String phase) {

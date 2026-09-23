@@ -45,6 +45,7 @@ final class ElytraFlightSmokeTest {
         try {
             EntityPushSmokeTest.verify(world,player);
             SwimmingSmokeTest.verify(world);
+            SneakMovementSmokeTest.verify(world,player);
             PickBlockSmokeTest.verify(world,sent);
             sent.clear();
             ServerEntityViews.clear();player.setHealth(20);player.setPosition(5,200,5);player.motionY=-.2;player.onGround=false;

@@ -45,7 +45,7 @@ final class LegacyCompatibility {
         for(int i=0;i<cliffs.length;i++)profiles.add(new CompatibilityProfile(cliffs[i],i==0?v118:v1182,
                 new ResourceProfile(cliffsResources[i],com.viaversion.viaforge.blocks.resources.CavesResourceConverter::convert),new FlattenedProtocolAdapter.Factory(cliffs[i])));
         int[] wild={759,760};String[] wildResources={"1.19","1.19.2"};
-        VersionRules v119=v1182.derive().rule(PUSHABLE_IMPULSE_TARGETS,true).build();
+        VersionRules v119=v1182.derive().rule(SWIFT_SNEAK,true).rule(PUSHABLE_IMPULSE_TARGETS,true).build();
         for(int i=0;i<wild.length;i++)profiles.add(new CompatibilityProfile(wild[i],v119,
                 new ResourceProfile(wildResources[i],com.viaversion.viaforge.blocks.resources.CavesResourceConverter::convert),new FlattenedProtocolAdapter.Factory(wild[i])));
         int[] trails={761,762,763};String[] trailsResources={"1.19.3","1.19.4","1.20.1"};
@@ -58,7 +58,7 @@ final class LegacyCompatibility {
         VersionRules v1203=v1202.derive().rule(SHIELD_FOLLOWS_LOOK,true).build();
         profiles.add(new CompatibilityProfile(765,v1203,new ResourceProfile("1.20.4",com.viaversion.viaforge.blocks.resources.GuiSpriteResourceConverter::convert),new FlattenedProtocolAdapter.Factory(765)));
         profiles.add(new CompatibilityProfile(766,v1203,new ResourceProfile("1.20.6",com.viaversion.viaforge.blocks.resources.GuiSpriteResourceConverter::convert),new FlattenedProtocolAdapter.Factory(766)));
-        VersionRules v121=v1203.derive().rule(WATER_EFFICIENCY_ATTRIBUTE,true).build();
+        VersionRules v121=v1203.derive().rule(SNEAK_SPEED_ATTRIBUTE,true).rule(WATER_EFFICIENCY_ATTRIBUTE,true).build();
         profiles.add(new CompatibilityProfile(767,v121,new ResourceProfile("1.21.1",com.viaversion.viaforge.blocks.resources.GuiSpriteResourceConverter::convert),new FlattenedProtocolAdapter.Factory(767)));
         VersionRules v1212=v121.derive().rule(DEFERRED_BLOCK_EFFECTS,true).rule(TICKED_ELYTRA_WINGS,true).rule(FIXED_CRAWLING_HEAD,true).build();
         profiles.add(new CompatibilityProfile(768,v1212,new ResourceProfile("1.21.3",com.viaversion.viaforge.blocks.resources.EquipmentResourceConverter::convert),new FlattenedProtocolAdapter.Factory(768)));

@@ -12,7 +12,7 @@ import org.objectweb.asm.*;
 public final class NativePushProbe {
     private static Path directory;
     private static long started;
-    private static int ticks;
+    private static int ticks,actionTick;
     private static boolean ready,done;
     private static String action="idle";
     private static final Gson GSON=new Gson();
@@ -20,11 +20,24 @@ public final class NativePushProbe {
         directory=Paths.get(path);started=System.currentTimeMillis();
         instrumentation.addTransformer(new ClassFileTransformer(){
             @Override public byte[] transform(ClassLoader loader,String name,Class<?> type,ProtectionDomain domain,byte[] bytes){
-                if(!name.equals("net/minecraft/client/Minecraft"))return null;
+                boolean player=name.equals("net/minecraft/client/player/LocalPlayer");
+                if(!name.equals("net/minecraft/client/Minecraft")&&!player)return null;
                 ClassReader reader=new ClassReader(bytes);ClassWriter writer=new ClassWriter(reader,ClassWriter.COMPUTE_MAXS);
                 reader.accept(new ClassVisitor(Opcodes.ASM9,writer){
                     @Override public MethodVisitor visitMethod(int access,String name,String descriptor,String signature,String[] exceptions){
                         MethodVisitor method=super.visitMethod(access,name,descriptor,signature,exceptions);
+                        if(player) {
+                            if(!name.equals("aiStep")&&!name.equals("applyInput")&&!name.equals("sendPosition"))return method;
+                            return new MethodVisitor(Opcodes.ASM9,method){
+                                private void observe(String phase){super.visitVarInsn(Opcodes.ALOAD,0);super.visitLdcInsn(phase);super.visitMethodInsn(Opcodes.INVOKESTATIC,"viaforge/lab/NativePushProbe","observe","(Ljava/lang/Object;Ljava/lang/String;)V",false);}
+                                @Override public void visitCode(){super.visitCode();observe(name+"_BEGIN");}
+                                @Override public void visitInsn(int opcode){if(opcode==Opcodes.RETURN)observe(name+"_END");super.visitInsn(opcode);}
+                                @Override public void visitMethodInsn(int opcode,String owner,String invoked,String desc,boolean itf){
+                                    boolean input=owner.equals("net/minecraft/client/player/ClientInput")&&invoked.equals("tick");
+                                    if(input)observe("INPUT_BEFORE");super.visitMethodInsn(opcode,owner,invoked,desc,itf);if(input)observe("INPUT_AFTER");
+                                }
+                            };
+                        }
                         if(!name.equals("tick")||!descriptor.equals("()V"))return method;
                         return new MethodVisitor(Opcodes.ASM9,method){
                             private void hook(boolean end){visitVarInsn(Opcodes.ALOAD,0);visitInsn(end?Opcodes.ICONST_1:Opcodes.ICONST_0);visitMethodInsn(Opcodes.INVOKESTATIC,"viaforge/lab/NativePushProbe","tick","(Ljava/lang/Object;Z)V",false);}
@@ -41,6 +54,30 @@ public final class NativePushProbe {
         throw new NoSuchFieldException(name);
     }
     private static Object call(Object o,String name)throws Exception{return o.getClass().getMethod(name).invoke(o);}
+    public static void observe(Object player,String phase) {
+        if(System.getenv("VIAFORGE_SNEAK_PROBE")==null||done||ticks>12000)return;
+        try {
+            Map<String,Object> j=new LinkedHashMap<>();j.put("time_ms",System.currentTimeMillis());j.put("tick",ticks);j.put("phase",phase);j.put("action",action);
+            j.put("player_tick",field(player,"tickCount"));j.put("sprinting",call(player,"isSprinting"));j.put("sneaking",call(player,"isShiftKeyDown"));
+            j.put("crouching",call(player,"isCrouching"));j.put("slowMovement",call(player,"isMovingSlowly"));j.put("swimming",call(player,"isSwimming"));
+            j.put("pose",String.valueOf(call(player,"getPose")));j.put("height",call(player,"getBbHeight"));j.put("eye_height",call(player,"getEyeHeight"));j.put("sprintWindow",field(player,"sprintTriggerTime"));
+            Object input=field(player,"input"),vector=call(input,"getMoveVector");j.put("input_forward",field(vector,"y"));j.put("input_strafe",field(vector,"x"));j.put("keys",String.valueOf(field(input,"keyPresses")));
+            j.put("travel_forward",field(player,"zza"));j.put("travel_strafe",field(player,"xxa"));
+            j.put("x",call(player,"getX"));j.put("y",call(player,"getY"));j.put("z",call(player,"getZ"));j.put("velocity",String.valueOf(call(player,"getDeltaMovement")));
+            j.put("box",String.valueOf(call(player,"getBoundingBox")));j.put("water",call(player,"isInWater"));j.put("eye_water",call(player,"isUnderWater"));
+            j.put("ground",call(player,"onGround"));j.put("collision_h",field(player,"horizontalCollision"));
+            Files.writeString(directory.resolve("movement.jsonl"),GSON.toJson(j)+"\n",StandardOpenOption.CREATE,StandardOpenOption.APPEND);
+        }catch(Exception failure){throw new IllegalStateException("Native observation failed",failure);}
+    }
+    private static String sequenceInput(String action,int tick) {
+        if(!action.startsWith("sequence:"))return action;
+        String last="idle";
+        for(String step:action.substring(9).split("\\|")) {
+            int separator=step.indexOf(':');int count=Integer.parseInt(step.substring(0,separator));last=step.substring(separator+1);
+            if(tick<count)return last;tick-=count;
+        }
+        return last;
+    }
     private static void key(Object options,String name,boolean down)throws Exception {
         Object key=field(options,name);key.getClass().getMethod("setDown",boolean.class).invoke(key,down);
     }
@@ -54,7 +91,8 @@ public final class NativePushProbe {
         try {
             Path path=directory.resolve("action.txt");
             if(!end){
-                action=Files.exists(path)?Files.readString(path).trim():"idle";
+                String next=Files.exists(path)?Files.readString(path).trim():"idle";
+                if(!next.equals(action)){action=next;actionTick=0;}else actionTick++;
                 if(action.equals("stop")){state("DONE","Input sequence recorded");done=true;call(mc,"stop");return;}
                 if(System.currentTimeMillis()-started>600000)throw new IllegalStateException("Native probe timeout");
             }
@@ -62,11 +100,12 @@ public final class NativePushProbe {
             if(!ready){if(!end)return;ready=true;state("ready","Official Mojang 26.2");}
             if(!end){
                 ticks++;Object options=field(mc,"options");
-                key(options,"keyUp",action.contains("forward"));key(options,"keyDown",action.contains("back"));
-                key(options,"keyLeft",action.contains("left"));key(options,"keyRight",action.contains("right"));
-                key(options,"keyShift",action.contains("sneak"));key(options,"keyJump",action.contains("jump"));key(options,"keySprint",action.contains("sprint"));
+                String keys=sequenceInput(action,actionTick);
+                key(options,"keyUp",keys.contains("forward"));key(options,"keyDown",keys.contains("back"));
+                key(options,"keyLeft",keys.contains("left"));key(options,"keyRight",keys.contains("right"));
+                key(options,"keyShift",keys.contains("sneak"));key(options,"keyJump",keys.contains("jump"));key(options,"keySprint",keys.contains("sprint"));
             }
-            Map<String,Object> j=new LinkedHashMap<>();j.put("time_ms",System.currentTimeMillis());j.put("tick",ticks);j.put("phase",end?"END":"START");j.put("action",action);
+            Map<String,Object> j=new LinkedHashMap<>();j.put("time_ms",System.currentTimeMillis());j.put("tick",ticks);j.put("phase",end?"END":"START");j.put("action",action);j.put("action_tick",actionTick);
             double x=(Double)call(player,"getX"),y=(Double)call(player,"getY"),z=(Double)call(player,"getZ");
             j.put("player_x",x);j.put("player_y",y);j.put("player_z",z);
             Object velocity=call(player,"getDeltaMovement");j.put("player_vx",field(velocity,"x"));j.put("player_vy",field(velocity,"y"));j.put("player_vz",field(velocity,"z"));
@@ -75,12 +114,21 @@ public final class NativePushProbe {
             if("1".equals(System.getenv("VIAFORGE_SWIM_PROBE"))) {
                 j.put("swimming",call(player,"isSwimming"));j.put("height",call(player,"getBbHeight"));
                 j.put("water",call(player,"isInWater"));j.put("eye_water",call(player,"isUnderWater"));
-                j.put("sprint",call(player,"isSprinting"));j.put("yaw",call(player,"getYRot"));j.put("pitch",call(player,"getXRot"));
+                j.put("sprinting",call(player,"isSprinting"));j.put("sneaking",call(player,"isShiftKeyDown"));
+                j.put("crouching",call(player,"isCrouching"));j.put("crawling",call(player,"isVisuallyCrawling"));j.put("slow_movement",call(player,"isMovingSlowly"));
+                j.put("eye_height",call(player,"getEyeHeight"));j.put("sprint_timer",field(player,"sprintTriggerTime"));
+                j.put("input_forward",field(player,"zza"));j.put("input_strafe",field(player,"xxa"));
+                Object input=field(player,"input"),vector=call(input,"getMoveVector");j.put("raw_forward",field(vector,"y"));j.put("raw_strafe",field(vector,"x"));
+                j.put("collision_h",field(player,"horizontalCollision"));j.put("collision_minor",field(player,"minorHorizontalCollision"));
+                Object speed=Class.forName("net.minecraft.world.entity.ai.attributes.Attributes").getField("MOVEMENT_SPEED").get(null);
+                j.put("speed_attribute",player.getClass().getMethod("getAttributeValue",Class.forName("net.minecraft.core.Holder")).invoke(player,speed));j.put("yaw",call(player,"getYRot"));j.put("pitch",call(player,"getXRot"));
                 Class<?> effects=Class.forName("net.minecraft.world.effect.MobEffects");Object dolphin=effects.getField("DOLPHINS_GRACE").get(null);
                 j.put("dolphins_grace",player.getClass().getMethod("hasEffect",Class.forName("net.minecraft.core.Holder")).invoke(player,dolphin));
                 j.put("conduit_power",player.getClass().getMethod("hasEffect",Class.forName("net.minecraft.core.Holder")).invoke(player,effects.getField("CONDUIT_POWER").get(null)));
                 j.put("air",call(player,"getAirSupply"));
                 Object efficiency=Class.forName("net.minecraft.world.entity.ai.attributes.Attributes").getField("WATER_MOVEMENT_EFFICIENCY").get(null);
+                Object sneakSpeed=Class.forName("net.minecraft.world.entity.ai.attributes.Attributes").getField("SNEAKING_SPEED").get(null);
+                j.put("sneak_speed",player.getClass().getMethod("getAttributeValue",Class.forName("net.minecraft.core.Holder")).invoke(player,sneakSpeed));
                 j.put("water_efficiency",player.getClass().getMethod("getAttributeValue",Class.forName("net.minecraft.core.Holder")).invoke(player,efficiency));
             }
             j.put("loaded",call(field(player,"connection"),"hasClientLoaded"));j.put("paused",call(mc,"isPaused"));

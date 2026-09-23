@@ -56,12 +56,6 @@ public final class ServerElytraFlight {
     }
     public static void slowInput(EntityPlayerSP player) {
         ServerSwimming.afterInput(player);
-        if (ServerSession.rule(ClientRule.CRAWLING_POSE) && !flying(player) && !ServerSwimming.swimming(player)
-                && (crawling(player) || !player.capabilities.isFlying && fits(player,1.5F) && !fits(player,1.8F))
-                && !player.movementInput.sneak && !(ServerSwimming.enabled(player)&&player.isInWater())) {
-            player.movementInput.moveForward *= .3F;
-            player.movementInput.moveStrafe *= .3F;
-        }
     }
     public static void input(EntityPlayerSP player) {
         ServerSwimming.input(player);

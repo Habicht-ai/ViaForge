@@ -15,6 +15,11 @@ es gibt weder zusätzliche Physikticks noch Grim-abhängige Koordinatenkorrektur
 
 ## Versionsregeln und Darstellung
 
+Sneak-/Sprintfolgen auf trockenem Boden werden gesondert in
+[SNEAK-SPRINT.md](SNEAK-SPRINT.md) untersucht. Der gemeinsame Eingabeweg erhält
+auch dort die versionsabhängige Reihenfolge von Tasten, Verlangsamung, Sprint
+und Haltung. Frühere Schwimmtests waren kein Nachweis für diese Landfolgen.
+
 | Zielversion | Unterschied |
 |---|---|
 | 1.13–1.13.2 | Float-Eingabebewegung, eigene Fluidoberfläche, Schleichen verlangsamt Eingaben; gleichzeitiger Sprint/Shift-Start erzeugt deshalb keine neue Schwimmhaltung. |

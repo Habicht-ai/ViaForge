@@ -5,6 +5,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
 @Mixin(EntityLivingBase.class)
 public abstract class MixinSwimmingLiving {
+    @ModifyConstant(method="onLivingUpdate",constant=@Constant(floatValue=.98F))
+    private float targetInputFriction(float original) {
+        EntityLivingBase entity=(EntityLivingBase)(Object)this;
+        return entity==net.minecraft.client.Minecraft.getMinecraft().thePlayer&&!entity.isRiding()
+            &&com.viaversion.viaforge.compatibility.ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.SQUARE_SWIM_INPUT)?1F:original;
+    }
     @Inject(method="canBreatheUnderwater",at=@At("HEAD"),cancellable=true)
     private void conduitBreathing(org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<Boolean> result) {
         EntityLivingBase entity=(EntityLivingBase)(Object)this;

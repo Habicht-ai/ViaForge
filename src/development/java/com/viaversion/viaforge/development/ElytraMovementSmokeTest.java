@@ -80,8 +80,12 @@ final class ElytraMovementSmokeTest {
             require(ServerElytraFlight.crawling(p)==ServerSession.rule(ClientRule.CRAWLING_POSE),"Only 1.14+ gives the retained small box an actual crawling pose");
             require(Math.abs(p.posX-5.5)<1e-7&&Math.abs(p.posZ-5.5)<1e-7,"Native headspace probe does not eject the lying player");
             if(ServerSession.rule(ClientRule.CRAWLING_POSE)) {
-                p.movementInput.moveForward=1;ServerElytraFlight.slowInput(p);
-                require(Math.abs(p.movementInput.moveForward-.3)<1e-6,"Crawling uses vanilla slow input without requiring sneak");
+                p.movementInput.moveForward=1;ServerElytraFlight.beforeInput(p);ServerElytraFlight.slowInput(p);
+                if(ServerSession.rule(ClientRule.SQUARE_SWIM_INPUT)) {
+                    require(p.movementInput.moveForward==1,"Since 1.21.5 raw input stays available for sprint decisions");
+                    com.viaversion.viaforge.compatibility.ServerSwimming.applyMovementInput(p);
+                    require(Math.abs(p.moveForward-.294)<1e-6,"Crawling slowdown applies at travel input since 1.21.5");
+                }else require(Math.abs(p.movementInput.moveForward-.3)<1e-6,"Crawling uses vanilla slow input without requiring sneak");
                 for(int i=0;i<12;i++)ServerElytraVisuals.tick(p);
                 require(ServerElytraVisuals.crawlAmount(p,1)==1,"Crawling animation reaches the horizontal pose");
                 net.minecraft.client.model.ModelPlayer model=new net.minecraft.client.model.ModelPlayer(0,false);

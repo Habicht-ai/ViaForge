@@ -21,6 +21,9 @@ public final class SwimmingPhysics {
         if(length<1.0E-4F)return new float[]{0,0};
         strafe=strafe/length*.98F*itemFactor*sneakFactor;forward=forward/length*.98F*itemFactor*sneakFactor;
         length=(float)Math.sqrt(strafe*strafe+forward*forward);
+        // Vanilla returns the scaled zero vector before normalizing it. A valid
+        // synchronized sneaking_speed of zero must not produce NaN movement.
+        if(length<=0)return new float[]{strafe,forward};
         float x=strafe*(1/length),z=forward*(1/length),ax=Math.abs(x),az=Math.abs(z);
         float tangent=az>ax?ax/az:az/ax;
         float scaled=Math.min(length*(float)Math.sqrt(1+tangent*tangent),1);

@@ -39,6 +39,9 @@ import ac.grim.grimac.shaded.com.github.retrooper.packetevents.event.PacketRecei
 import ac.grim.grimac.shaded.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientVehicleMove;
 import ac.grim.grimac.shaded.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSteerBoat;
 import ac.grim.grimac.shaded.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSteerVehicle;
+import ac.grim.grimac.shaded.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
+import ac.grim.grimac.shaded.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerInput;
+import ac.grim.grimac.shaded.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientEntityAction;
 
 /** Local laboratory control. Never changes a check, threshold or cancellation result. */
 public final class LabAC extends JavaPlugin implements Listener {
@@ -83,7 +86,17 @@ public final class LabAC extends JavaPlugin implements Listener {
                     if (counts.computeIfAbsent(event.getUser().getUUID(),id -> new AtomicLong()).incrementAndGet() > (traceBoats ? 30000 : 1200)) return;
                     Map<String,Object> record=new LinkedHashMap<>(Map.of("player",event.getUser().getName(),"packet",packet,"cancelled",event.isCancelled()));
                     if(traceBoats) {
-                        if(packet.equals("VEHICLE_MOVE")) {
+                        if(WrapperPlayClientPlayerFlying.isFlying(event.getPacketType())) {
+                            WrapperPlayClientPlayerFlying move=new WrapperPlayClientPlayerFlying(event);
+                            record.put("position_changed",move.hasPositionChanged());record.put("rotation_changed",move.hasRotationChanged());
+                            record.put("location",move.getLocation());record.put("ground",move.isOnGround());record.put("horizontal_collision",move.isHorizontalCollision());
+                        } else if(packet.equals("ENTITY_ACTION")) {
+                            record.put("action",new WrapperPlayClientEntityAction(event).getAction());
+                        } else if(packet.equals("PLAYER_INPUT")) {
+                            WrapperPlayClientPlayerInput input=new WrapperPlayClientPlayerInput(event);
+                            record.put("forward",input.isForward());record.put("back",input.isBackward());record.put("left",input.isLeft());record.put("right",input.isRight());
+                            record.put("jump",input.isJump());record.put("sneak",input.isShift());record.put("sprint",input.isSprint());
+                        } else if(packet.equals("VEHICLE_MOVE")) {
                             WrapperPlayClientVehicleMove move=new WrapperPlayClientVehicleMove(event);
                             record.put("position",move.getPosition());record.put("yaw",move.getYaw());record.put("pitch",move.getPitch());record.put("ground",move.isOnGround());
                         } else if(packet.equals("STEER_BOAT")) {
@@ -125,6 +138,9 @@ public final class LabAC extends JavaPlugin implements Listener {
                         record.put("old_status",p.vehicleData.oldStatus);record.put("land_friction",p.vehicleData.landFriction);
                         record.put("input_forward",p.vehicleData.vehicleForward);record.put("input_sideways",p.vehicleData.vehicleHorizontal);
                         record.put("last_yd",p.vehicleData.lastYd);record.put("box",p.boundingBox);
+                        record.put("sprinting",p.isSprinting);record.put("previous_sprinting",p.lastSprinting);
+                        record.put("sneaking",p.isSneaking);record.put("previous_sneaking",p.wasSneaking);record.put("slow_movement",p.isSlowMovement);
+                        record.put("pose",p.pose);record.put("sneak_speed",p.sneakingSpeedMultiplier);
                     }
                     logEvent("prediction",record);
                 }

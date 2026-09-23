@@ -7,6 +7,10 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class SwimmingTest {
+    @Test public void zeroSneakingSpeedProducesFiniteStationaryInput() {
+        assertArrayEquals(new float[]{0,0},SwimmingPhysics.squareInput(0,1,1,0),0);
+        assertArrayEquals(new float[]{0,0},SwimmingPhysics.squareInput(1,1,1,0),0);
+    }
     @Test public void targetBoundariesAreIndependentOfInternal340Format() {
         for(int p:new int[]{47,340,393,401,404,477,578,735,754,755,757,758,761,762,767,770,774,775,776,777,778}) {
             VersionRules r=CompatibilityRegistry.DEFAULT.resolve(p).rules();
@@ -18,6 +22,8 @@ public class SwimmingTest {
             assertEquals(p>=758&&p<=777,r.enabled(ClientRule.PRECISE_MOVEMENT_PACKETS));
             assertEquals(p>=762&&p<=777,r.enabled(ClientRule.CURRENT_AIR_SPRINT));
             assertEquals(p>=767&&p<=777,r.enabled(ClientRule.WATER_EFFICIENCY_ATTRIBUTE));
+            assertEquals(p>=759&&p<=777,r.enabled(ClientRule.SWIFT_SNEAK));
+            assertEquals(p>=767&&p<=777,r.enabled(ClientRule.SNEAK_SPEED_ATTRIBUTE));
             assertEquals(p>=775&&p<=777,r.enabled(ClientRule.ENTITY_FLUID_TRACKER));
         }
     }
@@ -98,5 +104,23 @@ public class SwimmingTest {
     private static void accept(SwimmingFluids store,ByteBuf packet) throws Exception {
         try{Types.VAR_INT.readPrimitive(packet);Types.STRING.read(packet);ClientEventEnvelope.read(packet);store.accept(packet);}
         finally{packet.release();}
+    }
+
+    @Test public void sneakAttributeSurvivesTranslationWithModifiersAndClamping() throws Exception {
+        // Packet arithmetic is independent of a running Via platform. Actual
+        // mapping lookup is exercised by the live attribute/equipment cases.
+        int id=17;
+        for(double additive:new double[]{.45,2}) {
+            ByteBuf wire=Unpooled.buffer(),event=null;
+            try {
+                Types.VAR_INT.writePrimitive(wire,com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPackets1_21.UPDATE_ATTRIBUTES.getId());
+                Types.VAR_INT.writePrimitive(wire,17);Types.VAR_INT.writePrimitive(wire,1);Types.VAR_INT.writePrimitive(wire,id);
+                wire.writeDouble(.3);Types.VAR_INT.writePrimitive(wire,1);Types.STRING.write(wire,"minecraft:enchantment.swift_sneak");wire.writeDouble(additive);wire.writeByte(0);
+                event=SwimmingPackets.attributes(wire,key->key==17?"minecraft:player.sneaking_speed":null);assertNotNull(event);assertEquals(0,wire.readerIndex());
+                Types.VAR_INT.readPrimitive(event);Types.STRING.read(event);assertEquals(36,ClientEventEnvelope.read(event).operation);
+                assertEquals(17,Types.VAR_INT.readPrimitive(event));assertEquals(1,event.readUnsignedByte());assertEquals(2,event.readUnsignedByte());
+                assertEquals(additive==.45?.75:1,event.readDouble(),0);assertFalse(event.isReadable());
+            }finally {wire.release();if(event!=null)event.release();}
+        }
     }
 }

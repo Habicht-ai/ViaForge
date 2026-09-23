@@ -10,8 +10,12 @@ public abstract class MixinSwimmingInput extends net.minecraft.entity.player.Ent
     protected MixinSwimmingInput(net.minecraft.world.World world,com.mojang.authlib.GameProfile profile){super(world,profile);}
     @Redirect(method="onLivingUpdate",at=@At(value="INVOKE",target="Lnet/minecraft/client/entity/EntityPlayerSP;setSprinting(Z)V"))
     private void originalSprint(EntityPlayerSP player,boolean sprint){
-        if(!ServerSwimming.enabled(player)||!player.isInWater())player.setSprinting(sprint);
+        if(!ServerSwimming.enabled(player)||player.isRiding())player.setSprinting(sprint);
     }
+    @Inject(method="onLivingUpdate",at=@At(value="INVOKE",target="Lnet/minecraft/client/entity/EntityPlayerSP;getFoodStats()Lnet/minecraft/util/FoodStats;"))
+    private void targetSprint(CallbackInfo ci){ServerSwimming.sprintInput((EntityPlayerSP)(Object)this);}
+    @Inject(method="updateEntityActionState",at=@At("RETURN"))
+    private void targetInput(CallbackInfo ci){ServerSwimming.applyMovementInput((EntityPlayerSP)(Object)this);}
     @Inject(method="onLivingUpdate",at=@At("HEAD"))
     private void swimFlightPriority(CallbackInfo ci){
         EntityPlayerSP player=(EntityPlayerSP)(Object)this;

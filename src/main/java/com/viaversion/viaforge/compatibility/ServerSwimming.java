@@ -21,7 +21,7 @@ public final class ServerSwimming {
     private static final class State {
         boolean swimming,eye,previousEye,previousForward,previousSneak,slowMovement;
         double depth;
-        double efficiency=Double.NaN,gravity=.08;
+        double efficiency=Double.NaN,gravity=.08,sneakSpeed=.3;
         int pose=-1,sprintWindow;
     }
     public static void clear(){STATES.clear();fluids.clear();SwimmingSound.clear();}
@@ -32,7 +32,26 @@ public final class ServerSwimming {
             swimming(entity)||ServerSession.rule(ClientRule.CRAWLING_POSE)&&entity.height==.6F&&!com.viaversion.viaforge.items.ServerElytraFlight.flying(entity):
             state(entity).pose==3||state(entity).pose<0&&swimming(entity));}
     public static double depth(Entity entity){return state(entity).depth;}
-    public static void attribute(Entity entity,int kind,double value){if(kind==0)state(entity).efficiency=value;else if(kind==1)state(entity).gravity=value;}
+    public static void attribute(Entity entity,int kind,double value){if(kind==0)state(entity).efficiency=value;else if(kind==1)state(entity).gravity=value;else if(kind==2)state(entity).sneakSpeed=value;}
+    public static float sneakSpeed(EntityPlayer player) {
+        if(ServerSession.rule(ClientRule.SNEAK_SPEED_ATTRIBUTE))return (float)state(player).sneakSpeed;
+        if(!ServerSession.rule(ClientRule.SWIFT_SNEAK))return .3F;
+        net.minecraft.item.ItemStack leggings=player.getCurrentArmor(1);
+        int level=0;
+        if(leggings!=null&&leggings.hasTagCompound()) {
+            // Our flattened snapshot retains the original namespaced list before
+            // 1.13 normalizes it into native enchantments/lore. Higher Via layers
+            // need not create their own backup (observed on actual 1.19.4 items).
+            // Read the snapshot; never replay a stateful item rewriter.
+            net.minecraft.nbt.NBTTagList list=leggings.getTagCompound().getCompoundTag("ViaForge|flattenedItem")
+                    .getCompoundTag("tag").getTagList("Enchantments",10);
+            for(int i=0;i<list.tagCount();i++) {
+                net.minecraft.nbt.NBTTagCompound entry=list.getCompoundTagAt(i);
+                if("minecraft:swift_sneak".equals(entry.getString("id")))level=Math.max(level,entry.getShort("lvl"));
+            }
+        }
+        return MathHelper.clamp_float(.3F+level*.15F,0,1);
+    }
     public static boolean eye(Entity entity){return enabled(entity)&&state(entity).eye;}
     public static void remotePose(EntityPlayer player) {
         if(!enabled(player)||player==Minecraft.getMinecraft().thePlayer||!player.isEntityAlive()||player.isPlayerSleeping())return;
@@ -121,7 +140,7 @@ public final class ServerSwimming {
     }
     public static void beforeInput(EntityPlayerSP player){
         if(!enabled(player))return;State state=state(player);
-        state.previousForward=ServerSession.rule(ClientRule.DOUBLE_SWIM_INPUT)&&state.eye?player.movementInput.moveForward>1.0E-5F:player.movementInput.moveForward>=.8F;
+        state.previousForward=(ServerSession.rule(ClientRule.SQUARE_SWIM_INPUT)||ServerSession.rule(ClientRule.DOUBLE_SWIM_INPUT)&&state.eye)?player.movementInput.moveForward>1.0E-5F:player.movementInput.moveForward>=.8F;
         state.previousSneak=player.movementInput.sneak;
         // LocalPlayer determines crouching before KeyboardInput reads the next keys.
         // In particular, the first simultaneous sprint+shift tick is not slowed.
@@ -131,33 +150,54 @@ public final class ServerSwimming {
             &&(state.previousSneak||!player.isPlayerSleeping()&&!com.viaversion.viaforge.items.ServerElytraFlight.fits(player,1.8F));
         if(state.sprintWindow>0)state.sprintWindow--;
     }
+    /** LocalPlayer's pose slowdown applies on land too, using the pre-sample pose. */
     public static void afterInput(EntityPlayerSP player) {
-        if(enabled(player)&&player.isInWater()&&!player.capabilities.isFlying&&ServerSession.rule(ClientRule.CRAWLING_POSE)) {
-            if(player.movementInput.sneak) {
-                player.movementInput.moveForward=(float)(player.movementInput.moveForward/.3D);
-                player.movementInput.moveStrafe=(float)(player.movementInput.moveStrafe/.3D);
+        if(!enabled(player)||!ServerSession.rule(ClientRule.CRAWLING_POSE)||player.isRiding())return;
+        // Native MovementInputFromOptions has already applied the current shift key.
+        // Recover keyboard impulses once; do not apply both old and new slowdown.
+        float side=Math.signum(player.movementInput.moveStrafe),ahead=Math.signum(player.movementInput.moveForward);
+        if(ServerSession.rule(ClientRule.SQUARE_SWIM_INPUT)) {
+            float length=(float)Math.sqrt(side*side+ahead*ahead);
+            if(length>0){side/=length;ahead/=length;}
+        }else if(!ServerSession.rule(ClientRule.SQUARE_SWIM_INPUT)
+                &&(state(player).slowMovement||ServerSession.rule(ClientRule.SHIFT_SWIM_INPUT)&&player.movementInput.sneak)) {
+            if(ServerSession.rule(ClientRule.SWIFT_SNEAK)){float speed=sneakSpeed(player);side*=speed;ahead*=speed;}
+            else {side=(float)(side*.3D);ahead=(float)(ahead*.3D);}
+        }
+        player.movementInput.moveStrafe=side;player.movementInput.moveForward=ahead;
+    }
+    /** Runs at the original sprint decision, before creative flight and travel. */
+    public static void sprintInput(EntityPlayerSP player) {
+        if(!enabled(player)||player.isRiding())return;State state=state(player);
+        boolean modern=ServerSession.rule(ClientRule.DOUBLE_SWIM_INPUT),square=ServerSession.rule(ClientRule.SQUARE_SWIM_INPUT);
+        boolean forward=(square||modern&&state.eye)?player.movementInput.moveForward>1.0E-5F:player.movementInput.moveForward>=.8F;
+        boolean food=player.getFoodStats().getFoodLevel()>6||player.capabilities.allowFlying;
+        boolean blind=player.isPotionActive(Potion.blindness),wet=player.isInWater();
+        if(player.isUsingItem()||square&&(state.previousSneak||player.movementInput.moveForward<0))state.sprintWindow=0;
+        boolean canStart=!player.isSprinting()&&forward&&food&&!player.isUsingItem()&&!blind&&(!wet||state.eye)
+            &&(!square||(!state.slowMovement||state.eye)&&(!com.viaversion.viaforge.items.ServerElytraFlight.flying(player)||state.eye));
+        if(canStart) {
+            if(!state.previousForward&&!state.previousSneak&&(square||player.onGround||state.eye)) {
+                if(state.sprintWindow>0)player.setSprinting(true);else state.sprintWindow=7;
             }
-            if(state(player).slowMovement||ServerSession.rule(ClientRule.SHIFT_SWIM_INPUT)&&player.movementInput.sneak) {
-                player.movementInput.moveForward=(float)(player.movementInput.moveForward*.3D);
-                player.movementInput.moveStrafe=(float)(player.movementInput.moveStrafe*.3D);
-            }
+            if(Minecraft.getMinecraft().gameSettings.keyBindSprint.isKeyDown())player.setSprinting(true);
+        }
+        if(player.isSprinting()) {
+            boolean noForward=modern?player.movementInput.moveForward<=1.0E-5F:!forward;
+            boolean stop=swimming(player)?!wet||!player.onGround&&!player.movementInput.sneak&&(noForward||!food)
+                :noForward||!food||player.isCollidedHorizontally||wet&&!state.eye;
+            if(stop||square&&blind)player.setSprinting(false);
         }
     }
-    public static void input(EntityPlayerSP player){
-        if(!enabled(player)||!player.isInWater())return;State state=state(player);
-        boolean forward=ServerSession.rule(ClientRule.DOUBLE_SWIM_INPUT)&&state.eye?player.movementInput.moveForward>1.0E-5F:player.movementInput.moveForward>=.8F,
-            food=player.getFoodStats().getFoodLevel()>6||player.capabilities.allowFlying;
-        boolean underwater=state.eye;
-        if(!player.isSprinting()&&underwater&&forward&&food&&!player.isUsingItem()&&!player.isPotionActive(Potion.blindness)){
-            if(Minecraft.getMinecraft().gameSettings.keyBindSprint.isKeyDown())player.setSprinting(true);
-            else if(!state.previousForward&&!state.previousSneak){if(state.sprintWindow>0)player.setSprinting(true);else state.sprintWindow=7;}
-        }
-        if(player.isSprinting()){
-            boolean stopForward=ServerSession.rule(ClientRule.DOUBLE_SWIM_INPUT)?player.movementInput.moveForward<=1.0E-5F:!forward;
-            boolean stop=swimming(player)?!player.onGround&&!player.movementInput.sneak&&(stopForward||!food):stopForward||!food||player.isCollidedHorizontally||!underwater;
-            if(stop)player.setSprinting(false);
-        }
-        if(player.movementInput.sneak&&!player.capabilities.isFlying)player.motionY-=(double).04F;
+    public static void input(EntityPlayerSP player) {
+        if(enabled(player)&&player.isInWater()&&player.movementInput.sneak&&!player.capabilities.isFlying&&!player.isRiding())player.motionY-=(double).04F;
+    }
+    /** 1.21.5 moved slowdown after sprint decisions, into LocalPlayer.applyInput. */
+    public static void applyMovementInput(EntityPlayerSP player) {
+        if(!enabled(player)||!ServerSession.rule(ClientRule.SQUARE_SWIM_INPUT)||player.isRiding())return;
+        float[] input=SwimmingPhysics.squareInput(Math.signum(player.movementInput.moveStrafe),Math.signum(player.movementInput.moveForward),
+                player.isUsingItem()?.2F:1,state(player).slowMovement?sneakSpeed(player):1);
+        player.moveStrafing=input[0];player.moveForward=input[1];
     }
     public static boolean move(EntityPlayer player,float strafe,float forward){
         if(!enabled(player)||player!=Minecraft.getMinecraft().thePlayer||!player.isInWater()||player.capabilities.isFlying||player.isRiding())return false;
@@ -173,11 +213,6 @@ public final class ServerSwimming {
             float drag=player.isSprinting()?.9F:.8F,speed=.02F;
             if(efficiency>0){drag+=(.54600006F-drag)*efficiency;speed+=(player.getAIMoveSpeed()-speed)*efficiency;}
             factors=new float[]{player.isPotionActive(30)?.96F:drag,speed};
-        }
-        if(ServerSession.rule(ClientRule.SQUARE_SWIM_INPUT)&&(strafe!=0||forward!=0)) {
-            float[] input=SwimmingPhysics.squareInput(Math.signum(strafe),Math.signum(forward),player.isUsingItem()?.2F:1,
-                    state(player).slowMovement?.3F:1);
-            strafe=input[0];forward=input[1];
         }
         if(ServerSession.rule(ClientRule.DOUBLE_SWIM_INPUT)){
             double length=strafe*(double)strafe+forward*(double)forward;

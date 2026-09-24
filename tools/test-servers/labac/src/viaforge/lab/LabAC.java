@@ -42,6 +42,7 @@ import ac.grim.grimac.shaded.com.github.retrooper.packetevents.wrapper.play.clie
 import ac.grim.grimac.shaded.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import ac.grim.grimac.shaded.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerInput;
 import ac.grim.grimac.shaded.com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientEntityAction;
+import ac.grim.grimac.shaded.com.github.retrooper.packetevents.wrapper.play.client.*;
 
 /** Local laboratory control. Never changes a check, threshold or cancellation result. */
 public final class LabAC extends JavaPlugin implements Listener {
@@ -82,11 +83,21 @@ public final class LabAC extends JavaPlugin implements Listener {
                     if (event.getUser().getUUID() == null) return;
                     String packet = event.getPacketType().toString();
                     if (!Set.of("PLAYER_FLYING","PLAYER_POSITION","PLAYER_ROTATION","PLAYER_POSITION_AND_ROTATION",
-                        "PONG","CLIENT_TICK_END","PLAYER_INPUT","STEER_VEHICLE","STEER_BOAT","VEHICLE_MOVE","ENTITY_ACTION","TELEPORT_CONFIRM").contains(packet)) return;
+                        "USE_ITEM","PLAYER_BLOCK_PLACEMENT","PLAYER_DIGGING","INTERACT_ENTITY","ATTACK","ANIMATION","HELD_ITEM_CHANGE","PONG","CLIENT_TICK_END","PLAYER_INPUT","STEER_VEHICLE","STEER_BOAT","VEHICLE_MOVE","ENTITY_ACTION","TELEPORT_CONFIRM").contains(packet)) return;
                     if (counts.computeIfAbsent(event.getUser().getUUID(),id -> new AtomicLong()).incrementAndGet() > (traceBoats ? 30000 : 1200)) return;
                     Map<String,Object> record=new LinkedHashMap<>(Map.of("player",event.getUser().getName(),"packet",packet,"cancelled",event.isCancelled()));
                     if(traceBoats) {
-                        if(WrapperPlayClientPlayerFlying.isFlying(event.getPacketType())) {
+                        if(packet.equals("USE_ITEM")) {
+                            WrapperPlayClientUseItem use=new WrapperPlayClientUseItem(event);record.put("sequence",use.getSequence());record.put("hand",use.getHand());record.put("yaw",use.getYaw());record.put("pitch",use.getPitch());
+                        }else if(packet.equals("PLAYER_BLOCK_PLACEMENT")) {
+                            WrapperPlayClientPlayerBlockPlacement use=new WrapperPlayClientPlayerBlockPlacement(event);record.put("sequence",use.getSequence());record.put("hand",use.getHand());record.put("position",use.getBlockPosition());
+                        }else if(packet.equals("PLAYER_DIGGING")) {
+                            WrapperPlayClientPlayerDigging dig=new WrapperPlayClientPlayerDigging(event);record.put("sequence",dig.getSequence());record.put("action",dig.getAction());record.put("position",dig.getBlockPosition());
+                        }else if(packet.equals("INTERACT_ENTITY")) {
+                            WrapperPlayClientInteractEntity hit=new WrapperPlayClientInteractEntity(event);record.put("action",hit.getAction());record.put("entity",hit.getEntityId());
+                        }else if(packet.equals("ANIMATION")) {
+                            record.put("hand",new WrapperPlayClientAnimation(event).getHand());
+                        }else if(WrapperPlayClientPlayerFlying.isFlying(event.getPacketType())) {
                             WrapperPlayClientPlayerFlying move=new WrapperPlayClientPlayerFlying(event);
                             record.put("position_changed",move.hasPositionChanged());record.put("rotation_changed",move.hasRotationChanged());
                             record.put("location",move.getLocation());record.put("ground",move.isOnGround());record.put("horizontal_collision",move.isHorizontalCollision());

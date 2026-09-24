@@ -1,0 +1,5014 @@
+[
+  {
+    "folder": "interaction-26.2-rightclick-before-1790261426349342300",
+    "client": "viaforge",
+    "target": 776,
+    "backend": 776,
+    "baseline": false,
+    "completed": true,
+    "error": null,
+    "started": 1790261426.8434715,
+    "ended": 1790261613.6248722,
+    "client_artifact": {
+      "path": "C:\\Users\\Panthera\\Desktop\\GitHub\\ViaVersionClient\\run\\mods\\ViaForge-development.jar",
+      "sha256": "3bf17d51a299311ba3f4091cce9d733ba782fba56f6ff63c04bc58d0b1f92313",
+      "boat_sources": {
+        "src\\main\\java\\com\\viaversion\\viaforge\\boats\\ServerBoat.java": "503cb058671605d61f87ee0728ee5c425a8ec88e3e3a19c7a067bf1a1e767740",
+        "src\\main\\java\\com\\viaversion\\viaforge\\mixin\\impl\\boats\\MixinBoatPlayer.java": "e8e362b4d30f54eee17208e43c0fe63e73383255ad4da66b58c3ab4148971dd0"
+      }
+    },
+    "real_player_target": null,
+    "result": "FAIL",
+    "passed": 2,
+    "measured": 9,
+    "survival": {
+      "BadPacketsJ": 74
+    },
+    "login": {},
+    "sequenced_packets": 199,
+    "sequence_errors": 0,
+    "cases": [
+      {
+        "case": "Rightclick Plain sword ground",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 69,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261550.253,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776509340",
+              "uuid": "7d20b023-0762-33bc-b228-b66dca5ef2f5",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 34,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790261549258
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261553.255,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776509340",
+              "uuid": "7d20b023-0762-33bc-b228-b66dca5ef2f5",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 37,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790261552260
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Stick ground turn",
+        "result": "FAIL",
+        "reasons": [
+          "Grim flags or setbacks"
+        ],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {
+          "BadPacketsJ": 17
+        },
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261557.253,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776509340",
+              "uuid": "7d20b023-0762-33bc-b228-b66dca5ef2f5",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 41,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790261556257
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261561.251,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776509340",
+              "uuid": "7d20b023-0762-33bc-b228-b66dca5ef2f5",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 45,
+              "flags": 11,
+              "setbacks": 0,
+              "observed_at": 1790261560256
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Stick air turn",
+        "result": "FAIL",
+        "reasons": [
+          "Grim flags or setbacks"
+        ],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {
+          "BadPacketsJ": 17
+        },
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261565.25,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776509340",
+              "uuid": "7d20b023-0762-33bc-b228-b66dca5ef2f5",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 49,
+              "flags": 17,
+              "setbacks": 0,
+              "observed_at": 1790261564255
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261568.253,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776509340",
+              "uuid": "7d20b023-0762-33bc-b228-b66dca5ef2f5",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 52,
+              "flags": 25,
+              "setbacks": 0,
+              "observed_at": 1790261567258
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Shield ground turn",
+        "result": "FAIL",
+        "reasons": [
+          "Grim flags or setbacks"
+        ],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {
+          "BadPacketsJ": 8
+        },
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261572.251,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776509340",
+              "uuid": "7d20b023-0762-33bc-b228-b66dca5ef2f5",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 56,
+              "flags": 35,
+              "setbacks": 0,
+              "observed_at": 1790261571256
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261576.249,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776509340",
+              "uuid": "7d20b023-0762-33bc-b228-b66dca5ef2f5",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 60,
+              "flags": 41,
+              "setbacks": 0,
+              "observed_at": 1790261575254
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Shield air turn",
+        "result": "FAIL",
+        "reasons": [
+          "Grim flags or setbacks"
+        ],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {
+          "BadPacketsJ": 8
+        },
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261580.265,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776509340",
+              "uuid": "7d20b023-0762-33bc-b228-b66dca5ef2f5",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 64,
+              "flags": 43,
+              "setbacks": 0,
+              "observed_at": 1790261579254
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261583.265,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776509340",
+              "uuid": "7d20b023-0762-33bc-b228-b66dca5ef2f5",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 67,
+              "flags": 47,
+              "setbacks": 0,
+              "observed_at": 1790261582254
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Blocks ground turn",
+        "result": "FAIL",
+        "reasons": [
+          "Rejected placement incorrectly falls through to air use or offhand",
+          "Grim flags or setbacks"
+        ],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {
+          "BadPacketsJ": 14
+        },
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261587.263,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776509340",
+              "uuid": "7d20b023-0762-33bc-b228-b66dca5ef2f5",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 71,
+              "flags": 51,
+              "setbacks": 0,
+              "observed_at": 1790261586252
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261591.26,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776509340",
+              "uuid": "7d20b023-0762-33bc-b228-b66dca5ef2f5",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 75,
+              "flags": 59,
+              "setbacks": 0,
+              "observed_at": 1790261590265
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Blocking sword pose",
+        "result": "FAIL",
+        "reasons": [
+          "Component blocking not observed",
+          "Grim flags or setbacks"
+        ],
+        "ticks": 65,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {
+          "BadPacketsJ": 1
+        },
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261595.258,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776509340",
+              "uuid": "7d20b023-0762-33bc-b228-b66dca5ef2f5",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 79,
+              "flags": 65,
+              "setbacks": 0,
+              "observed_at": 1790261594263
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261598.261,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776509340",
+              "uuid": "7d20b023-0762-33bc-b228-b66dca5ef2f5",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 82,
+              "flags": 65,
+              "setbacks": 0,
+              "observed_at": 1790261597266
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Blocking sword ground turn",
+        "result": "FAIL",
+        "reasons": [
+          "Component blocking not observed",
+          "Grim flags or setbacks"
+        ],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {
+          "BadPacketsJ": 8
+        },
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261603.256,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776509340",
+              "uuid": "7d20b023-0762-33bc-b228-b66dca5ef2f5",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 87,
+              "flags": 66,
+              "setbacks": 0,
+              "observed_at": 1790261602262
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261606.258,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776509340",
+              "uuid": "7d20b023-0762-33bc-b228-b66dca5ef2f5",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 90,
+              "flags": 71,
+              "setbacks": 0,
+              "observed_at": 1790261605263
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Final coast",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 60,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261607.254,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776509340",
+              "uuid": "7d20b023-0762-33bc-b228-b66dca5ef2f5",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 91,
+              "flags": 74,
+              "setbacks": 0,
+              "observed_at": 1790261606258
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261610.257,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776509340",
+              "uuid": "7d20b023-0762-33bc-b228-b66dca5ef2f5",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 94,
+              "flags": 74,
+              "setbacks": 0,
+              "observed_at": 1790261609262
+            }
+          ],
+          "generation": 1
+        }
+      }
+    ],
+    "evidence": {
+      "report.json": {
+        "bytes": 3323079,
+        "sha256": "65c85defe5f5ee2e90ca6f5cd27b718cac9482bdabe95e215237d2e5a632ac8f"
+      },
+      "viaforge\\client.jsonl": {
+        "bytes": 6172152,
+        "sha256": "ee3bdc123691cb544da1e96c14cb7d48dd07b975a0b260fa17eadab4153a0e4b"
+      },
+      "plugins\\ViaForgeLabAC\\events.jsonl": {
+        "bytes": 971441,
+        "sha256": "4041b145997c0ccdb9558a9f73c786fb54a31f02162bd68f40c794e09fac0c95"
+      },
+      "sources.json": {
+        "bytes": 2720,
+        "sha256": "556088a14c4d475cb00cc5ebfdbc857b921813dc5293fe2ece019e223d07b397"
+      }
+    },
+    "screenshots": {
+      "viaforge\\screenshots\\blocking-1620.png": {
+        "sha256": "d86773d4a0baa0006ded0cb6fd117cccfb8663f541372d0b6f8b3bc4d46f4ddb",
+        "bytes": 235886
+      }
+    }
+  },
+  {
+    "folder": "interaction-26.2-rightclick-original-1790261658564914500",
+    "client": "native",
+    "target": 776,
+    "backend": 776,
+    "baseline": false,
+    "completed": false,
+    "error": "RuntimeError(\"Client stopped: {'state': 'FAIL', 'detail': 'java.lang.NoSuchMethodException: net.minecraft.client.Minecraft.getMainRenderTarget()', 'name': 'NativeP47011400', 'protocol': 776}\")",
+    "started": 1790261658.9300091,
+    "ended": 1790261781.824694,
+    "client_artifact": null,
+    "real_player_target": null,
+    "result": "FAIL",
+    "passed": 6,
+    "measured": 7,
+    "survival": {},
+    "login": {},
+    "sequenced_packets": 159,
+    "sequence_errors": 0,
+    "cases": [
+      {
+        "case": "Rightclick Plain sword ground",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261729.516,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP47011400",
+              "uuid": "9718c8f2-c7d2-39cc-8360-63a192f7682c",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 34,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790261728521
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261733.516,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP47011400",
+              "uuid": "9718c8f2-c7d2-39cc-8360-63a192f7682c",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 38,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790261732521
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Stick ground turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261737.529,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP47011400",
+              "uuid": "9718c8f2-c7d2-39cc-8360-63a192f7682c",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 42,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790261736518
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261740.531,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP47011400",
+              "uuid": "9718c8f2-c7d2-39cc-8360-63a192f7682c",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 45,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790261739520
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Stick air turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261744.529,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP47011400",
+              "uuid": "9718c8f2-c7d2-39cc-8360-63a192f7682c",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 49,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790261743518
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261748.527,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP47011400",
+              "uuid": "9718c8f2-c7d2-39cc-8360-63a192f7682c",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 53,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790261747516
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Shield ground turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261752.525,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP47011400",
+              "uuid": "9718c8f2-c7d2-39cc-8360-63a192f7682c",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 57,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790261751529
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261755.528,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP47011400",
+              "uuid": "9718c8f2-c7d2-39cc-8360-63a192f7682c",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 60,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790261754516
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Shield air turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261760.52,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP47011400",
+              "uuid": "9718c8f2-c7d2-39cc-8360-63a192f7682c",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 65,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790261759526
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261763.523,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP47011400",
+              "uuid": "9718c8f2-c7d2-39cc-8360-63a192f7682c",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 68,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790261762528
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Blocks ground turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261767.521,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP47011400",
+              "uuid": "9718c8f2-c7d2-39cc-8360-63a192f7682c",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 72,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790261766526
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261770.524,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP47011400",
+              "uuid": "9718c8f2-c7d2-39cc-8360-63a192f7682c",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 75,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790261769529
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Blocking sword pose",
+        "result": "FAIL",
+        "reasons": [
+          "after: Survival/Grim conditions not confirmed",
+          "Component blocking not observed"
+        ],
+        "ticks": 30,
+        "predictions": 2,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261775.518,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP47011400",
+              "uuid": "9718c8f2-c7d2-39cc-8360-63a192f7682c",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 80,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790261774523
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261778.52,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [],
+          "generation": 1
+        }
+      }
+    ],
+    "evidence": {
+      "report.json": {
+        "bytes": 1570658,
+        "sha256": "ef60ef55bc7398f70c586e89c4b524bc102e47f7d1d456bdf0553de6fda02b82"
+      },
+      "native\\client.jsonl": {
+        "bytes": 3472184,
+        "sha256": "8841b10befd792ba65b27a5eb79003c51ded3290c8bae5ae724cb27bfd4c2ef2"
+      },
+      "plugins\\ViaForgeLabAC\\events.jsonl": {
+        "bytes": 484798,
+        "sha256": "b6091b37a855ac14af05ce67b39ca81264516e921a3e72b87775d6da8683c2b9"
+      },
+      "sources.json": {
+        "bytes": 2722,
+        "sha256": "de55cf1fd7087dec0bd56153e3e1481c2a0229edb013d1f547b84827afe2163b"
+      },
+      "native\\native-source.json": {
+        "bytes": 411,
+        "sha256": "990b16e727716c0b1270f7aaa8db97feb64562cd9d2f89d5f5cdad4156f081a8"
+      }
+    },
+    "screenshots": {}
+  },
+  {
+    "folder": "interaction-26.2-rightclick-original-verified-1790261823871004000",
+    "client": "native",
+    "target": 776,
+    "backend": 776,
+    "baseline": false,
+    "completed": true,
+    "error": null,
+    "started": 1790261824.2190738,
+    "ended": 1790261963.161818,
+    "client_artifact": null,
+    "real_player_target": null,
+    "result": "PASS",
+    "passed": 9,
+    "measured": 9,
+    "survival": {},
+    "login": {
+      "Timer": 1,
+      "TimerLimit": 1
+    },
+    "sequenced_packets": 202,
+    "sequence_errors": 0,
+    "cases": [
+      {
+        "case": "Rightclick Plain sword ground",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261899.24,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP22496400",
+              "uuid": "59afb642-febd-3821-abee-d81b7f417cb9",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 33,
+              "flags": 2,
+              "setbacks": 0,
+              "observed_at": 1790261898245
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261902.242,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP22496400",
+              "uuid": "59afb642-febd-3821-abee-d81b7f417cb9",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 36,
+              "flags": 2,
+              "setbacks": 0,
+              "observed_at": 1790261901247
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Stick ground turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261907.237,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP22496400",
+              "uuid": "59afb642-febd-3821-abee-d81b7f417cb9",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 41,
+              "flags": 2,
+              "setbacks": 0,
+              "observed_at": 1790261906241
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261910.239,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP22496400",
+              "uuid": "59afb642-febd-3821-abee-d81b7f417cb9",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 44,
+              "flags": 2,
+              "setbacks": 0,
+              "observed_at": 1790261909244
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Stick air turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261914.236,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP22496400",
+              "uuid": "59afb642-febd-3821-abee-d81b7f417cb9",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 48,
+              "flags": 2,
+              "setbacks": 0,
+              "observed_at": 1790261913241
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261917.239,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP22496400",
+              "uuid": "59afb642-febd-3821-abee-d81b7f417cb9",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 51,
+              "flags": 2,
+              "setbacks": 0,
+              "observed_at": 1790261916244
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Shield ground turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 16,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261922.25,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP22496400",
+              "uuid": "59afb642-febd-3821-abee-d81b7f417cb9",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 56,
+              "flags": 2,
+              "setbacks": 0,
+              "observed_at": 1790261921239
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261925.236,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP22496400",
+              "uuid": "59afb642-febd-3821-abee-d81b7f417cb9",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 59,
+              "flags": 2,
+              "setbacks": 0,
+              "observed_at": 1790261924241
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Shield air turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 16,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261929.251,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP22496400",
+              "uuid": "59afb642-febd-3821-abee-d81b7f417cb9",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 63,
+              "flags": 2,
+              "setbacks": 0,
+              "observed_at": 1790261928241
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261933.238,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP22496400",
+              "uuid": "59afb642-febd-3821-abee-d81b7f417cb9",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 67,
+              "flags": 2,
+              "setbacks": 0,
+              "observed_at": 1790261932242
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Blocks ground turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261937.252,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP22496400",
+              "uuid": "59afb642-febd-3821-abee-d81b7f417cb9",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 71,
+              "flags": 2,
+              "setbacks": 0,
+              "observed_at": 1790261936242
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261940.238,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP22496400",
+              "uuid": "59afb642-febd-3821-abee-d81b7f417cb9",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 74,
+              "flags": 2,
+              "setbacks": 0,
+              "observed_at": 1790261939245
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Blocking sword pose",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 67,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261944.254,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP22496400",
+              "uuid": "59afb642-febd-3821-abee-d81b7f417cb9",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 78,
+              "flags": 2,
+              "setbacks": 0,
+              "observed_at": 1790261943241
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261948.251,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP22496400",
+              "uuid": "59afb642-febd-3821-abee-d81b7f417cb9",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 82,
+              "flags": 2,
+              "setbacks": 0,
+              "observed_at": 1790261947240
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Blocking sword ground turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 67,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 16,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261952.25,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP22496400",
+              "uuid": "59afb642-febd-3821-abee-d81b7f417cb9",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 86,
+              "flags": 2,
+              "setbacks": 0,
+              "observed_at": 1790261951254
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261955.254,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP22496400",
+              "uuid": "59afb642-febd-3821-abee-d81b7f417cb9",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 89,
+              "flags": 2,
+              "setbacks": 0,
+              "observed_at": 1790261954243
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Final coast",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 60,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790261956.25,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP22496400",
+              "uuid": "59afb642-febd-3821-abee-d81b7f417cb9",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 90,
+              "flags": 2,
+              "setbacks": 0,
+              "observed_at": 1790261955254
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790261959.255,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "NativeP22496400",
+              "uuid": "59afb642-febd-3821-abee-d81b7f417cb9",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "vanilla",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 93,
+              "flags": 2,
+              "setbacks": 0,
+              "observed_at": 1790261958243
+            }
+          ],
+          "generation": 1
+        }
+      }
+    ],
+    "evidence": {
+      "report.json": {
+        "bytes": 1895296,
+        "sha256": "c895524b3727b147fc3b6942b323126d038318151fc74b6f21c0f57338392317"
+      },
+      "native\\client.jsonl": {
+        "bytes": 4067474,
+        "sha256": "67dfe51da03ac63fd53ce6d49d8c40e11ba5540596877af2a9c4f919156743d8"
+      },
+      "plugins\\ViaForgeLabAC\\events.jsonl": {
+        "bytes": 581395,
+        "sha256": "fa880073dbef045fc5a2ffcbb003e751036cc2b019d9b5db6f1cfb2e854ec893"
+      },
+      "sources.json": {
+        "bytes": 2731,
+        "sha256": "68a99483d3390d392e3d9f3b394ad893fa733ad42e79eb3034463dac43fabbd4"
+      },
+      "native\\native-source.json": {
+        "bytes": 411,
+        "sha256": "fda5ea323c58f7cdcd6eb339ab068a7038f8e32145aabecde8e66b6c5194598f"
+      }
+    },
+    "screenshots": {
+      "native\\screenshots\\blocking-1627.png": {
+        "sha256": "2a60350a8dde3d6a51ffc03afe93f433d9585a76cdb10470bf6525b72f2649dd",
+        "bytes": 190054
+      }
+    }
+  },
+  {
+    "folder": "interaction-26.2-rightclick-before-verified-1790261998217167500",
+    "client": "viaforge",
+    "target": 776,
+    "backend": 776,
+    "baseline": true,
+    "completed": true,
+    "error": null,
+    "started": 1790261998.5787866,
+    "ended": 1790262146.8431077,
+    "client_artifact": {
+      "path": "C:\\Users\\Panthera\\Desktop\\GitHub\\ViaVersionClient\\run\\mods\\ViaForge-development.jar",
+      "sha256": "3bf17d51a299311ba3f4091cce9d733ba782fba56f6ff63c04bc58d0b1f92313",
+      "boat_sources": {
+        "src\\main\\java\\com\\viaversion\\viaforge\\boats\\ServerBoat.java": "503cb058671605d61f87ee0728ee5c425a8ec88e3e3a19c7a067bf1a1e767740",
+        "src\\main\\java\\com\\viaversion\\viaforge\\mixin\\impl\\boats\\MixinBoatPlayer.java": "e8e362b4d30f54eee17208e43c0fe63e73383255ad4da66b58c3ab4148971dd0"
+      }
+    },
+    "real_player_target": null,
+    "result": "FAIL",
+    "passed": 3,
+    "measured": 9,
+    "survival": {
+      "BadPacketsJ": 72
+    },
+    "login": {
+      "setback": 2
+    },
+    "sequenced_packets": 216,
+    "sequence_errors": 0,
+    "cases": [
+      {
+        "case": "Rightclick Plain sword ground",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 69,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262081.531,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush77642788",
+              "uuid": "18dcbcb2-47c7-310b-a9e1-a93e3cbb9bfa",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 40,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790262080536
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262085.542,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush77642788",
+              "uuid": "18dcbcb2-47c7-310b-a9e1-a93e3cbb9bfa",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 44,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790262084531
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Stick ground turn",
+        "result": "FAIL",
+        "reasons": [
+          "Grim flags or setbacks"
+        ],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {
+          "BadPacketsJ": 17
+        },
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262089.538,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush77642788",
+              "uuid": "18dcbcb2-47c7-310b-a9e1-a93e3cbb9bfa",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 48,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790262088545
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262092.541,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush77642788",
+              "uuid": "18dcbcb2-47c7-310b-a9e1-a93e3cbb9bfa",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 51,
+              "flags": 9,
+              "setbacks": 2,
+              "observed_at": 1790262091545
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Stick air turn",
+        "result": "FAIL",
+        "reasons": [
+          "Grim flags or setbacks"
+        ],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {
+          "BadPacketsJ": 17
+        },
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262096.54,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush77642788",
+              "uuid": "18dcbcb2-47c7-310b-a9e1-a93e3cbb9bfa",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 55,
+              "flags": 17,
+              "setbacks": 2,
+              "observed_at": 1790262095545
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262100.539,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush77642788",
+              "uuid": "18dcbcb2-47c7-310b-a9e1-a93e3cbb9bfa",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 59,
+              "flags": 29,
+              "setbacks": 2,
+              "observed_at": 1790262099544
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Shield ground turn",
+        "result": "FAIL",
+        "reasons": [
+          "Grim flags or setbacks"
+        ],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 16,
+        "flags": {
+          "BadPacketsJ": 8
+        },
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262104.537,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush77642788",
+              "uuid": "18dcbcb2-47c7-310b-a9e1-a93e3cbb9bfa",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 63,
+              "flags": 34,
+              "setbacks": 2,
+              "observed_at": 1790262103541
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262107.539,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush77642788",
+              "uuid": "18dcbcb2-47c7-310b-a9e1-a93e3cbb9bfa",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 66,
+              "flags": 39,
+              "setbacks": 2,
+              "observed_at": 1790262106543
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Shield air turn",
+        "result": "FAIL",
+        "reasons": [
+          "Grim flags or setbacks"
+        ],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 16,
+        "flags": {
+          "BadPacketsJ": 8
+        },
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262111.537,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush77642788",
+              "uuid": "18dcbcb2-47c7-310b-a9e1-a93e3cbb9bfa",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 70,
+              "flags": 42,
+              "setbacks": 2,
+              "observed_at": 1790262110542
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262115.534,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush77642788",
+              "uuid": "18dcbcb2-47c7-310b-a9e1-a93e3cbb9bfa",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 74,
+              "flags": 48,
+              "setbacks": 2,
+              "observed_at": 1790262114538
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Blocks ground turn",
+        "result": "FAIL",
+        "reasons": [
+          "Rejected placement incorrectly falls through to air use or offhand",
+          "Grim flags or setbacks"
+        ],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {
+          "BadPacketsJ": 14
+        },
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262119.548,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush77642788",
+              "uuid": "18dcbcb2-47c7-310b-a9e1-a93e3cbb9bfa",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 78,
+              "flags": 50,
+              "setbacks": 2,
+              "observed_at": 1790262118536
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262122.535,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush77642788",
+              "uuid": "18dcbcb2-47c7-310b-a9e1-a93e3cbb9bfa",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 81,
+              "flags": 56,
+              "setbacks": 2,
+              "observed_at": 1790262121539
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Blocking sword pose",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 68,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262126.548,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush77642788",
+              "uuid": "18dcbcb2-47c7-310b-a9e1-a93e3cbb9bfa",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 85,
+              "flags": 64,
+              "setbacks": 2,
+              "observed_at": 1790262125536
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262130.545,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush77642788",
+              "uuid": "18dcbcb2-47c7-310b-a9e1-a93e3cbb9bfa",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 89,
+              "flags": 64,
+              "setbacks": 2,
+              "observed_at": 1790262129534
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Blocking sword ground turn",
+        "result": "FAIL",
+        "reasons": [
+          "Grim flags or setbacks"
+        ],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 16,
+        "flags": {
+          "BadPacketsJ": 8
+        },
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262134.544,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush77642788",
+              "uuid": "18dcbcb2-47c7-310b-a9e1-a93e3cbb9bfa",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 93,
+              "flags": 64,
+              "setbacks": 2,
+              "observed_at": 1790262133549
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262137.548,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush77642788",
+              "uuid": "18dcbcb2-47c7-310b-a9e1-a93e3cbb9bfa",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 96,
+              "flags": 68,
+              "setbacks": 2,
+              "observed_at": 1790262136537
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Final coast",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 60,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262138.544,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush77642788",
+              "uuid": "18dcbcb2-47c7-310b-a9e1-a93e3cbb9bfa",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 97,
+              "flags": 71,
+              "setbacks": 2,
+              "observed_at": 1790262137549
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262141.546,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush77642788",
+              "uuid": "18dcbcb2-47c7-310b-a9e1-a93e3cbb9bfa",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 100,
+              "flags": 72,
+              "setbacks": 2,
+              "observed_at": 1790262140551
+            }
+          ],
+          "generation": 1
+        }
+      }
+    ],
+    "evidence": {
+      "report.json": {
+        "bytes": 3365977,
+        "sha256": "8a8ce409c475e8d97a8ebe3a09df7cefa385ff4d42a901350680cfe92be2f492"
+      },
+      "viaforge\\client.jsonl": {
+        "bytes": 6329989,
+        "sha256": "e88d509ada0548fea8fb119c4ae4681cdb8103b5e135c72ee1d5fe7eb6a46a85"
+      },
+      "plugins\\ViaForgeLabAC\\events.jsonl": {
+        "bytes": 981758,
+        "sha256": "20fae66582b72c5798d5ad43345d9b88717851222842edfac765440b8e14198e"
+      },
+      "sources.json": {
+        "bytes": 2729,
+        "sha256": "b80d7d7e7b6b66a2da74819df1e1d47571e29910ce0e8ea41d5fa12e6de8ce17"
+      }
+    },
+    "screenshots": {
+      "viaforge\\screenshots\\blocking-1614.png": {
+        "sha256": "46dffca8b148929451416b71f07d2c7e0cc149e3eb8031662b3204f8807dee14",
+        "bytes": 57674
+      }
+    }
+  },
+  {
+    "folder": "interaction-26.2-rightclick-fixed-1790262147332822100",
+    "client": "viaforge",
+    "target": 776,
+    "backend": 776,
+    "baseline": false,
+    "completed": true,
+    "error": null,
+    "started": 1790262147.6818974,
+    "ended": 1790262320.487388,
+    "client_artifact": {
+      "path": "C:\\Users\\Panthera\\Desktop\\GitHub\\ViaVersionClient\\run\\mods\\ViaForge-development.jar",
+      "sha256": "da7e84aed114ff51d9c33942febb39a438bc0cd9f35f91447437749986b20e47",
+      "boat_sources": {
+        "src\\main\\java\\com\\viaversion\\viaforge\\boats\\ServerBoat.java": "503cb058671605d61f87ee0728ee5c425a8ec88e3e3a19c7a067bf1a1e767740",
+        "src\\main\\java\\com\\viaversion\\viaforge\\mixin\\impl\\boats\\MixinBoatPlayer.java": "e8e362b4d30f54eee17208e43c0fe63e73383255ad4da66b58c3ab4148971dd0"
+      }
+    },
+    "real_player_target": null,
+    "result": "FAIL",
+    "passed": 8,
+    "measured": 9,
+    "survival": {},
+    "login": {
+      "setback": 2
+    },
+    "sequenced_packets": 216,
+    "sequence_errors": 0,
+    "cases": [
+      {
+        "case": "Rightclick Plain sword ground",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262254.872,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776215956",
+              "uuid": "35384a7a-6baa-30be-bb95-4cf2df8ea5f7",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 33,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790262253872
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262257.872,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776215956",
+              "uuid": "35384a7a-6baa-30be-bb95-4cf2df8ea5f7",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 36,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790262256872
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Stick ground turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262261.873,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776215956",
+              "uuid": "35384a7a-6baa-30be-bb95-4cf2df8ea5f7",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 40,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790262260874
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262265.874,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776215956",
+              "uuid": "35384a7a-6baa-30be-bb95-4cf2df8ea5f7",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 44,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790262264873
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Stick air turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262269.873,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776215956",
+              "uuid": "35384a7a-6baa-30be-bb95-4cf2df8ea5f7",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 48,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790262268874
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262272.874,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776215956",
+              "uuid": "35384a7a-6baa-30be-bb95-4cf2df8ea5f7",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 51,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790262271875
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Shield ground turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 16,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262277.875,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776215956",
+              "uuid": "35384a7a-6baa-30be-bb95-4cf2df8ea5f7",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 56,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790262276875
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262280.875,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776215956",
+              "uuid": "35384a7a-6baa-30be-bb95-4cf2df8ea5f7",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 59,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790262279874
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Shield air turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 16,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262284.875,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776215956",
+              "uuid": "35384a7a-6baa-30be-bb95-4cf2df8ea5f7",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 63,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790262283875
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262288.876,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776215956",
+              "uuid": "35384a7a-6baa-30be-bb95-4cf2df8ea5f7",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 67,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790262287875
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Blocks ground turn",
+        "result": "FAIL",
+        "reasons": [
+          "Rejected placement incorrectly falls through to air use or offhand"
+        ],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262292.877,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776215956",
+              "uuid": "35384a7a-6baa-30be-bb95-4cf2df8ea5f7",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 71,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790262291877
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262295.876,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776215956",
+              "uuid": "35384a7a-6baa-30be-bb95-4cf2df8ea5f7",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 74,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790262294877
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Blocking sword pose",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 68,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262299.877,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776215956",
+              "uuid": "35384a7a-6baa-30be-bb95-4cf2df8ea5f7",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 78,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790262298877
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262303.877,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776215956",
+              "uuid": "35384a7a-6baa-30be-bb95-4cf2df8ea5f7",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 82,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790262302878
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Blocking sword ground turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 16,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262307.878,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776215956",
+              "uuid": "35384a7a-6baa-30be-bb95-4cf2df8ea5f7",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 86,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790262306879
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262310.879,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776215956",
+              "uuid": "35384a7a-6baa-30be-bb95-4cf2df8ea5f7",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 89,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790262309879
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Final coast",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 60,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262311.879,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776215956",
+              "uuid": "35384a7a-6baa-30be-bb95-4cf2df8ea5f7",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 90,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790262310879
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262314.878,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776215956",
+              "uuid": "35384a7a-6baa-30be-bb95-4cf2df8ea5f7",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 93,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790262313879
+            }
+          ],
+          "generation": 1
+        }
+      }
+    ],
+    "evidence": {
+      "report.json": {
+        "bytes": 3300796,
+        "sha256": "a3436c6e7dd7dd50f1aaaebb0f2d9177ce13e1c453ee76b60a9e3dd04241a1d5"
+      },
+      "viaforge\\client.jsonl": {
+        "bytes": 6319973,
+        "sha256": "422263d6279091b77feeaa903f40cd738a7a8e055fed6710732b7640237ebdb0"
+      },
+      "plugins\\ViaForgeLabAC\\events.jsonl": {
+        "bytes": 965550,
+        "sha256": "d99a7ca189c11fb65c1d57c9718be12e88d1f3093f022a64eb596cc18293ed72"
+      },
+      "sources.json": {
+        "bytes": 2719,
+        "sha256": "27169c19e175040a167cdf3b4fb4ce8e53d5fab27bc7568295b36c8fe275d00d"
+      }
+    },
+    "screenshots": {
+      "viaforge\\screenshots\\blocking-1614.png": {
+        "sha256": "6ec4dfcb8b5b693e7c9ba6e6311232c9c8d5f193bf0bd53c4cc6ad428516e78d",
+        "bytes": 52714
+      }
+    }
+  },
+  {
+    "folder": "interaction-1.21.1-rightclick-boundary-1790262321042245400",
+    "client": "viaforge",
+    "target": 767,
+    "backend": 767,
+    "baseline": false,
+    "completed": true,
+    "error": null,
+    "started": 1790262321.4839,
+    "ended": 1790262464.190372,
+    "client_artifact": {
+      "path": "C:\\Users\\Panthera\\Desktop\\GitHub\\ViaVersionClient\\run\\mods\\ViaForge-development.jar",
+      "sha256": "da7e84aed114ff51d9c33942febb39a438bc0cd9f35f91447437749986b20e47",
+      "boat_sources": {
+        "src\\main\\java\\com\\viaversion\\viaforge\\boats\\ServerBoat.java": "503cb058671605d61f87ee0728ee5c425a8ec88e3e3a19c7a067bf1a1e767740",
+        "src\\main\\java\\com\\viaversion\\viaforge\\mixin\\impl\\boats\\MixinBoatPlayer.java": "e8e362b4d30f54eee17208e43c0fe63e73383255ad4da66b58c3ab4148971dd0"
+      }
+    },
+    "real_player_target": null,
+    "result": "FAIL",
+    "passed": 6,
+    "measured": 7,
+    "survival": {},
+    "login": {},
+    "sequenced_packets": 194,
+    "sequence_errors": 0,
+    "cases": [
+      {
+        "case": "Rightclick Plain sword ground",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262414.954,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767375231",
+              "uuid": "78afb0a9-13ad-36c9-873e-43a31c684f5f",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 33,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790262413953
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262418.954,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767375231",
+              "uuid": "78afb0a9-13ad-36c9-873e-43a31c684f5f",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 37,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790262417954
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Stick ground turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262422.954,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767375231",
+              "uuid": "78afb0a9-13ad-36c9-873e-43a31c684f5f",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 41,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790262421955
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262425.955,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767375231",
+              "uuid": "78afb0a9-13ad-36c9-873e-43a31c684f5f",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 44,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790262424955
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Stick air turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262430.956,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767375231",
+              "uuid": "78afb0a9-13ad-36c9-873e-43a31c684f5f",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 49,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790262429956
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262433.956,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767375231",
+              "uuid": "78afb0a9-13ad-36c9-873e-43a31c684f5f",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 52,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790262432956
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Shield ground turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 16,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262437.957,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767375231",
+              "uuid": "78afb0a9-13ad-36c9-873e-43a31c684f5f",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 56,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790262436958
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262440.956,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767375231",
+              "uuid": "78afb0a9-13ad-36c9-873e-43a31c684f5f",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 59,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790262439957
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Shield air turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 16,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262445.957,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767375231",
+              "uuid": "78afb0a9-13ad-36c9-873e-43a31c684f5f",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 64,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790262444957
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262448.958,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767375231",
+              "uuid": "78afb0a9-13ad-36c9-873e-43a31c684f5f",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 67,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790262447957
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Blocks ground turn",
+        "result": "FAIL",
+        "reasons": [
+          "Rejected placement incorrectly falls through to air use or offhand"
+        ],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262452.958,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767375231",
+              "uuid": "78afb0a9-13ad-36c9-873e-43a31c684f5f",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 71,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790262451958
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262456.958,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767375231",
+              "uuid": "78afb0a9-13ad-36c9-873e-43a31c684f5f",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 75,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790262455958
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Final coast",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 60,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790262457.959,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767375231",
+              "uuid": "78afb0a9-13ad-36c9-873e-43a31c684f5f",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 76,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790262456958
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790262460.959,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767375231",
+              "uuid": "78afb0a9-13ad-36c9-873e-43a31c684f5f",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 79,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790262459959
+            }
+          ],
+          "generation": 1
+        }
+      }
+    ],
+    "evidence": {
+      "report.json": {
+        "bytes": 2202341,
+        "sha256": "ac6f7178fb64fea188fcec64fab8ab309a0cb3854e7b9cc11f3441a311bcc19f"
+      },
+      "viaforge\\client.jsonl": {
+        "bytes": 4879837,
+        "sha256": "8e0151623e3c4d17735aa8a7d158b7e272cfc55bb9e3d90336934ff4f1b989b8"
+      },
+      "plugins\\ViaForgeLabAC\\events.jsonl": {
+        "bytes": 635650,
+        "sha256": "0a3ae82c7b77f3b4540cc53413cf44c1f7799abe7908245f33c965fc4aec4d14"
+      },
+      "sources.json": {
+        "bytes": 2669,
+        "sha256": "9d7677b323c84c563f66b6cde35436938f2ea2be89f03c02cb73f14c8784ef1b"
+      }
+    }
+  },
+  {
+    "folder": "interaction-26.2-rightclick-final-1790266594762257300",
+    "client": "viaforge",
+    "target": 776,
+    "backend": 776,
+    "baseline": false,
+    "completed": true,
+    "error": null,
+    "started": 1790266595.3376672,
+    "ended": 1790266752.2781014,
+    "client_artifact": {
+      "path": "C:\\Users\\Panthera\\Desktop\\GitHub\\ViaVersionClient\\run\\mods\\ViaForge-development.jar",
+      "sha256": "97e5ac7c04673ba526a119f9d35869726855e49becb1c82d7a0210081860b15b",
+      "boat_sources": {
+        "src\\main\\java\\com\\viaversion\\viaforge\\boats\\ServerBoat.java": "503cb058671605d61f87ee0728ee5c425a8ec88e3e3a19c7a067bf1a1e767740",
+        "src\\main\\java\\com\\viaversion\\viaforge\\mixin\\impl\\boats\\MixinBoatPlayer.java": "e8e362b4d30f54eee17208e43c0fe63e73383255ad4da66b58c3ab4148971dd0"
+      }
+    },
+    "real_player_target": null,
+    "result": "PASS",
+    "passed": 9,
+    "measured": 9,
+    "survival": {},
+    "login": {
+      "setback": 2
+    },
+    "sequenced_packets": 203,
+    "sequence_errors": 0,
+    "cases": [
+      {
+        "case": "Rightclick Plain sword ground",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790266686.987,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776647168",
+              "uuid": "7f755f3a-52a0-30f2-8e55-9c18eff0651a",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 44,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790266685988
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790266690.974,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776647168",
+              "uuid": "7f755f3a-52a0-30f2-8e55-9c18eff0651a",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 48,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790266689988
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Stick ground turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790266694.979,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776647168",
+              "uuid": "7f755f3a-52a0-30f2-8e55-9c18eff0651a",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 51,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790266693983
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790266697.984,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776647168",
+              "uuid": "7f755f3a-52a0-30f2-8e55-9c18eff0651a",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 54,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790266696975
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Stick air turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790266701.987,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776647168",
+              "uuid": "7f755f3a-52a0-30f2-8e55-9c18eff0651a",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 58,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790266700975
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790266705.975,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776647168",
+              "uuid": "7f755f3a-52a0-30f2-8e55-9c18eff0651a",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 62,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790266704978
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Shield ground turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 67,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 16,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790266709.977,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776647168",
+              "uuid": "7f755f3a-52a0-30f2-8e55-9c18eff0651a",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 66,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790266708981
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790266712.983,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776647168",
+              "uuid": "7f755f3a-52a0-30f2-8e55-9c18eff0651a",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 69,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790266711988
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Shield air turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 16,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790266716.984,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776647168",
+              "uuid": "7f755f3a-52a0-30f2-8e55-9c18eff0651a",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 73,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790266715988
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790266720.982,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776647168",
+              "uuid": "7f755f3a-52a0-30f2-8e55-9c18eff0651a",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 77,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790266719986
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Blocks ground turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790266724.981,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776647168",
+              "uuid": "7f755f3a-52a0-30f2-8e55-9c18eff0651a",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 81,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790266723985
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790266727.984,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776647168",
+              "uuid": "7f755f3a-52a0-30f2-8e55-9c18eff0651a",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 84,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790266726988
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Blocking sword pose",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 68,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790266731.985,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776647168",
+              "uuid": "7f755f3a-52a0-30f2-8e55-9c18eff0651a",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 88,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790266730989
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790266735.984,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776647168",
+              "uuid": "7f755f3a-52a0-30f2-8e55-9c18eff0651a",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 93,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790266734984
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Blocking sword ground turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 16,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790266739.984,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776647168",
+              "uuid": "7f755f3a-52a0-30f2-8e55-9c18eff0651a",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 96,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790266738978
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790266742.982,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776647168",
+              "uuid": "7f755f3a-52a0-30f2-8e55-9c18eff0651a",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 100,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790266741985
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Final coast",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 60,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790266743.98,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776647168",
+              "uuid": "7f755f3a-52a0-30f2-8e55-9c18eff0651a",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 100,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790266742983
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790266746.983,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "26.2-126-c646faf (MC: 26.2)",
+          "players": [
+            {
+              "name": "VFpush776647168",
+              "uuid": "7f755f3a-52a0-30f2-8e55-9c18eff0651a",
+              "client": "26.2",
+              "protocol": 776,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 104,
+              "flags": 0,
+              "setbacks": 2,
+              "observed_at": 1790266745985
+            }
+          ],
+          "generation": 1
+        }
+      }
+    ],
+    "evidence": {
+      "report.json": {
+        "bytes": 3310330,
+        "sha256": "91b441cf876ec036a7496fddf53a254eb8f28ab5b742a10780cf7cf910f1ce5b"
+      },
+      "viaforge\\client.jsonl": {
+        "bytes": 6314936,
+        "sha256": "94205365b836a1b9c2e6f12843b6672af760788b8a98cd8aa3de182d1cfdbafe"
+      },
+      "plugins\\ViaForgeLabAC\\events.jsonl": {
+        "bytes": 975504,
+        "sha256": "3a56067feec0afdf5b06492ea3d7d464380b1990e1821a13addd72b977477613"
+      },
+      "sources.json": {
+        "bytes": 2719,
+        "sha256": "0d288c6d5de49cd7c48e0c4de04639f23f003b7b645f34728328368e491b4e50"
+      }
+    },
+    "screenshots": {
+      "viaforge\\screenshots\\blocking-1606.png": {
+        "bytes": 52669,
+        "sha256": "d007a32a5311a40c7a459dcfe0b33acae4067ef963b9aa923b71445fdc977f23"
+      }
+    }
+  },
+  {
+    "folder": "interaction-1.21.1-rightclick-final-1790266784496914200",
+    "client": "viaforge",
+    "target": 767,
+    "backend": 767,
+    "baseline": false,
+    "completed": true,
+    "error": null,
+    "started": 1790266785.0162497,
+    "ended": 1790266933.6319664,
+    "client_artifact": {
+      "path": "C:\\Users\\Panthera\\Desktop\\GitHub\\ViaVersionClient\\run\\mods\\ViaForge-development.jar",
+      "sha256": "97e5ac7c04673ba526a119f9d35869726855e49becb1c82d7a0210081860b15b",
+      "boat_sources": {
+        "src\\main\\java\\com\\viaversion\\viaforge\\boats\\ServerBoat.java": "503cb058671605d61f87ee0728ee5c425a8ec88e3e3a19c7a067bf1a1e767740",
+        "src\\main\\java\\com\\viaversion\\viaforge\\mixin\\impl\\boats\\MixinBoatPlayer.java": "e8e362b4d30f54eee17208e43c0fe63e73383255ad4da66b58c3ab4148971dd0"
+      }
+    },
+    "real_player_target": null,
+    "result": "PASS",
+    "passed": 7,
+    "measured": 7,
+    "survival": {},
+    "login": {},
+    "sequenced_packets": 177,
+    "sequence_errors": 0,
+    "cases": [
+      {
+        "case": "Rightclick Plain sword ground",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790266883.326,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767843344",
+              "uuid": "3416d393-de0d-374a-9031-6fe1c5702d77",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 33,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790266882327
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790266886.319,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767843344",
+              "uuid": "3416d393-de0d-374a-9031-6fe1c5702d77",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 36,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790266885320
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Stick ground turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790266890.324,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767843344",
+              "uuid": "3416d393-de0d-374a-9031-6fe1c5702d77",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 40,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790266889313
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790266894.313,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767843344",
+              "uuid": "3416d393-de0d-374a-9031-6fe1c5702d77",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 44,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790266893315
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Stick air turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790266898.314,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767843344",
+              "uuid": "3416d393-de0d-374a-9031-6fe1c5702d77",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 48,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790266897319
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790266901.32,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767843344",
+              "uuid": "3416d393-de0d-374a-9031-6fe1c5702d77",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 51,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790266900321
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Shield ground turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 16,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790266905.326,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767843344",
+              "uuid": "3416d393-de0d-374a-9031-6fe1c5702d77",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 55,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790266904327
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790266909.314,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767843344",
+              "uuid": "3416d393-de0d-374a-9031-6fe1c5702d77",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 59,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790266908318
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Shield air turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 4,
+        "max_offset": 0.0,
+        "using_ticks": 16,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790266913.319,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767843344",
+              "uuid": "3416d393-de0d-374a-9031-6fe1c5702d77",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 63,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790266912321
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790266916.321,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767843344",
+              "uuid": "3416d393-de0d-374a-9031-6fe1c5702d77",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 66,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790266915326
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Rightclick Blocks ground turn",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 68,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790266920.32,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767843344",
+              "uuid": "3416d393-de0d-374a-9031-6fe1c5702d77",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 70,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790266919325
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790266924.319,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767843344",
+              "uuid": "3416d393-de0d-374a-9031-6fe1c5702d77",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 74,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790266923325
+            }
+          ],
+          "generation": 1
+        }
+      },
+      {
+        "case": "Final coast",
+        "result": "PASS",
+        "reasons": [],
+        "ticks": 60,
+        "predictions": 3,
+        "max_offset": 0.0,
+        "using_ticks": 0,
+        "flags": {},
+        "setbacks": 0,
+        "attack_order": null,
+        "attack_interleavings": null,
+        "before": {
+          "time": 1790266925.315,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767843344",
+              "uuid": "3416d393-de0d-374a-9031-6fe1c5702d77",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 75,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790266924320
+            }
+          ],
+          "generation": 1
+        },
+        "after": {
+          "time": 1790266928.317,
+          "state": "enabled",
+          "requested_enabled": true,
+          "grim": "2.3.74-8eb5f28",
+          "server": "1.21.1-133-3cb8529 (MC: 1.21.1)",
+          "players": [
+            {
+              "name": "VFpush767843344",
+              "uuid": "3416d393-de0d-374a-9031-6fe1c5702d77",
+              "client": "1.21",
+              "protocol": 767,
+              "brand": "fml,forge",
+              "gamemode": "SURVIVAL",
+              "op": false,
+              "disabled": false,
+              "verbose": true,
+              "exempt_permission": false,
+              "nosetback_permission": false,
+              "nomodifypacket_permission": false,
+              "predictions": 78,
+              "flags": 0,
+              "setbacks": 0,
+              "observed_at": 1790266927323
+            }
+          ],
+          "generation": 1
+        }
+      }
+    ],
+    "evidence": {
+      "report.json": {
+        "bytes": 2166318,
+        "sha256": "16d484a10904a41870d6968720e0cf9ffd6f227ef2ea781a33dc67aea8bb2866"
+      },
+      "viaforge\\client.jsonl": {
+        "bytes": 4859037,
+        "sha256": "9cb7534004ba684011bc8e48f236cc600bbb5efe2cf3ae26db50712cd317d86a"
+      },
+      "plugins\\ViaForgeLabAC\\events.jsonl": {
+        "bytes": 623805,
+        "sha256": "aea1741b85d0d50665d5670f1cb8c4af296f84f9959b875bbf6b4f8af919d4d8"
+      },
+      "sources.json": {
+        "bytes": 2666,
+        "sha256": "059930fec642a35bce2a8a5512b9ceef2d1d85ef144fd1c64246ae4e50dce543"
+      }
+    }
+  }
+]

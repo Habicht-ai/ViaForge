@@ -26,6 +26,15 @@ final class LegacyServerboundPackets {
         if(op==0){modern=PacketWrapper.create(ServerboundPackets1_9.PLAYER_ACTION,wrapper.user());modern.write(Types.VAR_INT,(int)wrapper.read(Types.UNSIGNED_BYTE));modern.write(Types.BLOCK_POSITION1_8,new com.viaversion.viaversion.api.minecraft.BlockPosition(0,0,0));modern.write(Types.UNSIGNED_BYTE,(short)0);}
         else {
             int hand=wrapper.read(Types.UNSIGNED_BYTE);if(hand>1)return;
+            if(op==7) {
+                InteractionRotation rotation=new InteractionRotation(wrapper.read(Types.FLOAT),wrapper.read(Types.FLOAT));
+                InteractionRotation previous=wrapper.user().get(InteractionRotation.class);
+                modern=PacketWrapper.create(ServerboundPackets1_9.USE_ITEM,wrapper.user());modern.write(Types.VAR_INT,hand);
+                wrapper.user().put(rotation);
+                try{modern.sendToServer(Protocol1_9To1_8.class,true);}
+                finally{if(previous==null)wrapper.user().remove(InteractionRotation.class);else wrapper.user().put(previous);}
+                return;
+            }
             if(op==1){
                 com.viaversion.viaversion.api.minecraft.BlockPosition pos=wrapper.read(Types.BLOCK_POSITION1_8);int face=wrapper.read(Types.UNSIGNED_BYTE);wrapper.read(Types.ITEM1_8);
                 modern=PacketWrapper.create(face==255?ServerboundPackets1_9.USE_ITEM:ServerboundPackets1_9.USE_ITEM_ON,wrapper.user());

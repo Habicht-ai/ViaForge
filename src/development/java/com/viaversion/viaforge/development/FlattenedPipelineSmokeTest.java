@@ -122,6 +122,7 @@ final class FlattenedPipelineSmokeTest {
     private final Map<String,Integer> states=new HashMap<>();
     private final List<String> stateNames=new ArrayList<>();
     private int joins;
+    private int expectedInteractionSequence;
     private FlattenedPipelineSmokeTest(CompatibilityProfile target)throws Exception {
         this.target=target;village=target.serverProtocol()>=477;bee=target.serverProtocol()>=573;nether=target.serverProtocol()>=735;netherPatch=target.serverProtocol()>=751;caves=target.serverProtocol()>=755;cavesPatch=target.serverProtocol()>=756;cliffs=target.serverProtocol()>=757;wild=target.serverProtocol()>=759;wildPatch=target.serverProtocol()>=760;wild3=target.serverProtocol()>=761;wild4=target.serverProtocol()>=762;trails=target.serverProtocol()>=763;config=target.serverProtocol()>=764;trials=target.serverProtocol()>=765;components=target.serverProtocol()>=766;tricky=target.serverProtocol()>=767;bundles=target.serverProtocol()>=768;winter=target.serverProtocol()>=769;spring=target.serverProtocol()>=770;summer=target.serverProtocol()>=771;summerPatch=target.serverProtocol()>=772;copper=target.serverProtocol()>=773;mounts=target.serverProtocol()>=774;year26=target.serverProtocol()>=775;sulfur=target.serverProtocol()>=776;wilderness=target.serverProtocol()==777;itemType=wilderness?VersionedTypes.V26_3.item():sulfur?VersionedTypes.V26_2.item():year26?VersionedTypes.V26_1.item():mounts?VersionedTypes.V1_21_11.item():copper?VersionedTypes.V1_21_9.item():summer?VersionedTypes.V1_21_6.item():spring?VersionedTypes.V1_21_5.item():winter?VersionedTypes.V1_21_4.item():bundles?VersionedTypes.V1_21_2.item():tricky?VersionedTypes.V1_21.item():components?VersionedTypes.V1_20_5.item():config?Types.ITEM1_20_2:target.serverProtocol()>=404?Types.ITEM1_13_2:Types.ITEM1_13;
         user.getProtocolInfo().setProtocolVersion(ProtocolVersion.v1_8);
@@ -141,7 +142,7 @@ final class FlattenedPipelineSmokeTest {
     static String verify(CompatibilityProfile target,WorldClient world,Path report)throws Exception {
         FlattenedPipelineSmokeTest test=new FlattenedPipelineSmokeTest(target);
         try {
-            test.join();test.transportClock();int count=test.blocks(world);test.heightWindow(world);test.items();test.eggs();test.drops(world);test.events();test.boatInput(world);test.flight(world);test.hands();test.editors();test.resources(report);MobRenderSmokeTest.modern(target,world,report);test.lifecycle();
+            test.join();test.transportClock();int count=test.blocks(world);test.heightWindow(world);test.items();test.eggs();test.drops(world);test.events();test.boatInput(world);test.flight(world);test.hands(world);test.diggingSequences();test.editors();test.resources(report);MobRenderSmokeTest.modern(target,world,report);test.lifecycle();
             return target.resources().version()+": real flattened chunks ("+count+" inherited states), single/multi updates, bed colors without tile NBT, shulker events, falling blocks; all inherited block/item inventory round trips, Damage/enchantments/banner NBT, split counts, fresh Creative picks; 43 egg species: ID-only server items, fresh Creative picks, server echoes/models and click round trips"+(test.sulfur?", typed entity components/hashes and overridden spawn species":"")+"; offhand/full/direct/equipment, boat/player/mob metadata, passengers, boat movement/paddles and all 36 directional/jump/dismount input combinations, cooldowns/particles/Totem, both hand directions; original target resource aliases, particle atlas texels and all inherited block/item models; structure mirror/rotation/flags/seed, command/gateway/structure NBT, chunk unload and dimension cleanup"+(test.village?", separate sky/block light and JSON Lore":"")+(test.bee?", original chest face/UV checks":"")+(test.caves?", 384-height source and 1.17 inventory codec; native Y=0..255 window only":"")+" PASS";
         }finally{test.close();}
     }
@@ -367,6 +368,17 @@ final class FlattenedPipelineSmokeTest {
             if(definition.itemId()==383){fresh.setTag(new CompoundTag());fresh.tag().put("EntityTag",tag.getCompoundTag("EntityTag").copy());}
             Item picked=sendItem(fresh,true);require(picked.identifier()==original.identifier(),"Fresh flattened Creative item "+definition.itemId());
         }
+        if(spring) {
+            StructuredItem sword=new StructuredItem(wireItem(Protocol1_12_2To1_13.MAPPINGS.getNewItemId(276<<4)),1);
+            sword.dataContainer().setIdLookup(wilderness?Via.getManager().getProtocolManager().getProtocol(Protocol26_2To26_3.class):sulfur?Via.getManager().getProtocolManager().getProtocol(Protocol26_1To26_2.class):year26?Via.getManager().getProtocolManager().getProtocol(Protocol1_21_11To26_1.class):mounts?Via.getManager().getProtocolManager().getProtocol(Protocol1_21_9To1_21_11.class):copper?Via.getManager().getProtocolManager().getProtocol(Protocol1_21_7To1_21_9.class):summerPatch?Via.getManager().getProtocolManager().getProtocol(Protocol1_21_6To1_21_7.class):summer?Via.getManager().getProtocolManager().getProtocol(Protocol1_21_5To1_21_6.class):spring?Via.getManager().getProtocolManager().getProtocol(Protocol1_21_4To1_21_5.class):winter?Via.getManager().getProtocolManager().getProtocol(Protocol1_21_2To1_21_4.class):bundles?Via.getManager().getProtocolManager().getProtocol(Protocol1_21To1_21_2.class):tricky?Via.getManager().getProtocolManager().getProtocol(Protocol1_20_5To1_21.class):Via.getManager().getProtocolManager().getProtocol(Protocol1_20_3To1_20_5.class),true);
+            com.viaversion.viaversion.api.minecraft.item.data.BlocksAttacks blocks=new com.viaversion.viaversion.api.minecraft.item.data.BlocksAttacks(0,0,
+                new com.viaversion.viaversion.api.minecraft.item.data.BlocksAttacks.DamageReduction[0],
+                new com.viaversion.viaversion.api.minecraft.item.data.BlocksAttacks.ItemDamageFunction(0,0,0),null,null,null);
+            sword.dataContainer().set(year26?StructuredDataKey.BLOCKS_ATTACKS26_1:StructuredDataKey.BLOCKS_ATTACKS1_21_5,blocks);
+            Item localSword=slot(sword,36);
+            require(localSword.tag().getCompoundTag(com.viaversion.viaforge.common.blocks.ComponentItemSnapshot.KEY).getByte("blocking")==1,"Original blocking component survives complete target item pipeline");
+            sendHashedItem(localSword,sword);
+        }
         // Direct target NBT, independent of a reverse-generated fixture.
         CompoundTag tag=new CompoundTag();tag.putInt("Damage",57);tag.putString("Custom","shield");
         CompoundTag display=new CompoundTag();display.putString("Name","{\"text\":\"Original shield\",\"color\":\"gold\"}");tag.put("display",display);
@@ -555,7 +567,7 @@ final class FlattenedPipelineSmokeTest {
                 ByteBuf result=BlockPipelineSmokeTest.take(server,outgoing(swing?ServerboundPackets1_13.SWING:ServerboundPackets1_13.USE_ITEM));
                 try {
                     require(Types.VAR_INT.readPrimitive(result)==hand,"Actual input preserves selected hand on target wire");
-                    if(!swing&&wild)require(Types.VAR_INT.readPrimitive(result)==0,"Use sequence preserved");
+                    if(!swing&&wild)require(Types.VAR_INT.readPrimitive(result)==++expectedInteractionSequence,"Use sequence advances once");
                     if(!swing&&tricky){result.readFloat();result.readFloat();}
                     require(!result.isReadable(),"Exact target hand action length");
                 }finally{result.release();}
@@ -652,18 +664,38 @@ final class FlattenedPipelineSmokeTest {
         if(copper&&oldId==8)result.add(Types.FLOAT,1F);
         return result;
     }
-    private void hands()throws Exception {
+    private void diggingSequences()throws Exception {
+        if(!wild)return;
+        for(net.minecraft.network.play.client.C07PacketPlayerDigging.Action action:new net.minecraft.network.play.client.C07PacketPlayerDigging.Action[]{
+                net.minecraft.network.play.client.C07PacketPlayerDigging.Action.START_DESTROY_BLOCK,
+                net.minecraft.network.play.client.C07PacketPlayerDigging.Action.ABORT_DESTROY_BLOCK,
+                net.minecraft.network.play.client.C07PacketPlayerDigging.Action.START_DESTROY_BLOCK,
+                net.minecraft.network.play.client.C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK,
+                net.minecraft.network.play.client.C07PacketPlayerDigging.Action.RELEASE_USE_ITEM}) {
+            ByteBuf source=BlockPipelineSmokeTest.packet(0x07);
+            new net.minecraft.network.play.client.C07PacketPlayerDigging(action,new BlockPos(1,64,2),net.minecraft.util.EnumFacing.UP).writePacketData(new PacketBuffer(source));send(source);
+            ByteBuf data=BlockPipelineSmokeTest.take(server,outgoing(ServerboundPackets1_13.PLAYER_ACTION));
+            try {
+                require(Types.VAR_INT.readPrimitive(data)==action.ordinal()+(wilderness&&action.ordinal()>=1?1:0),"Target dig action preserved");positionType().read(data);data.readByte();
+                int expected=action.ordinal()==0||action.ordinal()==2?++expectedInteractionSequence:0;
+                require(Types.VAR_INT.readPrimitive(data)==expected&&!data.isReadable(),"Digging shares prediction sequence; abort/release do not advance");
+            }finally{data.release();}
+        }
+    }
+    private void hands(WorldClient world)throws Exception {
         for(int hand=0;hand<=1;hand++) {
-            net.minecraft.network.play.client.C17PacketCustomPayload packet=com.viaversion.viaforge.hands.HandPackets.wrapped(new net.minecraft.network.play.client.C08PacketPlayerBlockPlacement((net.minecraft.item.ItemStack)null),hand);
+            float clickYaw=hand==0?123.25F:-73.5F,clickPitch=hand==0?-47.5F:62.25F;
+            net.minecraft.network.play.client.C17PacketCustomPayload packet=useAtRotation(world,hand,clickYaw,clickPitch);
             ByteBuf source=BlockPipelineSmokeTest.packet(0x17);packet.writePacketData(new PacketBuffer(source));send(source);
-            ByteBuf data=BlockPipelineSmokeTest.take(server,outgoing(ServerboundPackets1_13.USE_ITEM));try{require(Types.VAR_INT.readPrimitive(data)==hand,"Target hand-aware use");if(wild)require(Types.VAR_INT.readPrimitive(data)==0,"Use-item sequence");if(tricky)require(data.readFloat()==0&&data.readFloat()==0,"1.21 use yaw and pitch");require(!data.isReadable(),"Use-item consumed");}finally{data.release();}
+            ByteBuf data=BlockPipelineSmokeTest.take(server,outgoing(ServerboundPackets1_13.USE_ITEM));try{require(Types.VAR_INT.readPrimitive(data)==hand,"Target hand-aware use");if(wild)require(Types.VAR_INT.readPrimitive(data)==++expectedInteractionSequence,"Shared use-item sequence");if(tricky)require(data.readFloat()==clickYaw&&data.readFloat()==clickPitch,"1.21 use preserves click rotation before later camera changes");require(!data.isReadable(),"Use-item consumed");}finally{data.release();}
+            require(user.get(InteractionRotation.class)==null,"Click rotation cannot leak into another packet");
             packet=com.viaversion.viaforge.hands.HandPackets.wrapped(new net.minecraft.network.play.client.C08PacketPlayerBlockPlacement(new BlockPos(1,64,2),1,null,.25F,.5F,.75F),hand);
             source=BlockPipelineSmokeTest.packet(0x17);packet.writePacketData(new PacketBuffer(source));send(source);data=BlockPipelineSmokeTest.take(server,outgoing(ServerboundPackets1_13.USE_ITEM_ON));
             try{if(village)require(Types.VAR_INT.readPrimitive(data)==hand,"1.14 hand precedes block position");
                 BlockPosition pos=positionType().read(data);require(pos.x()==1&&pos.y()==64&&pos.z()==2&&Types.VAR_INT.readPrimitive(data)==1,"Target block coordinates/face");
                 if(!village)require(Types.VAR_INT.readPrimitive(data)==hand,"Target block hand");
                 require(data.readFloat()==.25F&&data.readFloat()==.5F&&data.readFloat()==.75F,"Target block cursor");
-                if(village)require(!data.readBoolean(),"1.14 inside-block flag");if(bundles)require(!data.readBoolean(),"World border flag");if(wild)require(Types.VAR_INT.readPrimitive(data)==0,"Block-use sequence");require(!data.isReadable(),"Target block use consumed");}finally{data.release();}
+                if(village)require(!data.readBoolean(),"1.14 inside-block flag");if(bundles)require(!data.readBoolean(),"World border flag");if(wild)require(Types.VAR_INT.readPrimitive(data)==++expectedInteractionSequence,"Shared block-use sequence");require(!data.isReadable(),"Target block use consumed");}finally{data.release();}
         }
         for(int selectedHand=0;selectedHand<2;selectedHand++) {
             ByteBuf encoded=client.alloc().buffer();Types.VAR_INT.writePrimitive(encoded,100);Types.VAR_INT.writePrimitive(encoded,2);encoded.writeFloat(.25F).writeFloat(.5F).writeFloat(-.75F);
@@ -689,6 +721,18 @@ final class FlattenedPipelineSmokeTest {
         try{require(Types.VAR_INT.readPrimitive(attackData)==100,"Attack entity identity");if(!year26){require(Types.VAR_INT.readPrimitive(attackData)==1,"Attack action");if(nether)attackData.readBoolean();}require(!attackData.isReadable(),"Attack packet fully consumed");}finally{attackData.release();}
         ByteBuf source=BlockPipelineSmokeTest.packet(0x17);com.viaversion.viaforge.hands.HandPackets.action(6).writePacketData(new PacketBuffer(source));send(source);
         ByteBuf data=BlockPipelineSmokeTest.take(server,outgoing(ServerboundPackets1_13.PLAYER_ACTION));try{require(Types.VAR_INT.readPrimitive(data)==(wilderness?7:6),"Swap target action");positionType().read(data);data.readByte();if(wild)require(Types.VAR_INT.readPrimitive(data)==0,"Swap sequence");require(!data.isReadable(),"Swap target layout");}finally{data.release();}
+    }
+    private net.minecraft.network.play.client.C17PacketCustomPayload useAtRotation(WorldClient world,int hand,float yaw,float pitch) {
+        Minecraft mc=Minecraft.getMinecraft();net.minecraft.client.entity.EntityPlayerSP previous=mc.thePlayer;
+        // This standalone pipeline runs at the main menu; install an actual
+        // player only while capturing the click, then translate after restoring it.
+        net.minecraft.client.network.NetHandlerPlayClient handler=new net.minecraft.client.network.NetHandlerPlayClient(mc,null,
+            new NetworkManager(EnumPacketDirection.CLIENTBOUND),new com.mojang.authlib.GameProfile(new UUID(0,713),"RotationTest"));
+        try {
+            mc.thePlayer=new net.minecraft.client.entity.EntityPlayerSP(mc,world,handler,new net.minecraft.stats.StatFileWriter());
+            mc.thePlayer.rotationYaw=yaw;mc.thePlayer.rotationPitch=pitch;
+            return com.viaversion.viaforge.hands.HandPackets.wrapped(new net.minecraft.network.play.client.C08PacketPlayerBlockPlacement((net.minecraft.item.ItemStack)null),hand);
+        }finally{mc.thePlayer=previous;}
     }
     private void editors()throws Exception {
         net.minecraft.nbt.NBTTagCompound tag=new net.minecraft.nbt.NBTTagCompound();
@@ -805,6 +849,7 @@ final class FlattenedPipelineSmokeTest {
         ByteBuf respawn=packet(ClientboundPackets1_13.RESPAWN);
         if(nether){if(components)Types.VAR_INT.writePrimitive(respawn,1);else if(wild)Types.STRING.write(respawn,"minecraft:the_nether");else if(netherPatch)Types.NAMED_COMPOUND_TAG.write(respawn,dimension("minecraft:the_nether"));else Types.STRING.write(respawn,"minecraft:the_nether");Types.STRING.write(respawn,"minecraft:the_nether");respawn.writeLong(12345L);if(wilderness){Types.VAR_INT.writePrimitive(respawn,1);Types.OPTIONAL_VAR_INT.write(respawn,1);}else respawn.writeByte(1).writeByte(1);respawn.writeBoolean(false).writeBoolean(false);if(!config)respawn.writeBoolean(false);if(wild)Types.OPTIONAL_GLOBAL_POSITION.write(respawn,null);if(trails)Types.VAR_INT.writePrimitive(respawn,0);if(bundles)Types.VAR_INT.writePrimitive(respawn,32);if(config)respawn.writeByte(0);}
         else {respawn.writeInt(-1);if(bee)respawn.writeLong(12345L);if(!village)respawn.writeByte(0);respawn.writeByte(1);Types.STRING.write(respawn,"default");}receive(respawn);drain(client);
+        expectedInteractionSequence=0;diggingSequences();
         require(!cached(2,65,3),"Dimension switch discards source states");
         require(user.get(FlattenedProtocolAdapter.class).waterColors.at(0,64,0,-1)==-1,"Dimension switch discards water colors");
         if(village)require(((com.viaversion.viabackwards.protocol.v1_14to1_13_2.storage.ProtocolStorables1_14)user.storables(com.viaversion.viabackwards.protocol.v1_14to1_13_2.Protocol1_14To1_13_2.class)).chunkLightStorage().getStoredLight(0,0)==null,"Dimension switch clears Via light cache");

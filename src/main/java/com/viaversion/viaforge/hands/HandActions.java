@@ -41,6 +41,11 @@ public final class HandActions {
                     if(held!=null&&(held.stackSize!=count||p.capabilities.isCreativeMode))HandRenderer.reset(hand);
                     return true;
                 }
+                // 1.13+ stops on BlockItem's FAIL without swinging. The native
+                // boolean conflates FAIL with PASS; falling through would send
+                // air-use and then retry the click with the opposite hand.
+                if(held!=null && held.getItem() instanceof ItemBlock && !ServerItemCooldowns.cooling(held)
+                        && com.viaversion.viaforge.compatibility.ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.MODERN_BLOCK_USE_FAILURE))return true;
             }
         }
         if(held==null)return false;

@@ -9,6 +9,15 @@ für isolierte Testinstanzen; die normale Konfiguration bleibt bei false.
 
 ## Quellen und Grenzen
 
+Neue Interaktionstests vom 23.09.2026 bestätigen eine zusätzliche **Laufzeitgrenze**:
+Paper 1.14 Build 17 und 1.14.4 Build 245 starten mit diesem Grim, aber bei der
+Itemverarbeitung scheitert `BukkitItemResetHandler` an
+`NoSuchMethodException: net.minecraft.server.v1_14_R1.EntityLiving.cU()`;
+PacketEvents trennt daraufhin mit `Invalid packet`. Die Startprüfung der Profile
+bleibt historisch richtig, ist aber kein Interaktions-PASS. 1.19 wird wie 1.18.2
+durch die unveränderte Forge-Sperre blockiert. Genaue Berichte und weitere
+Testgrenzen stehen in [INTERACTIONS.md](INTERACTIONS.md).
+
 - [Offizielles Grim-Repository](https://github.com/GrimAnticheat/Grim), geprüfter Commit `8eb5f2809591c891deb4958bb2927844871e0600`: README nennt Minecraft 1.8–26.2, Java 17+, Bukkit/Spigot/Paper/Folia und Fabric. **26.3 ist nicht unterstützt.** Es gibt keine umbenannte 26.2-Instanz als Ersatz.
 - Eingesetzt: offizieller Bukkit-Build **2.3.74-8eb5f28**, Modrinth-Version `Gd6BG1HA`, veröffentlicht 10.09.2026. [Download](https://cdn.modrinth.com/data/LJNGWSvH/versions/Gd6BG1HA/grimac-bukkit-2.3.74-8eb5f28.jar). SHA-256: `91c06e7ae7da53636bc5e500d5af3d36a6180247e155fa5b4340da5a72f9eeb7`. PacketEvents ist im Bukkit-JAR enthalten; es wurde kein zusätzliches PacketEvents installiert.
 - [Plattformhinweise](https://github.com/GrimAnticheat/Grim/wiki/Supported-platforms): Fabric ist eine andere Distribution, keine Bukkit-Plugininstallation. Der untersuchte Fabric-Metadatensatz beginnt bei 1.16.1 und begrenzt 26.x auf 26.1.2 bis vor 26.3; Fabric Loader mindestens 0.16. Für die vorhandenen Laborversionen verwendet diese Integration exakte Paper-Builds.

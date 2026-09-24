@@ -30,7 +30,12 @@ final class PickBlockSmokeTest {
         world.doPreChunk(0,0,true);mc.theWorld=world;
         mc.thePlayer=new net.minecraft.client.entity.EntityPlayerSP(mc,world,handler,new net.minecraft.stats.StatFileWriter());
         mc.playerController=new net.minecraft.client.multiplayer.PlayerControllerMP(mc,handler);
-        try{verify(world,sent);}finally{Offhand.clear();mc.theWorld=oldWorld;mc.thePlayer=oldPlayer;mc.playerController=oldController;}
+        try{
+            // Simulate a prior modern connection having selected a lily pad.
+            Blocks.waterlily.setBlockBounds(.0625F,0,.0625F,.9375F,.09375F,.9375F);
+            InteractionSmokeTest.verify(world,mc.thePlayer,sent);
+            verify(world,sent);
+        }finally{Offhand.clear();mc.theWorld=oldWorld;mc.thePlayer=oldPlayer;mc.playerController=oldController;}
     }
     static void verify(WorldClient world,List<Packet> sent)throws Exception {
         Minecraft mc=Minecraft.getMinecraft();

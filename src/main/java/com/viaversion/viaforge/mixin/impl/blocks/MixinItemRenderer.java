@@ -22,6 +22,10 @@ public abstract class MixinItemRenderer {
     @Inject(method = "doBlockTransformations", at = @At("HEAD"), cancellable = true)
     private void shieldBlocking(CallbackInfo ci) {
         if (ClientItems.is(itemToRender, com.viaversion.viaforge.common.blocks.LegacyItemCatalog.Kind.SHIELD)) ci.cancel();
+        else if(itemToRender!=null && itemToRender.getItem() instanceof net.minecraft.item.ItemSword
+                && com.viaversion.viaforge.compatibility.ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.COMPONENT_BLOCKING)) {
+            com.viaversion.viaforge.hands.HandRenderer.blockTransform(1);ci.cancel();
+        }
     }
 
     @Inject(method = "transformFirstPersonItem", at = @At("HEAD"), cancellable = true)

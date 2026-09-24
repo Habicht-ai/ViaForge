@@ -15,6 +15,16 @@ Land sneak/sprint transitions have a separate [reproduction, original-client
 comparison and version boundaries](SNEAK-SPRINT.md). The correction shares the
 original input stages with swimming and preserves modern sneak-speed attributes.
 
+Ladders, lily pads, component sword blocking and interaction packet timing have
+separate [original-client evidence and reproducible checks](INTERACTIONS.md).
+In particular, a queued legacy swing can arrive after changed player input;
+single stationary attacks alone do not reproduce that PacketOrderB case.
+The subsequent [right-click rotation and blocking-pose regression](RIGHTCLICK-WORK.md)
+reproduces BadPacketsJ while turning: use-item rotation must be captured at the
+click, rather than reconstructed from the previous movement packet.
+Rejected BlockItem placement also follows the 1.13 boundary: send use-on before
+evaluating placement, then stop on failure without air use or an offhand retry.
+
 The clarified Creative middle-click hotbar desync is reproduced and corrected:
 the added offhand slot shifted the original pick-block packet's slot calculation.
 Local placement sounds also use the target resource catalog. See

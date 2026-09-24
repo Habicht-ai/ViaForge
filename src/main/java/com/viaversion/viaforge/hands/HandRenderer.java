@@ -63,6 +63,8 @@ public final class HandRenderer {
                     float eat=1-(float)Math.pow(progress,27);GlStateManager.translate(sign*eat*.6F,-eat*.5F,0);GlStateManager.rotate(sign*eat*90,0,1,0);GlStateManager.rotate(eat*10,1,0,0);GlStateManager.rotate(sign*eat*30,0,0,1);
                 }
                 base(sign,equip);
+                if(action==EnumAction.BLOCK && stack.getItem() instanceof ItemSword
+                        && com.viaversion.viaforge.compatibility.ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.COMPONENT_BLOCKING))blockTransform(sign);
                 if(action==EnumAction.BOW){
                     GlStateManager.translate(sign*-.2785682F,.18344387F,.15731531F);GlStateManager.rotate(-13.935F,1,0,0);GlStateManager.rotate(sign*35.3F,0,1,0);GlStateManager.rotate(sign*-9.785F,0,0,1);
                     float ticks=stack.getMaxItemUseDuration()-(p.getItemInUseCount()-partial+1),pull=ticks/20;pull=Math.min(1,(pull*pull+pull*2)/3);
@@ -79,6 +81,13 @@ public final class HandRenderer {
         }finally{GlStateManager.popMatrix();}
     }
     private static void base(int sign,float equip){GlStateManager.translate(sign*.56F,-.52F-equip*.6F,-.72F);}
+    /** Original 1.21.5+ non-shield BLOCK transform, after the normal arm offset. */
+    public static void blockTransform(int sign) {
+        GlStateManager.translate(sign*-.14142136F,.08F,.14142136F);
+        GlStateManager.rotate(-102.25F,1,0,0);
+        GlStateManager.rotate(sign*13.365F,0,1,0);
+        GlStateManager.rotate(sign*78.05F,0,0,1);
+    }
     private static void arm(int sign,float equip,float swing){
         Minecraft mc=Minecraft.getMinecraft();float root=MathHelper.sqrt_float(swing),wave=MathHelper.sin(root*(float)Math.PI);
         GlStateManager.translate(sign*(-.3F*wave+.64000005F),.4F*MathHelper.sin(root*(float)Math.PI*2)-.6F-equip*.6F,-.4F*MathHelper.sin(swing*(float)Math.PI)-.71999997F);

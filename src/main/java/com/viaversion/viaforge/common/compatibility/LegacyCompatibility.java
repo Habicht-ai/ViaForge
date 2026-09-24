@@ -7,7 +7,7 @@ import static com.viaversion.viaforge.common.compatibility.ClientRule.*;
 /** Existing releases composed from a baseline and only the changes at each boundary. */
 final class LegacyCompatibility {
     static CompatibilityRegistry create() {
-        VersionRules v19=VersionRules.NATIVE.derive().content(107).enable(ClientFeature.BLOCKS,ClientFeature.ITEMS,ClientFeature.ENTITY_VISUALS,ClientFeature.MOBS,ClientFeature.TWO_HANDS,ClientFeature.BOATS,ClientFeature.COMBAT,ClientFeature.COOLDOWNS,ClientFeature.ELYTRA).rule(CLIENT_ENTITY_PUSH,true).rule(SMALL_MOTION_THRESHOLD,true).rule(EARLY_POSITION_REMINDER,true).build();
+        VersionRules v19=VersionRules.NATIVE.derive().content(107).enable(ClientFeature.BLOCKS,ClientFeature.ITEMS,ClientFeature.ENTITY_VISUALS,ClientFeature.MOBS,ClientFeature.TWO_HANDS,ClientFeature.BOATS,ClientFeature.COMBAT,ClientFeature.COOLDOWNS,ClientFeature.ELYTRA).rule(MODERN_THIN_COLLISIONS,true).rule(CLIENT_ENTITY_PUSH,true).rule(SMALL_MOTION_THRESHOLD,true).rule(EARLY_POSITION_REMINDER,true).build();
         VersionRules v110=v19.derive().content(210).rule(CRYSTAL_BEAM_OFFSET,true).build();
         VersionRules v111=v110.derive().content(315).enable(ClientFeature.TOTEM).rule(EXTENDED_GATEWAY_BEAM,true).rule(INTERPOLATED_GATEWAY_COOLDOWN,true).rule(COMBAT_CURSE_BOOKS,true).rule(NAMESPACED_ENTITY_IDS,true).rule(EXCLUSIVE_TURN_PADDLES,true).rule(COLORED_SHULKERS,true).build();
         VersionRules v1111=v111.derive().content(316).rule(ELYTRA_FIREWORKS,true).rule(REVERSED_DRAGON_HEAD_ITEM,true).rule(MODERN_ATTACK_ICON,true).build();
@@ -18,12 +18,12 @@ final class LegacyCompatibility {
             profiles.add(new CompatibilityProfile(wire.protocol(),rules,ResourceProfile.legacy(wire.resourceVersion()),new LegacyProtocolAdapter.Factory(wire)));
         }
         int[] flattened={393,401,404};String[] resources={"1.13","1.13.1","1.13.2"};
-        VersionRules v113=v112.derive().rule(SWIMMING,true).rule(BIOME_WATER_COLORS,true).build();
+        VersionRules v113=v112.derive().rule(MODERN_BLOCK_USE_FAILURE,true).rule(SWIMMING,true).rule(BIOME_WATER_COLORS,true).build();
         VersionRules v1131=v113.derive().rule(PREDICT_HOTBAR_DROPS,true).build();
         for(int i=0;i<flattened.length;i++)profiles.add(new CompatibilityProfile(flattened[i],i==0?v113:v1131,
                 new ResourceProfile(resources[i],com.viaversion.viaforge.blocks.resources.FlattenedResourceConverter::convert),new FlattenedProtocolAdapter.Factory(flattened[i])));
         int[] village={477,480,485,490,498};String[] villageResources={"1.14","1.14.1","1.14.2","1.14.3","1.14.4"};
-        VersionRules v114=v1131.derive().rule(SHIFT_SWIM_INPUT,true).rule(DOUBLE_SWIM_INPUT,true).rule(SLEEPING_PUSH_IMMUNITY,true).rule(CRAWLING_POSE,true).build();
+        VersionRules v114=v1131.derive().rule(JUMP_CLIMBING,true).rule(SHIFT_SWIM_INPUT,true).rule(DOUBLE_SWIM_INPUT,true).rule(SLEEPING_PUSH_IMMUNITY,true).rule(CRAWLING_POSE,true).build();
         for(int i=0;i<village.length;i++)profiles.add(new CompatibilityProfile(village[i],v114,
                 new ResourceProfile(villageResources[i],com.viaversion.viaforge.blocks.resources.VillageResourceConverter::convert),new FlattenedProtocolAdapter.Factory(village[i])));
         int[] buzzy={573,575,578};String[] buzzyResources={"1.15","1.15.1","1.15.2"};
@@ -63,7 +63,7 @@ final class LegacyCompatibility {
         VersionRules v1212=v121.derive().rule(DEFERRED_BLOCK_EFFECTS,true).rule(TICKED_ELYTRA_WINGS,true).rule(FIXED_CRAWLING_HEAD,true).build();
         profiles.add(new CompatibilityProfile(768,v1212,new ResourceProfile("1.21.3",com.viaversion.viaforge.blocks.resources.EquipmentResourceConverter::convert),new FlattenedProtocolAdapter.Factory(768)));
         profiles.add(new CompatibilityProfile(769,v1212,new ResourceProfile("1.21.4",com.viaversion.viaforge.blocks.resources.EquipmentResourceConverter::convert),new FlattenedProtocolAdapter.Factory(769)));
-        VersionRules v1215=v1212.derive().rule(SQUARE_SWIM_INPUT,true).rule(HORIZONTAL_MOTION_THRESHOLD,true).rule(INDIVIDUAL_EGG_MODELS,true).rule(LIMITED_INVENTORY_FLIGHT_YAW,true).build();
+        VersionRules v1215=v1212.derive().rule(COMPONENT_BLOCKING,true).rule(SQUARE_SWIM_INPUT,true).rule(HORIZONTAL_MOTION_THRESHOLD,true).rule(INDIVIDUAL_EGG_MODELS,true).rule(LIMITED_INVENTORY_FLIGHT_YAW,true).build();
         profiles.add(new CompatibilityProfile(770,v1215,new ResourceProfile("1.21.5",com.viaversion.viaforge.blocks.resources.SpringResourceConverter::convert),new FlattenedProtocolAdapter.Factory(770)));
         profiles.add(new CompatibilityProfile(771,v1215,new ResourceProfile("1.21.6",com.viaversion.viaforge.blocks.resources.SpringResourceConverter::convert),new FlattenedProtocolAdapter.Factory(771)));
         profiles.add(new CompatibilityProfile(772,v1215,new ResourceProfile("1.21.8",com.viaversion.viaforge.blocks.resources.SpringResourceConverter::convert),new FlattenedProtocolAdapter.Factory(772)));

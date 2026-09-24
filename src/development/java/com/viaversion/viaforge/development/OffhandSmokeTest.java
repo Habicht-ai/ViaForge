@@ -90,7 +90,8 @@ final class OffhandSmokeTest {
             Offhand.context=-1;handler.addToSendQueue(new C15PacketClientSettings("en_US",8,net.minecraft.entity.player.EntityPlayer.EnumChatVisibility.FULL,true,127));
             wire(profile,client,(C17PacketCustomPayload)sent.remove(0),"CLIENT_INFORMATION",b->{require(Types.STRING.read(b).equals("en_US")&&b.readByte()==8&&Types.VAR_INT.readPrimitive(b)==0&&b.readBoolean()&&b.readUnsignedByte()==127&&Types.VAR_INT.readPrimitive(b)==1,"Native settings preserve skin/chat and right mainhand");});
             wire(profile,client,HandPackets.wrapped(new C15PacketClientSettings("de_DE",6,net.minecraft.entity.player.EntityPlayer.EnumChatVisibility.HIDDEN,false,63),0),"CLIENT_INFORMATION",b->{Types.STRING.read(b);b.readByte();Types.VAR_INT.readPrimitive(b);b.readBoolean();b.readByte();require(Types.VAR_INT.readPrimitive(b)==0,"Left mainhand reaches target server");});
-            Offhand.swingHand=1;handler.addToSendQueue(new C0APacketAnimation());require(Offhand.swingHand==0&&sent.remove(0) instanceof C0APacketAnimation,"Native mining/attack swings return to mainhand");
+            Offhand.swingHand=1;handler.addToSendQueue(new C0APacketAnimation());require(Offhand.swingHand==0&&sent.size()==1&&sent.get(0) instanceof C17PacketCustomPayload,"Native mining/attack swings return to mainhand immediately");
+            wire(profile,client,(C17PacketCustomPayload)sent.remove(0),"SWING",b->require(Types.VAR_INT.readPrimitive(b)==0,"Mainhand swing reaches the server without a following movement packet"));
         }finally{Offhand.context=before;}
     }
     private static void hold(ItemStack stack){Minecraft mc=Minecraft.getMinecraft();mc.thePlayer.inventory.mainInventory[mc.thePlayer.inventory.currentItem]=stack;}

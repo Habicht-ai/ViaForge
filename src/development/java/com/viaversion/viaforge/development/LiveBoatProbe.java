@@ -143,14 +143,31 @@ public final class LiveBoatProbe {
                 }
                 LiveHotbarActions.act(action,actionTick);
                 String keys=sequenceInput(action,actionTick);
+                // Camera input only; the original tick emits movement/use packets.
+                if(keys.contains("turn"))mc.thePlayer.setAngles(10F,0F);
                 key(mc.gameSettings.keyBindForward,keys.contains("forward"));key(mc.gameSettings.keyBindBack,keys.contains("back"));
                 key(mc.gameSettings.keyBindLeft,keys.contains("left"));key(mc.gameSettings.keyBindRight,keys.contains("right"));
                 key(mc.gameSettings.keyBindSneak,action.equals("dismount")||keys.contains("sneak"));
                 key(mc.gameSettings.keyBindSprint,keys.contains("sprint"));key(mc.gameSettings.keyBindJump,keys.contains("jump"));
+                if("1".equals(System.getenv("VIAFORGE_INTERACTION_PROBE"))) {
+                    if(keys.contains("photo")&&actionTick==30)net.minecraft.util.ScreenShotHelper.saveScreenshot(folder.toFile(),"blocking-"+tick+".png",mc.displayWidth,mc.displayHeight,mc.getFramebuffer());
+                    for(net.minecraft.client.settings.KeyBinding binding:new net.minecraft.client.settings.KeyBinding[]{mc.gameSettings.keyBindUseItem,mc.gameSettings.keyBindAttack}) {
+                        boolean down=keys.contains(binding==mc.gameSettings.keyBindUseItem?"use":"attack");
+                        if(down&&!binding.isKeyDown())net.minecraft.client.settings.KeyBinding.onTick(binding.getKeyCode());
+                        key(binding,down);
+                    }
+                }
             }
             JsonObject j=new JsonObject();j.addProperty("phase",event.phase.toString());j.addProperty("action",action);j.addProperty("action_tick",actionTick);
             j.addProperty("player_tick",mc.thePlayer.ticksExisted);j.addProperty("gamemode",mc.playerController.getCurrentGameType().toString());
             j.addProperty("player_x",mc.thePlayer.posX);j.addProperty("player_y",mc.thePlayer.posY);j.addProperty("player_z",mc.thePlayer.posZ);
+            if("1".equals(System.getenv("VIAFORGE_INTERACTION_PROBE"))) {
+                j.addProperty("using_item",mc.thePlayer.isUsingItem());j.addProperty("ladder",mc.thePlayer.isOnLadder());
+                j.addProperty("use_ticks",mc.thePlayer.getItemInUseCount());
+                j.addProperty("hit",String.valueOf(mc.objectMouseOver));
+                j.addProperty("held",String.valueOf(mc.thePlayer.getHeldItem()));
+                if(tick%20==0)j.addProperty("held_nbt",String.valueOf(mc.thePlayer.getHeldItem()==null?null:mc.thePlayer.getHeldItem().getTagCompound()));
+            }
             if("1".equals(System.getenv("VIAFORGE_HOTBAR_PROBE")))LiveHotbarActions.observe(j);
             if("1".equals(System.getenv("VIAFORGE_SWIM_PROBE"))) {
                 j.addProperty("loaded",mc.theWorld.isBlockLoaded(new net.minecraft.util.BlockPos(mc.thePlayer)));

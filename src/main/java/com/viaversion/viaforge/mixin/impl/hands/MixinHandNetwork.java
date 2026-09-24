@@ -16,7 +16,10 @@ public abstract class MixinHandNetwork {
         if(packet instanceof C0APacketAnimation && Offhand.localUseSwing()){ci.cancel();return;}
         if(packet instanceof C15PacketClientSettings){((NetHandlerPlayClient)(Object)this).addToSendQueue(HandPackets.wrapped(packet,Offhand.mainLeft()?0:1));ci.cancel();return;}
         if(packet instanceof C0APacketAnimation)Offhand.swingHand=Math.max(0,Offhand.context);
-        boolean use=Offhand.context>=0&&(packet instanceof C08PacketPlayerBlockPlacement||packet instanceof C02PacketUseEntity||packet instanceof C0APacketAnimation);
+        // Modern clicks already choose their original swing/attack order. Route
+        // every swing through the hand path immediately: ViaRewind's legacy
+        // animation queue otherwise waits for movement, after sneak/sprint input.
+        boolean use=packet instanceof C0APacketAnimation||Offhand.context>=0&&(packet instanceof C08PacketPlayerBlockPlacement||packet instanceof C02PacketUseEntity);
         boolean inventory=packet instanceof C0EPacketClickWindow && ((C0EPacketClickWindow)packet).getWindowId()==0;
         boolean creative=packet instanceof C10PacketCreativeInventoryAction && ((C10PacketCreativeInventoryAction)packet).getSlotId()==45;
         if(use||inventory||creative){((NetHandlerPlayClient)(Object)this).addToSendQueue(HandPackets.wrapped(packet,Math.max(0,Offhand.context)));ci.cancel();}

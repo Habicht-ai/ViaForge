@@ -27,7 +27,9 @@ def command(folder, port, name=None):
     classes=lab.REPO/'build/native-push/classes';classes.mkdir(parents=True,exist_ok=True)
     javac=Path(lab.java({'java':21})).with_name('javac.exe')
     subprocess.run([str(javac),'--release','17','-cp',os.pathsep.join(map(str,[asm,gson])),'-d',str(classes),str(lab.HERE/'native-probe/NativePushProbe.java')],check=True,creationflags=lab.NO_WINDOW)
-    agent=lab.REPO/'build/libs/ViaForgeLab-NativePushProbe-1.0.0.jar'
+    # Each running original client owns its observer JAR (Windows keeps loaded
+    # agent archives open); a second player must not rewrite the first one's JAR.
+    agent=folder/'ViaForgeLab-NativePushProbe-1.0.0.jar'
     with zipfile.ZipFile(agent,'w',zipfile.ZIP_DEFLATED) as jar:
         jar.writestr('META-INF/MANIFEST.MF','Manifest-Version: 1.0\nPremain-Class: viaforge.lab.NativePushProbe\n\n')
         with zipfile.ZipFile(asm) as dep:

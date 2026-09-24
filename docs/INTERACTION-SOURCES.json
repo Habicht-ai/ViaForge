@@ -1,0 +1,76 @@
+{
+  "1.9": {
+    "client": {
+      "sha1": "2f67dfe8953299440d1902f9124f0f2c3a2c940f",
+      "size": 8697592,
+      "url": "https://piston-data.mojang.com/v1/objects/2f67dfe8953299440d1902f9124f0f2c3a2c940f/client.jar"
+    },
+    "client_sha256": "0273b5c79d6b96799c6480ae61366d6b1d042655970de87f77f1a3f1ebea9307",
+    "classes": [
+      "akb.class",
+      "amk.class",
+      "apg.class",
+      "apm.class",
+      "bcf.class"
+    ]
+  },
+  "1.9.4": {
+    "client": {
+      "sha1": "4a61c873be90bb1196d68dac7b29870408c56969",
+      "size": 8736083,
+      "url": "https://piston-data.mojang.com/v1/objects/4a61c873be90bb1196d68dac7b29870408c56969/client.jar"
+    },
+    "classes": [
+      "akb.class",
+      "akg.class",
+      "akv.class",
+      "amk.class",
+      "anx.class",
+      "apg.class",
+      "apm.class"
+    ],
+    "client_sha256": "23e90103a1ca2ac71100004c6d5846de09f85695f579843ef8da41571e60c908"
+  },
+  "1.13.2": {
+    "client": {
+      "sha1": "30bfe37a8db404db11c7edf02cb5165817afb4d9",
+      "size": 16089640,
+      "url": "https://piston-data.mojang.com/v1/objects/30bfe37a8db404db11c7edf02cb5165817afb4d9/client.jar"
+    },
+    "sha256": "3410887ba652f25792c7675bfaf9140e73b60e93cfbf113a803f8a98cb05c0f9",
+    "classes": [
+      "afa.class"
+    ]
+  },
+  "1.14": {
+    "client": {
+      "sha1": "7a762a59345c13af7d87111207a93f5a8607f6c0",
+      "size": 18796546,
+      "url": "https://piston-data.mojang.com/v1/objects/7a762a59345c13af7d87111207a93f5a8607f6c0/client.jar"
+    },
+    "sha256": "93907cbf0655aa5f10d049efa4d745f4250eecc5d0d5d1268046eec3144f323a",
+    "classes": [
+      "aio.class"
+    ]
+  },
+  "26.2": {
+    "version": "26.2",
+    "client_sha256": "40896ee9f1e2bec3c934daac7e93d41e9e3d9c2f8ae0ca366d52ffbfd1afa290",
+    "client": {
+      "sha1": "2dc72797acbc1b63fc16a11c4ac393605f453754",
+      "size": 39193383,
+      "url": "https://piston-data.mojang.com/v1/objects/2dc72797acbc1b63fc16a11c4ac393605f453754/client.jar"
+    },
+    "agent_sha256": "2b3b5335ea144f3e07ca5498fa3cc4d5af88dcc14b0a9b0651c78fee71ea8e06",
+    "classes": [
+      "net\\minecraft\\client\\KeyMapping.java",
+      "net\\minecraft\\client\\multiplayer\\ClientPacketListener.java",
+      "net\\minecraft\\client\\multiplayer\\MultiPlayerGameMode.java",
+      "net\\minecraft\\world\\entity\\LivingEntity.java",
+      "net\\minecraft\\world\\item\\Item.java",
+      "net\\minecraft\\world\\item\\ItemStack.java",
+      "net\\minecraft\\world\\level\\block\\LadderBlock.java",
+      "net\\minecraft\\world\\level\\block\\LilyPadBlock.java"
+    ]
+  }
+}

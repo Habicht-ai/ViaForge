@@ -33,6 +33,10 @@ public final class ComponentItemSnapshot {
             CompoundTag snapshot=new CompoundTag();snapshot.put("item",new ByteArrayTag(encoded));snapshot.putInt("format",format);
             Integer stack=data.get(StructuredDataKey.MAX_STACK_SIZE),damage=data.get(StructuredDataKey.MAX_DAMAGE);
             if(stack!=null)snapshot.putInt("stack",stack);if(damage!=null)snapshot.putInt("damage",damage);
+            // Interpret the original patch before Via removes modern use components.
+            // Server-side ViaVersion uses blocks_attacks to restore sword blocking.
+            if(format>=770&&data.get(format>=775?StructuredDataKey.BLOCKS_ATTACKS26_1:StructuredDataKey.BLOCKS_ATTACKS1_21_5)!=null
+                    &&data.get(StructuredDataKey.CONSUMABLE1_21_2)==null) snapshot.putByte("blocking",(byte)1);
             return snapshot;
         }catch(Exception error){throw new IllegalStateException("Cannot retain original item components",error);}
         finally{bytes.release();}

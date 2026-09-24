@@ -1,0 +1,153 @@
+{
+  "1.21.4": {
+    "client": "run\\ViaForge\\block-assets\\1.21.4-client.jar",
+    "sha256": "c17c450c6e72cc51297daa57ce38f800aa01cf022b743daa21a0512d326d894e",
+    "block_transform_classes": [
+      "glt.class"
+    ],
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/c16bd1251bdf2cab3d7c3b30393427eeb19c6b2e/1.21.4.json",
+    "download": {
+      "sha1": "a7e5a6024bfd3cd614625aa05629adf760020304",
+      "size": 28335587,
+      "url": "https://piston-data.mojang.com/v1/objects/a7e5a6024bfd3cd614625aa05629adf760020304/client.jar"
+    }
+  },
+  "1.21.5": {
+    "client": "run\\ViaForge\\block-assets\\1.21.5-client.jar",
+    "sha256": "522672ad20b460c02c2e39b6c5035ef6a849af28eb11ab2ac7eb293d395a8c11",
+    "block_transform_classes": [
+      "grg.class"
+    ],
+    "metadata_url": "https://piston-meta.mojang.com/v1/packages/085c81eae857c821a14d1694519a0f6569a00427/1.21.5.json",
+    "download": {
+      "sha1": "b88808bbb3da8d9f453694b5d8f74a3396f1a533",
+      "size": 28984409,
+      "url": "https://piston-data.mojang.com/v1/objects/b88808bbb3da8d9f453694b5d8f74a3396f1a533/client.jar"
+    }
+  },
+  "26.2": {
+    "version": "26.2",
+    "client_sha256": "40896ee9f1e2bec3c934daac7e93d41e9e3d9c2f8ae0ca366d52ffbfd1afa290",
+    "client": {
+      "sha1": "2dc72797acbc1b63fc16a11c4ac393605f453754",
+      "size": 39193383,
+      "url": "https://piston-data.mojang.com/v1/objects/2dc72797acbc1b63fc16a11c4ac393605f453754/client.jar"
+    },
+    "agent_sha256": "1b2fe0a3b42bac08f4e49032fef5927d6f2309da05e6df71bce6a2c84d8784c8"
+  },
+  "classes": {
+    "1.21.4\\glt.java": "94ec1ef8e83757e6c163a58235927417c3483f955dac908fc6b67788fbf9d75a",
+    "1.21.5\\grg.java": "b4b4dd12cfdfa5315a055c01e7f69f776da197df662a1e6ca6f7553bdef222d9",
+    "com\\viaversion\\viabackwards\\protocol\\v1_21to1_20_5\\Protocol1_21To1_20_5.java": "a8d711ca9e15ea9ddcc1ee633384dd69722e98bbde8328a13fae57ebec6b5f2f",
+    "com\\viaversion\\viabackwards\\protocol\\v1_21to1_20_5\\rewriter\\BlockItemPacketRewriter1_21.java": "c461d3f4aa8c605638c7ea73aec963a1a23e4d68786a738e87911fb7ef8e96d0",
+    "com\\viaversion\\viabackwards\\protocol\\v1_21to1_20_5\\rewriter\\EntityPacketRewriter1_21.java": "44b012dbcf27826249e96c94604973ae0612ccd2796fba4d8c27a92a6645a1e8",
+    "com\\viaversion\\viabackwards\\protocol\\v1_21to1_20_5\\storage\\PlayerRotationStorage.java": "f6aefb9ad788bf7185ece59b523443aacd5b72d6e1acc771b9acd41c7db5c750",
+    "net\\minecraft\\client\\Minecraft.java": "ca7ff448000327937a518e7921525fbfe1e2bc4f4658296d2dae03a5ab40212c",
+    "net\\minecraft\\client\\Screenshot.java": "e2468d5a9fe05601a07ae13a60a7ab860f1b48ae0e158be01cfca316e60b8366",
+    "net\\minecraft\\client\\multiplayer\\MultiPlayerGameMode.java": "25b54f969a93f860dede969efd3f60dfcc5ca7fbe5fb110ce0dc9bc61244d3a4",
+    "net\\minecraft\\client\\renderer\\ItemInHandRenderer.java": "4a3d359c9f2a5eb4d65304074972efa8b5272a7bc9ee1413903a581867980af0",
+    "1.12.2\\bib.java": "aed39ab84a6473f481b46be6eca3a9cea22723c0588fb5521977affa376a2ac1",
+    "1.12.2\\bsa.java": "648a2ad99a6a2bd2d31b4964b0edfba930bd3529d2a1509f74acc769e8fe136c",
+    "1.13\\cfi.java": "d317bc8980dbb50f079565c10bdb6728c81ab7c63b6cdc2cac45e3047195568e",
+    "1.13\\cqu.java": "4f902d1d8b20ed8fe9272f3ac8565702bd78499e42e12c081a6c7a4330ec947d",
+    "1.14\\cvi.java": "883ea929cb4e2f2cb08ba00eedb3e21c04ebbda2386f7878a6b201cc56a81438",
+    "1.18.2\\bta.java": "98c039bf474d17cacd75e1f17cc4fb8e45529df582da732028a87bebfb3315ad",
+    "1.18.2\\dyr.java": "ed8c0f514847efcd224942818c0aa84e1cb5bddbaf726cfb8fa2719555c660c4",
+    "1.18.2\\emv.java": "45f0f1297f9ddd16a8869aef1945950ad4bd3eae85c66f792788605495a828de",
+    "1.19\\bya.java": "c36b0eb4e995a298c278186a4f81fa488c26381802f488ecc8130b3d75a92d46",
+    "1.19\\eev.java": "a1e396316360e1aa2d895623a51282569499c1320e1935ce45dafc7310c6fd17",
+    "1.19\\etp.java": "de09a3f4455a5417148347181ac9bbd6602f7153bf102ad1ef64a4bef6e3fcf3",
+    "1.21.1\\cso.java": "b7d0a857145068f7d5e5e7563857e56aff62336b2664eb18a81771558291ca46",
+    "1.21.1\\fgo.java": "b4f3c2b505a5ef292e74e9a624579805edf3ac7bb89e51d0104565d70c2aa551",
+    "1.21.1\\fzo.java": "f4dd04b4f051506a44b7816df39df82bfe9de6514c0d8f340370c772b52af22d",
+    "1.9\\bkt.java": "67ba15f422f96f3f0828015a447edffc9d2e042e44fc5ad537286476388797ef",
+    "net\\minecraft\\item\\ItemBlock.java": "881264c62ff9fd35cd7acb000845881032f8e78ea464de4016e6b124f7c959c5",
+    "net\\minecraft\\client\\multiplayer\\PlayerControllerMP.java": "f65293fe527ed934005c7c840d4894d92a8955fa648c8e24b12f9c508494a754"
+  },
+  "placement_boundaries": {
+    "1.18.2": {
+      "client": "run\\ViaForge\\block-assets\\1.18.2-client.jar",
+      "sha256": "1d09e3639644b6b2254499469d0765cc005a286d19f3fa595b0ed8fb07971ec7",
+      "download": {
+        "sha1": "2e9a3e3107cca00d6bc9c97bf7d149cae163ef21",
+        "size": 20259661,
+        "url": "https://piston-data.mojang.com/v1/objects/2e9a3e3107cca00d6bc9c97bf7d149cae163ef21/client.jar"
+      },
+      "classes": {
+        "net.minecraft.client.Minecraft": "dyr",
+        "net.minecraft.client.multiplayer.MultiPlayerGameMode": "emv",
+        "net.minecraft.world.item.BlockItem": "bta"
+      }
+    },
+    "1.19": {
+      "client": "run\\ViaForge\\block-assets\\1.19-client.jar",
+      "sha256": "ffd4fb3037d4110085b4d3d2dc47b760695528eb14292c3e5f7c758983c6d764",
+      "download": {
+        "sha1": "c0898ec7c6a5a2eaa317770203a1554260699994",
+        "size": 21462385,
+        "url": "https://piston-data.mojang.com/v1/objects/c0898ec7c6a5a2eaa317770203a1554260699994/client.jar"
+      },
+      "classes": {
+        "net.minecraft.client.Minecraft": "eev",
+        "net.minecraft.client.multiplayer.MultiPlayerGameMode": "etp",
+        "net.minecraft.world.item.BlockItem": "bya"
+      }
+    },
+    "1.21.1": {
+      "client": "run\\ViaForge\\block-assets\\1.21.1-client.jar",
+      "sha256": "499f6897d1837516680f3114072d8106e11c9adcd933fe5cf051b551089b0c99",
+      "download": {
+        "sha1": "30c73b1c5da787909b2f73340419fdf13b9def88",
+        "size": 26836906,
+        "url": "https://piston-data.mojang.com/v1/objects/30c73b1c5da787909b2f73340419fdf13b9def88/client.jar"
+      },
+      "classes": {
+        "net.minecraft.client.Minecraft": "fgo",
+        "net.minecraft.client.multiplayer.MultiPlayerGameMode": "fzo",
+        "net.minecraft.world.item.BlockItem": "cso"
+      }
+    },
+    "1.9": {
+      "client": "run\\ViaForge\\block-assets\\1.9-client.jar",
+      "sha256": "0273b5c79d6b96799c6480ae61366d6b1d042655970de87f77f1a3f1ebea9307",
+      "download": {
+        "sha1": "2f67dfe8953299440d1902f9124f0f2c3a2c940f",
+        "size": 8697592,
+        "url": "https://piston-data.mojang.com/v1/objects/2f67dfe8953299440d1902f9124f0f2c3a2c940f/client.jar"
+      },
+      "metadata_url": "https://piston-meta.mojang.com/v1/packages/9178828493e41a24452841039710f05728c466d6/1.9.json",
+      "classes": [
+        "bkt",
+        "bcf"
+      ]
+    },
+    "1.12.2": {
+      "client": "run\\ViaForge\\block-assets\\1.12.2-client.jar",
+      "sha256": "8ada07da5ee77dad3527bd7278fbd05ee1fc8a597813b216a871a2d7d64cc64f",
+      "download": {
+        "sha1": "0f275bc1547d01fa5f56ba34bdc87d981ee12daf",
+        "size": 10180113,
+        "url": "https://piston-data.mojang.com/v1/objects/0f275bc1547d01fa5f56ba34bdc87d981ee12daf/client.jar"
+      },
+      "metadata_url": "https://piston-meta.mojang.com/v1/packages/832d95b9f40699d4961394dcf6cf549e65f15dc5/1.12.2.json",
+      "classes": [
+        "bsa",
+        "bib"
+      ]
+    },
+    "1.13": {
+      "client": "run\\ViaForge\\block-assets\\1.13-client.jar",
+      "sha256": "d807a5ed9428b6c16b64888fd2b7fa76dcf5c55d06f96f7c0c47762c3fc3e26e",
+      "download": {
+        "sha1": "c0b970952cdd279912da384cdbfc0c26e6c6090b",
+        "size": 16033625,
+        "url": "https://piston-data.mojang.com/v1/objects/c0b970952cdd279912da384cdbfc0c26e6c6090b/client.jar"
+      },
+      "metadata_url": "https://piston-meta.mojang.com/v1/packages/c24c2fd37c8ca2e1c18721e2c77caf4d24c87f92/1.13.json",
+      "classes": [
+        "cqu",
+        "cfi"
+      ]
+    }
+  }
+}

@@ -101,9 +101,21 @@ public final class NativePushProbe {
             if(!end){
                 ticks++;Object options=field(mc,"options");
                 String keys=sequenceInput(action,actionTick);
+                if(keys.contains("turn"))player.getClass().getMethod("turn",double.class,double.class).invoke(player,10D,0D);
+                if(keys.contains("photo")&&actionTick==30)Class.forName("net.minecraft.client.Screenshot").getMethod("grab",java.io.File.class,String.class,Class.forName("com.mojang.blaze3d.pipeline.RenderTarget"),int.class,java.util.function.Consumer.class)
+                    .invoke(null,directory.toFile(),"blocking-"+ticks+".png",call(field(mc,"gameRenderer"),"mainRenderTarget"),1,(java.util.function.Consumer<Object>)(message)->{});
                 key(options,"keyUp",keys.contains("forward"));key(options,"keyDown",keys.contains("back"));
                 key(options,"keyLeft",keys.contains("left"));key(options,"keyRight",keys.contains("right"));
                 key(options,"keyShift",keys.contains("sneak"));key(options,"keyJump",keys.contains("jump"));key(options,"keySprint",keys.contains("sprint"));
+                if("1".equals(System.getenv("VIAFORGE_INTERACTION_PROBE"))) {
+                    for(String n:new String[]{"keyUse","keyAttack"}) {
+                        Object binding=field(options,n);boolean down=keys.contains(n.equals("keyUse")?"use":"attack");
+                        if(down&&!(Boolean)call(binding,"isDown")) {
+                            Field f=Class.forName("net.minecraft.client.KeyMapping").getDeclaredField("clickCount");f.setAccessible(true);f.setInt(binding,f.getInt(binding)+1);
+                        }
+                        key(options,n,down);
+                    }
+                }
             }
             Map<String,Object> j=new LinkedHashMap<>();j.put("time_ms",System.currentTimeMillis());j.put("tick",ticks);j.put("phase",end?"END":"START");j.put("action",action);j.put("action_tick",actionTick);
             double x=(Double)call(player,"getX"),y=(Double)call(player,"getY"),z=(Double)call(player,"getZ");
@@ -111,6 +123,11 @@ public final class NativePushProbe {
             Object velocity=call(player,"getDeltaMovement");j.put("player_vx",field(velocity,"x"));j.put("player_vy",field(velocity,"y"));j.put("player_vz",field(velocity,"z"));
             j.put("player_ground",call(player,"onGround"));j.put("player_spectator",call(player,"isSpectator"));
             j.put("player_alive",call(player,"isAlive"));j.put("player_health",call(player,"getHealth"));
+            if("1".equals(System.getenv("VIAFORGE_INTERACTION_PROBE"))) {
+                j.put("using_item",call(player,"isUsingItem"));j.put("ladder",call(player,"onClimbable"));
+                j.put("use_ticks",call(player,"getUseItemRemainingTicks"));j.put("hit",String.valueOf(field(mc,"hitResult")));
+                j.put("held",String.valueOf(call(player,"getMainHandItem")));
+            }
             if("1".equals(System.getenv("VIAFORGE_SWIM_PROBE"))) {
                 j.put("swimming",call(player,"isSwimming"));j.put("height",call(player,"getBbHeight"));
                 j.put("water",call(player,"isInWater"));j.put("eye_water",call(player,"isUnderWater"));

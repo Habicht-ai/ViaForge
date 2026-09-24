@@ -119,7 +119,9 @@ final class HandUseSmokeTest {
             p.onGround=false;wire.flag(p.getEntityId(),true,p.sendQueue);
             // A genuine attack still has its native network action, including 26.3.
             sent.clear();p.isSwingInProgress=false;p.swingItem();
-            require(sent.size()==1&&sent.get(0) instanceof C0APacketAnimation,"Use-only suppression does not remove native attacks");
+            require(sent.size()==1&&sent.get(0) instanceof C17PacketCustomPayload,"Use-only suppression does not remove native attacks");
+            net.minecraft.network.PacketBuffer attack=((C17PacketCustomPayload)sent.get(0)).getBufferData();
+            require(attack.getUnsignedByte(0)==3&&attack.getUnsignedByte(1)==0,"Attack swing takes immediate mainhand path");
         }finally{p.onGround=false;p.clearItemInUse();p.isSwingInProgress=false;p.swingProgress=p.prevSwingProgress=0;hold(oldMain);Offhand.set(oldOff);HandRenderer.clear();ServerItemCooldowns.clear();p.capabilities.isCreativeMode=creative;config.set(ViaForgeConfig.LEFT_MAIN_HAND,oldLeft);mc.objectMouseOver=oldHit;sent.clear();}
     }
     static void shields(List<Packet> sent,ElytraFlightSmokeTest.Wire wire)throws Exception {
@@ -174,8 +176,8 @@ final class HandUseSmokeTest {
             require(packet instanceof C17PacketCustomPayload,"Input emitted only hand-aware packets: "+packet);
             C17PacketCustomPayload custom=(C17PacketCustomPayload)packet;
             int operation=custom.getBufferData().getUnsignedByte(custom.getBufferData().readerIndex());
-            require(operation==1||operation==3,"Expected use/swing operation, got "+operation);
-            if(operation==1)uses++;else swings++;
+            require(operation==1||operation==7||operation==3,"Expected use/swing operation, got "+operation);
+            if(operation==3)swings++;else uses++;
             wire.use(custom,operation==3,hand);
         }
         require(uses==1&&swings==(swing?1:0),"Exactly one use and version-correct swing, no extra 26.3 attack: "+uses+"/"+swings);sent.clear();

@@ -596,6 +596,7 @@ final class FlattenedPipelineSmokeTest {
         });
     }
     private void events()throws Exception {
+        velocity();
         ByteBuf player=packet(ClientboundPackets1_13.ADD_PLAYER);Types.VAR_INT.writePrimitive(player,2);Types.UUID.write(player,new UUID(0,2));if(config)Types.VAR_INT.writePrimitive(player,wireEntity(com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13.EntityType.PLAYER.getId()));
         spawnCoordinates(player,1,65,2);player.writeByte(0).writeByte(0);if(config){objectData(player,0);spawnVelocity(player);}if(!bee)player.writeByte(255);receive(player);event(5).release();
         ByteBuf hand=packet(ClientboundPackets1_13.SET_ENTITY_DATA);Types.VAR_INT.writePrimitive(hand,2);
@@ -721,6 +722,30 @@ final class FlattenedPipelineSmokeTest {
         try{require(Types.VAR_INT.readPrimitive(attackData)==100,"Attack entity identity");if(!year26){require(Types.VAR_INT.readPrimitive(attackData)==1,"Attack action");if(nether)attackData.readBoolean();}require(!attackData.isReadable(),"Attack packet fully consumed");}finally{attackData.release();}
         ByteBuf source=BlockPipelineSmokeTest.packet(0x17);com.viaversion.viaforge.hands.HandPackets.action(6).writePacketData(new PacketBuffer(source));send(source);
         ByteBuf data=BlockPipelineSmokeTest.take(server,outgoing(ServerboundPackets1_13.PLAYER_ACTION));try{require(Types.VAR_INT.readPrimitive(data)==(wilderness?7:6),"Swap target action");positionType().read(data);data.readByte();if(wild)require(Types.VAR_INT.readPrimitive(data)==0,"Swap sequence");require(!data.isReadable(),"Swap target layout");}finally{data.release();}
+    }
+    private void velocity()throws Exception {
+        drain(client);
+        for(com.viaversion.viaversion.api.minecraft.Vector3d vector:new com.viaversion.viaversion.api.minecraft.Vector3d[]{
+                new com.viaversion.viaversion.api.minecraft.Vector3d(0,0,.3478),
+                new com.viaversion.viaversion.api.minecraft.Vector3d(4.25,-8.125,12.75),
+                com.viaversion.viaversion.api.minecraft.Vector3d.ZERO}) {
+            ByteBuf source=packet(ClientboundPackets1_13.SET_ENTITY_MOTION);Types.VAR_INT.writePrimitive(source,1);
+            int start=source.writerIndex();
+            if(copper)Types.LOW_PRECISION_VECTOR.write(source,vector);
+            else for(double value:new double[]{vector.x(),vector.y(),vector.z()})source.writeShort(com.viaversion.viabackwards.utils.VelocityUtil.toLegacyVelocity(value));
+            ByteBuf original=source.duplicate();original.readerIndex(start);
+            double[] expected=copper?null:new double[]{original.readShort()/8000D,original.readShort()/8000D,original.readShort()/8000D};
+            if(copper){com.viaversion.viaversion.api.minecraft.Vector3d value=Types.LOW_PRECISION_VECTOR.read(original);expected=new double[]{value.x(),value.y(),value.z()};}
+            receive(source);ByteBuf converted=client.readInbound();require(converted!=null,"Velocity reaches native queue");
+            try {
+                require(Types.VAR_INT.readPrimitive(converted)==(copper?0x3f:0x12),"Modern motion replaces the lossy legacy packet only since1.21.9");
+                if(copper){require("VF|entity".equals(Types.STRING.read(converted)),"Retained motion channel");require(ClientEventEnvelope.read(converted).operation==37,"Retained motion event");}
+                require(Types.VAR_INT.readPrimitive(converted)==1,"Motion retains entity ID");
+                for(double value:expected)require((copper?converted.readDouble():converted.readShort()/8000D)==value,"Exact decoded motion through full Via pipeline");
+                require(!converted.isReadable(),"Exact motion payload length");
+            } finally {converted.release();}
+            require(client.readInbound()==null,"One original velocity emits exactly one client update");
+        }
     }
     private net.minecraft.network.play.client.C17PacketCustomPayload useAtRotation(WorldClient world,int hand,float yaw,float pitch) {
         Minecraft mc=Minecraft.getMinecraft();net.minecraft.client.entity.EntityPlayerSP previous=mc.thePlayer;

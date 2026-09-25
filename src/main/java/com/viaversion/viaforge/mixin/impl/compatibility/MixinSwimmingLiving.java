@@ -28,6 +28,7 @@ public abstract class MixinSwimmingLiving {
     }
     @Inject(method="onLivingUpdate",at=@At("RETURN"))
     private void postTravelBubbles(org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
+        com.viaversion.viaforge.compatibility.ServerSurfacePhysics.afterTravel((EntityLivingBase)(Object)this);
         if(com.viaversion.viaforge.compatibility.ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.DEFERRED_BLOCK_EFFECTS))ServerSwimming.bubbles((EntityLivingBase)(Object)this);
     }
     @Redirect(method="updateFallState",at=@At(value="INVOKE",target="Lnet/minecraft/entity/EntityLivingBase;handleWaterMovement()Z"))

@@ -49,14 +49,15 @@ def assert_no_client():
         raise RuntimeError('Existing Minecraft client: ' + found)
 
 
-def run(version, label, client_type='viaforge', extended=False, baseline=False, reconnect=False, controls=False, scenario='boat', baseline_stage=None, world_template=None, swim_transitions=False, sneak_extended=False, sneak_attributes=False, sneak_swift=False, sneak_timing=False, interaction_backend=None, interaction_netty=False, interaction_player=False, interaction_rightclick=False):
+def run(version, label, client_type='viaforge', extended=False, baseline=False, reconnect=False, controls=False, scenario='boat', baseline_stage=None, world_template=None, swim_transitions=False, sneak_extended=False, sneak_attributes=False, sneak_swift=False, sneak_timing=False, interaction_backend=None, interaction_netty=False, interaction_player=False, interaction_rightclick=False, interaction_surfaces=False):
     assert_no_client()
     if scenario=='interaction':
         import interaction_probe
     target_row = next(r for r in lab.GRIM_VERSIONS if r['minecraft_version'] == version)
-    source_row = read_json(lab.ROOT/'interaction-platform-1.8.8/source-row.json') if interaction_backend=='1.8.8' else target_row
+    source_row = read_json(lab.ROOT/'interaction-platform-1.8.8/source-row.json') if interaction_backend=='1.8.8' else next(r for r in lab.GRIM_VERSIONS if r['minecraft_version']==interaction_backend) if interaction_backend else target_row
     backend_protocol=source_row['protocol']
-    if (client_type=='native' or extended or controls) and version!='1.12.2' and not (scenario in ('push','swim','sneak','interaction') and version=='26.2' and not extended and not controls):
+    native_edges117=client_type=='native' and version=='1.17.1' and interaction_surfaces=='edges'
+    if (client_type=='native' or extended or controls) and version!='1.12.2' and not native_edges117 and not (scenario in ('push','swim','sneak','interaction') and version=='26.2' and not extended and not controls):
         raise ValueError('Native/extended script is currently mapped to exact 1.12.2')
     folder = lab.ROOT / (scenario + '-' + version + '-' + label + '-' + str(time.time_ns()))
     folder.mkdir()
@@ -99,7 +100,7 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
         lab.save(folder/'netty-runtime.json',metadata)
     plugins = folder / 'plugins'
     plugins.mkdir()
-    if interaction_backend=='1.8.8':
+    if interaction_backend:
         via=lab.REPO/'build/inspection/interaction/platform/ViaVersion-5.12.0.jar'
         assert grim.digest(via)=='c4d512fa9760fa41d17abaedde12aa1f4c9bde920d0a992fe0fc016962f126be'
         shutil.copy2(via,plugins/via.name)
@@ -130,6 +131,10 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
              'generator-settings': '3;minecraft:bedrock,62*minecraft:stone;1;' if backend_protocol<393 else '',
              'allow-flight': 'true', 'allow-nether': 'false', 'spawn-protection': 0, 'max-players': 8,
              'motd': 'Isolated ViaForge boat diagnosis'}
+    relay_ms=int(os.environ.get('VIAFORGE_METADATA_RELAY_MS','0'))
+    if relay_ms:
+        if scenario!='interaction' or interaction_surfaces!='edges' or row['protocol']!=776:raise ValueError('Metadata relay requires explicit 26.2 edge diagnosis')
+        props['network-compression-threshold']=-1
     (folder / 'server.properties').write_text(''.join(f'{k}={v}\n' for k, v in props.items()))
     lab.save(folder / 'sources.json', dict(server=source_row, row=row, java=lab.java(source_row),
              paper_sha256=grim.digest(patched), grim_sha256=grim.digest(grim_jar), helper_sha256=grim.digest(helper)))
@@ -138,8 +143,9 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
         if p.exists(): shutil.copy2(p, folder / (p.name + '.before'))
     development=lab.REPO/'run/mods/ViaForge-development.jar'
     if baseline and scenario=='interaction':
-        old=lab.REPO/('build/backups/rightclick-20260924-initial/ViaForge-before-with-camera.jar' if baseline_stage=='rightclick' else 'build/backups/interaction-20260923-initial/ViaForge-initial-with-probe.jar')
+        old=lab.REPO/('build/backups/flight-edges-20260925-initial/ViaForge-before-edge-probe.jar' if baseline_stage=='edges' else 'build/backups/flight-surfaces-20260924-initial/ViaForge-before-with-probe-v3.jar' if baseline_stage=='surfaces' else 'build/backups/rightclick-20260924-initial/ViaForge-before-with-camera.jar' if baseline_stage=='rightclick' else 'build/backups/interaction-20260923-initial/ViaForge-initial-with-probe.jar')
         shutil.copy2(development,folder/'development-fixed.jar');shutil.copy2(old,development)
+        lab.save(folder/'baseline-classes.json',dict(source=str(old),source_sha256=grim.digest(old),description='Archived production baseline, input/observation probe only'))
     elif baseline and scenario=='sneak':
         old=lab.REPO/'build/backups/sneak-20260923-initial/ViaForge-initial-with-probe.jar'
         if not old.exists():raise RuntimeError('Explicit pre-sneak baseline archive missing')
@@ -171,14 +177,20 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
                     replaced[item.filename]=hashlib.sha256(data).hexdigest()
         lab.save(folder/'baseline-classes.json',dict(source=str(old),source_sha256=grim.digest(old),classes=replaced))
         shutil.copy2(folder/'development-baseline.jar',development)
-    server = client = companion = None
+    server = client = companion = relay = None
     companion_dir = None
     cases = []
-    report = dict(server=source_row, row=row, label=label, client=client_type, baseline=baseline, started=time.time(), cases=cases, completed=False, scenario=scenario,interaction_player=interaction_player,interaction_rightclick=interaction_rightclick,backend_protocol=backend_protocol,swim_transitions=swim_transitions,sneak_extended=sneak_extended,sneak_attributes=sneak_attributes,sneak_swift=sneak_swift,sneak_timing=sneak_timing)
+    report = dict(server=source_row, row=row, label=label, client=client_type, baseline=baseline, started=time.time(), cases=cases, completed=False, scenario=scenario,interaction_player=interaction_player,interaction_rightclick=interaction_rightclick,interaction_surfaces=interaction_surfaces,backend_protocol=backend_protocol,swim_transitions=swim_transitions,sneak_extended=sneak_extended,sneak_attributes=sneak_attributes,sneak_swift=sneak_swift,sneak_timing=sneak_timing)
     if scenario=='interaction':
         report['artifacts'] = dict(development_sha256=grim.digest(development),
             helper_sha256=grim.digest(helper), grim_sha256=grim.digest(grim_jar),
             paper_sha256=grim.digest(patched))
+        if interaction_backend:report['artifacts']['viaversion_sha256']=grim.digest(via)
+        if interaction_surfaces:
+            report['surface_probe_sources']={str(p.relative_to(lab.REPO)):grim.digest(p) for p in [
+                lab.HERE/'surface_probe.py',lab.HERE/'boat_probe.py',lab.HERE/'native-probe/NativePushProbe.java',
+                lab.REPO/'src/development/java/com/viaversion/viaforge/development/LiveBoatProbe.java']}
+            if interaction_surfaces=='edges':report['surface_probe_sources']['tools/test-servers/edge_probe.py']=grim.digest(lab.HERE/'edge_probe.py')
     client_dir = folder / client_type
     client_dir.mkdir()
     server_log = folder / 'server-console.log'
@@ -265,21 +277,35 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
             sneak_probe.fixture(console,row['protocol'],sneak_extended or sneak_swift=='water')
         if scenario=='interaction':
             import interaction_probe
-            if backend_protocol>=393:interaction_probe.fixture(console,backend_protocol)
+            if interaction_surfaces and row['protocol']>=393:
+                import surface_probe
+                surface_probe.fixture(console,backend_protocol)
+                if interaction_surfaces=='edges':
+                    import edge_probe
+                    edge_probe.fixture(console)
+            elif backend_protocol>=393:interaction_probe.fixture(console,backend_protocol)
         grim.control(row, 'on')
+        connect_port=row['port']
+        if relay_ms:
+            from metadata_relay import Relay
+            relay=Relay(folder,row['port'],relay_ms);connect_port=relay.port
+            report['network_diagnostic']=dict(kind='one delayed flight-end frame',milliseconds=relay_ms,source_sha256=grim.digest(lab.HERE/'metadata_relay.py'))
         env = dict(os.environ, VIAFORGE_NO_PAUSE='1', JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4',
                    VIAFORGE_PUSH_PROBE='1' if scenario in ('push','swim','sneak','interaction') else '0', VIAFORGE_SWIM_PROBE='1' if scenario in ('swim','sneak','interaction') else '0',
                    VIAFORGE_HOTBAR_PROBE='1' if scenario=='hotbar' else '0',
-                   VIAFORGE_BOAT_PROBE=str(client_dir), VIAFORGE_BOAT_PROTOCOL=str(row['protocol']), VIAFORGE_BOAT_PORT=str(row['port']))
+                   VIAFORGE_BOAT_PROBE=str(client_dir), VIAFORGE_BOAT_PROTOCOL=str(row['protocol']), VIAFORGE_BOAT_PORT=str(connect_port))
         if scenario in ('sneak','interaction'):env['VIAFORGE_SNEAK_PROBE']=str(client_dir)
         if scenario=='interaction':env['VIAFORGE_INTERACTION_PROBE']='1'
         for key in ('VIAFORGE_BLOCK_SMOKE_TEST', 'VIAFORGE_SMOKE_PROTOCOL', 'VIAFORGE_PROTOCOL_PROBE', 'VIAFORGE_LIVE_FLIGHT'):
             env.pop(key, None)
         with (client_dir / 'console.log').open('w') as log:
             if client_type=='native':
-                if scenario in ('push','swim','sneak','interaction') and version=='26.2':
+                if native_edges117:
+                    import native_117_probe
+                    launch=native_117_probe.command(client_dir,connect_port)
+                elif scenario in ('push','swim','sneak','interaction') and version=='26.2':
                     import native_push_probe
-                    launch=native_push_probe.command(client_dir,row['port'])
+                    launch=native_push_probe.command(client_dir,connect_port)
                 else:
                     import native_boat_probe
                     launch=native_boat_probe.command(client_dir,row['port'])
@@ -301,6 +327,9 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
                 boat_sources={str(p.relative_to(lab.REPO)):grim.digest(p) for p in [
                     lab.REPO/'src/main/java/com/viaversion/viaforge/boats/ServerBoat.java',
                     lab.REPO/'src/main/java/com/viaversion/viaforge/mixin/impl/boats/MixinBoatPlayer.java']})
+            if not baseline:
+                observers=['LiveBoatProbe.java','MovementTrace.java','mixin/MovementPacketProbe.java','mixin/MovementTransportProbe.java']
+                report['client_artifact']['observer_sources']={p:grim.digest(lab.REPO/'src/development/java/com/viaversion/viaforge/development'/p) for p in observers}
             if scenario=='push':
                 relative=['compatibility/ClientEntityPush.java','compatibility/ClientEntityMotion.java',
                           'common/compatibility/EntityPushRules.java','common/compatibility/EntityPositionRules.java',
@@ -320,6 +349,21 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
                           'items/ServerElytraFlight.java','mixin/impl/compatibility/MixinSwimmingInput.java',
                           'mixin/impl/compatibility/MixinSwimmingLiving.java']
                 report['client_artifact']['sneak_sources']={s:grim.digest(lab.REPO/'src/main/java/com/viaversion/viaforge'/s) for s in relative}
+            if interaction_surfaces and not baseline:
+                relative=['compatibility/ServerSurfacePhysics.java','blocks/ShulkerBlockEntity.java',
+                          'common/compatibility/OriginalLookMath.java','common/compatibility/ElytraPhysics.java',
+                          'common/compatibility/LegacyCompatibility.java','items/ServerElytraFlight.java',
+                          'items/ServerFireworks.java','compatibility/ServerSwimming.java','compatibility/ServerBubbleColumns.java',
+                          'compatibility/ClientPacketTasks.java','compatibility/ServerSession.java','common/compatibility/PacketTaskQueue.java',
+                          'common/compatibility/CompatibilityDecodeHandler.java','common/ViaForgeCommon.java',
+                          'common/compatibility/FlattenedProtocolAdapter.java','common/compatibility/VillageBlockData.java',
+                          'common/compatibility/OriginalVelocity.java','common/compatibility/ClientEventEnvelope.java','items/ServerEntityViews.java',
+                          'common/compatibility/SwimmingPackets.java',
+                          'mixin/impl/connect/MixinPacketTasks.java','mixin/impl/connect/MixinPacketTaskStage.java',
+                          'mixin/impl/connect/MixinConcurrentClientTasks.java',
+                          'mixin/impl/compatibility/MixinExpandedBlockRay.java',
+                          'mixin/impl/compatibility/MixinSurfaceMovement.java','mixin/impl/compatibility/MixinSwimmingLiving.java']
+                report['client_artifact']['surface_sources']={s:grim.digest(lab.REPO/'src/main/java/com/viaversion/viaforge'/s) for s in relative}
             if scenario=='hotbar':
                 relative=['src/development/java/com/viaversion/viaforge/development/LiveHotbarActions.java',
                           'src/development/java/com/viaversion/viaforge/development/HotbarTrace.java',
@@ -513,6 +557,7 @@ def run(version, label, client_type='viaforge', extended=False, baseline=False, 
             except subprocess.TimeoutExpired: report['client_still_running'] = client.pid
         if server and server.poll() is None:
             server.stdin.write('save-all\nstop\n'); server.stdin.flush(); server.wait(timeout=60)
+        if relay:report['network_diagnostic_result']=relay.close()
         if client is None or client.poll() is not None:
             if baseline:shutil.copy2(folder/'development-fixed.jar',development)
             for p in config_files:

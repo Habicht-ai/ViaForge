@@ -1,1 +1,1 @@
-{"required":true,"minVersion":"0.7.5","compatibilityLevel":"JAVA_8","package":"com.viaversion.viaforge.development.mixin","client":["MovementPlayerProbe","MovementTravelProbe"]}
+{"required":true,"minVersion":"0.7.5","compatibilityLevel":"JAVA_8","package":"com.viaversion.viaforge.development.mixin","client":["MovementPlayerProbe","MovementTravelProbe","MovementPacketProbe","MovementElytraProbe","MovementTransportProbe"]}

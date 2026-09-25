@@ -14,6 +14,23 @@ import static org.junit.Assert.*;
 
 /** Synthetic wire bytes deliberately differ from Minecraft's legacy wire format. */
 public class CompatibilityDecodePipelineTest {
+    @Test public void allOutputsOfAnOriginalPacketBecomeVisibleTogether() {
+        PacketTaskQueue queue=new PacketTaskQueue();List<Integer> handled=new ArrayList<>();
+        Fixture fixture=new Fixture(new Probe(),false,true,queue);
+        fixture.channel.pipeline().addAfter("compatibility","client",new ChannelInboundHandlerAdapter(){
+            @Override public void channelRead(ChannelHandlerContext ctx,Object message) {
+                ByteBuf buffer=(ByteBuf)message;int value=buffer.getUnsignedByte(buffer.readerIndex());buffer.release();
+                queue.add(()->handled.add(value));queue.drain();
+                assertTrue("No partial original packet may execute",handled.isEmpty());
+            }
+        });
+        try {
+            fixture.channel.writeInbound(Unpooled.buffer().writeByte(42).writeByte(93));
+            assertTrue(handled.isEmpty());queue.drain();
+            assertEquals(3,handled.size());assertEquals(Integer.valueOf(0x70),handled.get(0));
+            assertEquals(Integer.valueOf(0x72),handled.get(2));assertEquals(1,fixture.translations);
+        } finally {fixture.close();}
+    }
     @Test public void originalDataSurvivesLossyTranslationAndUsesTheSharedRestoreStage(){
         Probe codec=new Probe();Fixture fixture=new Fixture(codec,false,true);
         try{
@@ -77,6 +94,9 @@ public class CompatibilityDecodePipelineTest {
     static class Fixture {
         final EmbeddedChannel channel=new EmbeddedChannel(new ChannelInboundHandlerAdapter());int joins,closes,translations;
         Fixture(Probe codec,boolean cancel,boolean allowed){
+            this(codec,cancel,allowed,null);
+        }
+        Fixture(Probe codec,boolean cancel,boolean allowed,PacketTaskQueue queue){
             ProtocolInfo info=(ProtocolInfo)Proxy.newProxyInstance(getClass().getClassLoader(),new Class<?>[]{ProtocolInfo.class},(proxy,method,args)->{if(method.getName().equals("getServerState"))return State.PLAY;throw new UnsupportedOperationException(method.getName());});
             UserConnection user=(UserConnection)Proxy.newProxyInstance(getClass().getClassLoader(),new Class<?>[]{UserConnection.class},(proxy,method,args)->{
                 switch(method.getName()){
@@ -88,7 +108,8 @@ public class CompatibilityDecodePipelineTest {
                     default:throw new UnsupportedOperationException(method.getName());
                 }
             });
-            channel.pipeline().addFirst("compatibility",new CompatibilityDecodeHandler(user,codec,()->joins++,()->closes++));
+            channel.pipeline().addFirst("compatibility",new CompatibilityDecodeHandler(user,codec,()->joins++,()->closes++,
+                    ()->queue!=null&&queue.beginPacket(),()->queue.endPacket()));
         }
         void close(){channel.close();channel.runPendingTasks();channel.checkException();Object next;while((next=channel.readInbound())!=null)((ByteBuf)next).release();}
     }

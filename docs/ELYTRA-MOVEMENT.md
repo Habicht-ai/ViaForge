@@ -1,5 +1,12 @@
 # Elytra-Bewegung: Sprint-Sprung und niedrige Durchgänge
 
+Für senkrechten Blick (−90°), originale Blickarithmetik und aktuelle
+Flugvergleiche siehe [Elytra, Slime und Shulkerdeckel](FLIGHT-SURFACES.md).
+
+Der anschließende [Lande-/Blasensäulenbericht](FLIGHT-EDGES.md) korrigiert
+zusätzlich den verlangsamten Eingabetick bei noch gehaltener Flugpose nach
+dem Löschen des Flugflags. Frühere PASS-Fälle deckten diesen Übergang nicht ab.
+
 Nachfolgende Korrekturen an Landefolgen, Pose-Zeitpunkt und Handdarstellung:
 [aktueller Regressionsbericht](REGRESSIONS-2026-09-20.md). Die untenstehenden
 Build-Ergebnisse und Prüfsummen gehören zum vorherigen Stand.

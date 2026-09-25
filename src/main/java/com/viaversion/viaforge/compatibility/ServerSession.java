@@ -67,7 +67,7 @@ public final class ServerSession {
 
     public static void join(Object connection, CompatibilityProfile profile) {
         Minecraft mc = Minecraft.getMinecraft();
-        mc.addScheduledTask(() -> {
+        ClientPacketTasks.connectionEvent(connection, () -> {
             if (mc.isSingleplayer()) return;
             SessionEpoch.Ticket ticket = SESSION.begin(connection,profile);
             waterColors=null;
@@ -121,7 +121,7 @@ public final class ServerSession {
 
     public static void leave(Object connection) {
         Minecraft mc = Minecraft.getMinecraft();
-        mc.addScheduledTask(() -> {
+        ClientPacketTasks.connectionEvent(connection, () -> {
             if (!SESSION.leave(connection)) return;
             waterColors=null;
             resourceFailure=null;

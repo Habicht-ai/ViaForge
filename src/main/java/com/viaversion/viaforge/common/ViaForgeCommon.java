@@ -124,7 +124,11 @@ public class ViaForgeCommon {
         user.put(target);
         ViaDecodeHandler decoder = !target.extended() ? new ViaDecodeHandler(user)
                 : new com.viaversion.viaforge.common.compatibility.CompatibilityDecodeHandler(user,target.adapter().create(target,ClientBlocks::localState),
-                        () -> ServerSession.join(channel,target), () -> ServerSession.leave(channel));
+                        () -> ServerSession.join(channel,target), () -> ServerSession.leave(channel),
+                        () -> target.rules().enabled(com.viaversion.viaforge.common.compatibility.ClientRule.CONCURRENT_CLIENT_TASKS)
+                                && user.getProtocolInfo().getServerState()==com.viaversion.viaversion.api.protocol.packet.State.PLAY
+                                && com.viaversion.viaforge.compatibility.ClientPacketTasks.beginPacket(target.rules().enabled(com.viaversion.viaforge.common.compatibility.ClientRule.DEDICATED_PACKET_QUEUE)),
+                        com.viaversion.viaforge.compatibility.ClientPacketTasks::endPacket);
         pipeline.addBefore(platform.getDecodeHandlerName(), ViaDecodeHandler.NAME, decoder);
         pipeline.addBefore("encoder", ViaEncodeHandler.NAME, new ViaEncodeHandler(user));
 

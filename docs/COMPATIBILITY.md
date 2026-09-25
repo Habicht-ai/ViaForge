@@ -15,6 +15,11 @@ Land sneak/sprint transitions have a separate [reproduction, original-client
 comparison and version boundaries](SNEAK-SPRINT.md). The correction shares the
 original input stages with swimming and preserves modern sneak-speed attributes.
 
+Straight-up Elytra flight, slime movement and shulker lid pushes have separate
+[original-client findings, version boundaries and live evidence](FLIGHT-SURFACES.md).
+Additional [landing transitions, swimming columns and repeated lid use](FLIGHT-EDGES.md)
+have their own reproductions and original-client comparisons.
+
 Ladders, lily pads, component sword blocking and interaction packet timing have
 separate [original-client evidence and reproducible checks](INTERACTIONS.md).
 In particular, a queued legacy swing can arrive after changed player input;

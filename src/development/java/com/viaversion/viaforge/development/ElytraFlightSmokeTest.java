@@ -46,6 +46,7 @@ final class ElytraFlightSmokeTest {
             EntityPushSmokeTest.verify(world,player);
             SwimmingSmokeTest.verify(world);
             SneakMovementSmokeTest.verify(world,player);
+            SurfacePhysicsSmokeTest.verify(world,player);
             InteractionSmokeTest.verify(world,player,sent);
             PickBlockSmokeTest.verify(world,sent);
             sent.clear();
@@ -107,11 +108,20 @@ final class ElytraFlightSmokeTest {
                     if(method.getName().equals("hashCode"))return System.identityHashCode(proxy);
                     if(method.getName().equals("spawnParticle"))particles.add(args);return null;
                 });
+                double oldX=player.posX,oldY=player.posY,oldZ=player.posZ;
+                double[] look=com.viaversion.viaforge.common.compatibility.OriginalLookMath.look(player.rotationYaw,player.rotationPitch,ServerSession.rules());
+                double expectedBoost=com.viaversion.viaforge.common.compatibility.ElytraPhysics.boost(player.motionZ,look[2]);
                 world.addWorldAccess(observer);try{rocket.onUpdate();}finally{world.removeWorldAccess(observer);}
                 double offset=ServerSession.rule(ClientRule.FIREWORK_HAND_TRAIL)?.5:0;
                 require(Math.abs(rocket.getDistanceToEntity(player)-offset)<1e-5&&rocket.posY==player.posY,"Rocket follows player, with version-specific hand offset");
                 require(!rocket.isInRangeToRenderDist(1),"Attached rocket model is invisible, like original");
-                require(player.motionZ==2&&rocket.motionZ==2,"Rocket visual update does not apply a second boost");
+                require(player.motionZ==expectedBoost&&rocket.motionZ==expectedBoost,"Rocket tick applies one boost and copies the resulting velocity");
+                require(player.posX==oldX&&player.posY==oldY&&player.posZ==oldZ,"Rocket tick changes velocity without an extra player movement");
+                wire.rocket(942,1,handler);
+                net.minecraft.entity.item.EntityFireworkRocket second=(net.minecraft.entity.item.EntityFireworkRocket)world.getEntityByID(942);
+                second.onUpdate();
+                require(player.motionZ==com.viaversion.viaforge.common.compatibility.ElytraPhysics.boost(expectedBoost,look[2]),"Overlapping rockets each apply once at their own tick");
+                world.removeEntityFromWorld(942);
                 require(particles.size()==1&&(Integer)particles.get(0)[0]==net.minecraft.util.EnumParticleTypes.FIREWORKS_SPARK.getParticleID(),"Exactly one original firework spark per attached-rocket tick");
                 Object[] spark=particles.get(0);
                 require(Math.abs((Double)spark[2]-rocket.posX)<1e-7&&Math.abs((Double)spark[4]-rocket.posZ)<1e-7

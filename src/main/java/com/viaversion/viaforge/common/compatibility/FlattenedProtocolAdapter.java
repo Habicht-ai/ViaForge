@@ -26,6 +26,7 @@ public final class FlattenedProtocolAdapter implements PacketAdapter, StorableOb
     private final Set<PacketWrapper> captured=Collections.newSetFromMap(new IdentityHashMap<>());
     private final Set<PacketWrapper> replaced=Collections.newSetFromMap(new IdentityHashMap<>());
     private boolean active,failed,observedJoin;
+    private OriginalVelocity velocity;
     public FlattenedProtocolAdapter(IntUnaryOperator mapper){this.mapper=mapper;}
     public List<ByteBuf> replace(ByteBuf original){return null;}
     public boolean capture(ByteBuf original){
@@ -37,6 +38,17 @@ public final class FlattenedProtocolAdapter implements PacketAdapter, StorableOb
     /** Called only at declared boundaries by the mixin in AbstractProtocol. */
     public boolean beforeProtocol(Object protocol,PacketWrapper packet) {
         if(!active||failed)return false;
+        if(protocol instanceof com.viaversion.viabackwards.protocol.v1_21_9to1_21_7.Protocol1_21_9To1_21_7
+                && packet.getId()==com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundPackets1_21_9.SET_ENTITY_MOTION.getId()) {
+            ByteBuf source=null;
+            try {source=snapshot(packet);velocity=OriginalVelocity.capture(source);}
+            catch(Exception error){throw new IllegalStateException("Invalid original entity motion",error);}
+            finally {if(source!=null)source.release();}
+            // Via still executes exactly once, including its trackers. Restore
+            // the native packet at the output boundary, rather than applying two
+            // different velocities or introducing another movement step.
+            return false;
+        }
         if(protocol instanceof com.viaversion.viabackwards.protocol.v1_17to1_16_4.Protocol1_17To1_16_4
                 && packet.getId()==com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ClientboundPackets1_17.PING.getId()) {
             // ViaBackwards' proxy fallback replies on Netty immediately. A client must
@@ -61,11 +73,36 @@ public final class FlattenedProtocolAdapter implements PacketAdapter, StorableOb
         }
         VillageBlockData family=modernFamilies.get(type);
         if(!original&&!legacy&&!modern&&family==null)return false;
+        boolean attributes=protocol instanceof com.viaversion.viabackwards.protocol.v1_21to1_20_5.Protocol1_21To1_20_5
+                && packet.getId()==com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPackets1_21.UPDATE_ATTRIBUTES.getId();
+        // Most modern boundaries only retain block packets. Re-serializing
+        // unrelated metadata at every one of these boundaries needlessly keeps
+        // an already received state update away from the game-thread queue.
+        // Via still performs its one normal translation through every boundary.
+        if(family!=null&&!original&&!legacy&&!modern&&!attributes
+                &&(captured.contains(packet)||!family.captures(packet.getId())))return false;
         ByteBuf snapshot=null,normalized=null;
         try {
+            if ((original && packet.getId()==ClientboundPackets1_13.SET_ENTITY_DATA.getId())
+                    || (modern && packet.getId()==com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ClientboundPackets1_14.SET_ENTITY_DATA.getId())) {
+                // Via already decoded these values at the preceding boundary.
+                // A full snapshot used to serialize and parse the same metadata
+                // twice more before it could reach the original packet queue.
+                // Restore the readable fields; Via still transforms them once.
+                try {
+                    int entity=packet.passthrough(Types.VAR_INT);
+                    java.util.List<com.viaversion.viaversion.api.minecraft.entitydata.EntityData> data=packet.passthrough(modern
+                            ? com.viaversion.viaversion.api.type.types.version.Types1_14.ENTITY_DATA_LIST
+                            : com.viaversion.viaversion.api.type.types.version.Types1_13.ENTITY_DATA_LIST);
+                    ByteBuf swimming=SwimmingPackets.metadata(entity,data,modern,UnpooledByteBufAllocator.DEFAULT);
+                    if(swimming!=null)pending.add(swimming);
+                    if(original)captureCloudParticle(entity,data,(Protocol1_13To1_12_2)protocol);
+                } finally {packet.resetReader();}
+                return false;
+            }
             snapshot=snapshot(packet);
-            if(protocol instanceof com.viaversion.viabackwards.protocol.v1_21to1_20_5.Protocol1_21To1_20_5) {
-                ByteBuf attributes=SwimmingPackets.attributes(snapshot);if(attributes!=null)pending.add(attributes);
+            if(attributes) {
+                ByteBuf retainedAttributes=SwimmingPackets.attributes(snapshot);if(retainedAttributes!=null)pending.add(retainedAttributes);
             }
             if(original||modern) {
                 ByteBuf swimming=SwimmingPackets.capture(snapshot,modern);
@@ -81,7 +118,6 @@ public final class FlattenedProtocolAdapter implements PacketAdapter, StorableOb
                 if(normalized!=null){captureBlocks(packet,normalized);captured.add(packet);}
             }else if(original) {
                 if(flattened==null)flattened=new FlattenedBlockData();
-                captureCloudParticle(snapshot,(Protocol1_13To1_12_2)protocol);
                 normalized=captured.contains(packet)?null:flattened.normalize(snapshot);
                 if(Types.VAR_INT.readPrimitive(snapshot.duplicate())==ClientboundPackets1_13.LOGIN.getId())observedJoin=true;
                 if(normalized!=null){captureBlocks(packet,normalized);captured.add(packet);}
@@ -101,19 +137,18 @@ public final class FlattenedProtocolAdapter implements PacketAdapter, StorableOb
         }
         return false;
     }
-    private void captureCloudParticle(ByteBuf source,Protocol1_13To1_12_2 protocol)throws Exception {
-        ByteBuf input=source.duplicate();
-        if(Types.VAR_INT.readPrimitive(input)!=ClientboundPackets1_13.SET_ENTITY_DATA.getId())return;
-        int entity=Types.VAR_INT.readPrimitive(input);
-        for(com.viaversion.viaversion.api.minecraft.entitydata.EntityData data:com.viaversion.viaversion.api.type.types.version.Types1_13.ENTITY_DATA_LIST.read(input)) {
+    private void captureCloudParticle(int entity,java.util.List<com.viaversion.viaversion.api.minecraft.entitydata.EntityData> entries,Protocol1_13To1_12_2 protocol)throws Exception {
+        for(com.viaversion.viaversion.api.minecraft.entitydata.EntityData data:entries) {
             if(data.id()!=9||data.dataType().typeId()!=15)continue;
             // ViaBackwards' generic particle filter cancels this entry before its
             // cloud-specific filter runs. Retain it before that lossy step.
-            com.viaversion.viaversion.api.minecraft.Particle particle=data.value();
+            // Item-particle rewriting mutates its item argument. Keep that
+            // detached from the values that the real Via pass still owns.
+            com.viaversion.viaversion.api.minecraft.Particle particle=((com.viaversion.viaversion.api.minecraft.Particle)data.value()).copy();
             com.viaversion.viabackwards.protocol.v1_13to1_12_2.data.ParticleIdMappings1_12_2.ParticleData mapping=
                     com.viaversion.viabackwards.protocol.v1_13to1_12_2.data.ParticleIdMappings1_12_2.getMapping(particle.id());
             int[] arguments=mapping.rewriteMeta(protocol,particle.getArguments());
-            ByteBuf normalized=source.alloc().buffer();
+            ByteBuf normalized=Unpooled.buffer();
             try {
                 Types.VAR_INT.writePrimitive(normalized,com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ClientboundPackets1_12_1.SET_ENTITY_DATA.getId());
                 Types.VAR_INT.writePrimitive(normalized,entity);
@@ -140,13 +175,21 @@ public final class FlattenedProtocolAdapter implements PacketAdapter, StorableOb
         catch(Throwable error){copy.release();throw error;}
         finally{if(tail!=null)tail.readerIndex(reader);packet.resetReader();}
     }
-    public ByteBuf restore(ByteBuf translated)throws Exception{return failed?null:blocks.restore(translated,mapper);}
+    public ByteBuf restore(ByteBuf translated)throws Exception{
+        if(failed)return null;
+        if(velocity!=null&&velocity.replaces(translated)) {
+            ByteBuf original=velocity.event();velocity=null;return original;
+        }
+        return blocks.restore(translated,mapper);
+    }
     public boolean observedJoin(){return observedJoin;}
     public List<ByteBuf> afterTranslation(ByteBuf original){
         active=false;captured.clear();replaced.clear();
-        List<ByteBuf> result=new ArrayList<>(pending);pending.clear();return result;
+        List<ByteBuf> result=new ArrayList<>(pending);pending.clear();
+        if(velocity!=null){result.add(velocity.event());velocity=null;}
+        return result;
     }
-    public void clear(){active=false;waterColors.clear();blocks.world().clear();entities.clear();captured.clear();replaced.clear();for(ByteBuf packet:pending)packet.release();pending.clear();if(flattened!=null){for(ByteBuf packet:flattened.fluidUpdates)packet.release();flattened.fluidUpdates.clear();}}
+    public void clear(){active=false;velocity=null;waterColors.clear();blocks.world().clear();entities.clear();captured.clear();replaced.clear();for(ByteBuf packet:pending)packet.release();pending.clear();if(flattened!=null){for(ByteBuf packet:flattened.fluidUpdates)packet.release();flattened.fluidUpdates.clear();}}
     public static final class Factory implements ProtocolAdapterFactory {
         private final int protocol;
         public Factory(int protocol){if(protocol!=393&&protocol!=401&&protocol!=404&&protocol!=477&&protocol!=480&&protocol!=485&&protocol!=490&&protocol!=498&&protocol!=573&&protocol!=575&&protocol!=578&&protocol!=735&&protocol!=736&&protocol!=751&&protocol!=753&&protocol!=754&&protocol!=755&&protocol!=756&&protocol!=757&&protocol!=758&&protocol!=759&&protocol!=760&&protocol!=761&&protocol!=762&&protocol!=763&&protocol!=764&&protocol!=765&&protocol!=766&&protocol!=767&&protocol!=768&&protocol!=769&&protocol!=770&&protocol!=771&&protocol!=772&&protocol!=773&&protocol!=774&&protocol!=775&&protocol!=776&&protocol!=777)throw new IllegalArgumentException("Unverified flattened target "+protocol);this.protocol=protocol;}

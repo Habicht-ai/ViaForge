@@ -5,6 +5,11 @@
   "package": "com.viaversion.viaforge.mixin.impl",
   "refmap": "mixins.viaforge.refmap.json",
   "client": [
+    "connect.MixinPacketTasks",
+    "connect.MixinPacketTaskStage",
+    "connect.MixinConcurrentClientTasks",
+    "compatibility.MixinSurfaceMovement",
+    "compatibility.MixinExpandedBlockRay",
     "compatibility.MixinLadderShape",
     "compatibility.MixinLilyShape",
     "compatibility.MixinThinBlockOutline",

@@ -16,16 +16,26 @@ public final class NativePushProbe {
     private static boolean ready,done;
     private static String action="idle";
     private static final Gson GSON=new Gson();
+    private static final java.util.Queue<String> packetEvents=new java.util.concurrent.ConcurrentLinkedQueue<>();
     public static void premain(String path,Instrumentation instrumentation) {
         directory=Paths.get(path);started=System.currentTimeMillis();
         instrumentation.addTransformer(new ClassFileTransformer(){
             @Override public byte[] transform(ClassLoader loader,String name,Class<?> type,ProtectionDomain domain,byte[] bytes){
                 boolean player=name.equals("net/minecraft/client/player/LocalPlayer");
-                if(!name.equals("net/minecraft/client/Minecraft")&&!player)return null;
+                boolean packets=name.equals("net/minecraft/client/multiplayer/ClientPacketListener")||name.equals("net/minecraft/client/multiplayer/ClientCommonPacketListenerImpl");
+                if(!name.equals("net/minecraft/client/Minecraft")&&!player&&!packets)return null;
                 ClassReader reader=new ClassReader(bytes);ClassWriter writer=new ClassWriter(reader,ClassWriter.COMPUTE_MAXS);
                 reader.accept(new ClassVisitor(Opcodes.ASM9,writer){
                     @Override public MethodVisitor visitMethod(int access,String name,String descriptor,String signature,String[] exceptions){
                         MethodVisitor method=super.visitMethod(access,name,descriptor,signature,exceptions);
+                        if(packets) {
+                            if(!name.equals("handlePing")&&!name.equals("handleSetEntityData")&&!(name.equals("send")&&descriptor.equals("(Lnet/minecraft/network/protocol/Packet;)V")))return method;
+                            return new MethodVisitor(Opcodes.ASM9,method){
+                                private void log(String phase){super.visitVarInsn(Opcodes.ALOAD,1);super.visitLdcInsn(phase);super.visitMethodInsn(Opcodes.INVOKESTATIC,"viaforge/lab/NativePushProbe","packet","(Ljava/lang/Object;Ljava/lang/String;)V",false);}
+                                @Override public void visitCode(){super.visitCode();log(name+"_BEGIN");}
+                                @Override public void visitInsn(int opcode){if(opcode==Opcodes.RETURN)log(name+"_END");super.visitInsn(opcode);}
+                            };
+                        }
                         if(player) {
                             if(!name.equals("aiStep")&&!name.equals("applyInput")&&!name.equals("sendPosition"))return method;
                             return new MethodVisitor(Opcodes.ASM9,method){
@@ -54,8 +64,18 @@ public final class NativePushProbe {
         throw new NoSuchFieldException(name);
     }
     private static Object call(Object o,String name)throws Exception{return o.getClass().getMethod(name).invoke(o);}
+    public static void packet(Object packet,String phase) {
+        String type=packet.getClass().getSimpleName();
+        if(!type.equals("ClientboundPingPacket")&&!type.equals("ServerboundPongPacket")&&!type.equals("ClientboundSetEntityDataPacket"))return;
+        try {
+            Map<String,Object> j=new LinkedHashMap<>();j.put("time_ms",System.currentTimeMillis());j.put("phase",phase);j.put("thread",Thread.currentThread().getName());j.put("packet",type);
+            j.put("id",call(packet,type.equals("ClientboundSetEntityDataPacket")?"id":"getId"));
+            if(type.equals("ClientboundSetEntityDataPacket"))j.put("metadata",String.valueOf(call(packet,"packedItems")));
+            packetEvents.add(GSON.toJson(j));
+        }catch(Exception failure){throw new IllegalStateException("Native packet observation failed",failure);}
+    }
     public static void observe(Object player,String phase) {
-        if(System.getenv("VIAFORGE_SNEAK_PROBE")==null||done||ticks>12000)return;
+        if(System.getenv("VIAFORGE_SNEAK_PROBE")==null||done||ticks>36000)return;
         try {
             Map<String,Object> j=new LinkedHashMap<>();j.put("time_ms",System.currentTimeMillis());j.put("tick",ticks);j.put("phase",phase);j.put("action",action);
             j.put("player_tick",field(player,"tickCount"));j.put("sprinting",call(player,"isSprinting"));j.put("sneaking",call(player,"isShiftKeyDown"));
@@ -89,12 +109,17 @@ public final class NativePushProbe {
     public static void tick(Object mc,boolean end) {
         if(done)return;
         try {
+            if(end&&!packetEvents.isEmpty()) {
+                List<String> batch=new ArrayList<>();String entry;
+                while((entry=packetEvents.poll())!=null)batch.add(entry);
+                Files.write(directory.resolve("packet-order.jsonl"),batch,java.nio.charset.StandardCharsets.UTF_8,StandardOpenOption.CREATE,StandardOpenOption.APPEND);
+            }
             Path path=directory.resolve("action.txt");
             if(!end){
                 String next=Files.exists(path)?Files.readString(path).trim():"idle";
                 if(!next.equals(action)){action=next;actionTick=0;}else actionTick++;
                 if(action.equals("stop")){state("DONE","Input sequence recorded");done=true;call(mc,"stop");return;}
-                if(System.currentTimeMillis()-started>600000)throw new IllegalStateException("Native probe timeout");
+                if(System.currentTimeMillis()-started>Long.parseLong(System.getenv().getOrDefault("VIAFORGE_PROBE_TIMEOUT_MS","600000")))throw new IllegalStateException("Native probe timeout");
             }
             Object player=field(mc,"player"),level=field(mc,"level");if(player==null||level==null)return;
             if(!ready){if(!end)return;ready=true;state("ready","Official Mojang 26.2");}
@@ -102,6 +127,8 @@ public final class NativePushProbe {
                 ticks++;Object options=field(mc,"options");
                 String keys=sequenceInput(action,actionTick);
                 if(keys.contains("turn"))player.getClass().getMethod("turn",double.class,double.class).invoke(player,10D,0D);
+                if(keys.contains("lookup"))player.getClass().getMethod("turn",double.class,double.class).invoke(player,0D,(-(keys.contains("near")?89.9:90)-(Float)call(player,"getXRot"))/.15);
+                if(keys.contains("close"))call(player,"closeContainer");
                 if(keys.contains("photo")&&actionTick==30)Class.forName("net.minecraft.client.Screenshot").getMethod("grab",java.io.File.class,String.class,Class.forName("com.mojang.blaze3d.pipeline.RenderTarget"),int.class,java.util.function.Consumer.class)
                     .invoke(null,directory.toFile(),"blocking-"+ticks+".png",call(field(mc,"gameRenderer"),"mainRenderTarget"),1,(java.util.function.Consumer<Object>)(message)->{});
                 key(options,"keyUp",keys.contains("forward"));key(options,"keyDown",keys.contains("back"));
@@ -120,6 +147,25 @@ public final class NativePushProbe {
             Map<String,Object> j=new LinkedHashMap<>();j.put("time_ms",System.currentTimeMillis());j.put("tick",ticks);j.put("phase",end?"END":"START");j.put("action",action);j.put("action_tick",actionTick);
             double x=(Double)call(player,"getX"),y=(Double)call(player,"getY"),z=(Double)call(player,"getZ");
             j.put("player_x",x);j.put("player_y",y);j.put("player_z",z);
+            if("1".equals(System.getenv("VIAFORGE_INTERACTION_PROBE"))) {
+                j.put("elytra",call(player,"isFallFlying"));
+                int boosts=0;
+                for(Object entity:(Iterable<?>)call(level,"entitiesForRendering"))
+                    if(entity.getClass().getName().endsWith("FireworkRocketEntity")&&field(entity,"attachedToEntity")==player)boosts++;
+                j.put("boosts",boosts);
+                Class<?> bp=Class.forName("net.minecraft.core.BlockPos");Object pos=bp.getConstructor(int.class,int.class,int.class).newInstance(1,64,0);
+                Object column=bp.getConstructor(int.class,int.class,int.class).newInstance((int)Math.floor(x),63,(int)Math.floor(z));
+                j.put("loaded_column",level.getClass().getMethod("hasChunkAt",bp).invoke(level,column));
+                Object feet=bp.getConstructor(int.class,int.class,int.class).newInstance((int)Math.floor(x),(int)Math.floor(y),(int)Math.floor(z));
+                String feetState=String.valueOf(level.getClass().getMethod("getBlockState",bp).invoke(level,feet));
+                j.put("bubble",feetState.contains("bubble_column")?(feetState.contains("drag=true")?18:17):0);
+                for(String key:new String[]{"floor","substrate"}) {
+                    Object below=bp.getConstructor(int.class,int.class,int.class).newInstance((int)Math.floor(x),key.equals("floor")?(int)Math.floor(y-.01):63,(int)Math.floor(z));
+                    j.put(key,String.valueOf(level.getClass().getMethod("getBlockState",bp).invoke(level,below)));
+                }
+                Object box=level.getClass().getMethod("getBlockEntity",bp).invoke(level,pos);
+                if(box!=null&&box.getClass().getName().endsWith("ShulkerBoxBlockEntity"))j.put("shulker_progress",box.getClass().getMethod("getProgress",float.class).invoke(box,1F));
+            }
             Object velocity=call(player,"getDeltaMovement");j.put("player_vx",field(velocity,"x"));j.put("player_vy",field(velocity,"y"));j.put("player_vz",field(velocity,"z"));
             j.put("player_ground",call(player,"onGround"));j.put("player_spectator",call(player,"isSpectator"));
             j.put("player_alive",call(player,"isAlive"));j.put("player_health",call(player,"getHealth"));

@@ -14,10 +14,24 @@ public class CompatibilityDecodeHandler extends ViaDecodeHandler {
     private static final Logger LOGGER=Logger.getLogger("ViaForge/Compatibility");
     private final PacketAdapter adapter;
     private final Runnable onJoin,onClose;
+    private final java.util.function.BooleanSupplier beginPacket;
+    private final Runnable endPacket;
     private boolean disabled;
     public CompatibilityDecodeHandler(UserConnection user,PacketAdapter adapter,Runnable onJoin,Runnable onClose) {
+        this(user,adapter,onJoin,onClose,()->false,()->{});
+    }
+    public CompatibilityDecodeHandler(UserConnection user,PacketAdapter adapter,Runnable onJoin,Runnable onClose,
+            java.util.function.BooleanSupplier beginPacket,Runnable endPacket) {
         super(user);this.adapter=adapter;this.onJoin=onJoin;this.onClose=onClose;
+        this.beginPacket=beginPacket;this.endPacket=endPacket;
         if (adapter instanceof FlattenedProtocolAdapter) user.put((FlattenedProtocolAdapter) adapter);
+    }
+    @Override public void channelRead(ChannelHandlerContext ctx,Object message)throws Exception {
+        // MessageToMessageDecoder forwards every translated output before returning.
+        // Publish their game-thread handlers together, as one original packet.
+        boolean batch=beginPacket.getAsBoolean();
+        try { super.channelRead(ctx,message); }
+        finally { if(batch)endPacket.run(); }
     }
     @Override public void handlerAdded(ChannelHandlerContext ctx)throws Exception {
         if(ctx.channel()!=connection.getChannel())throw new IllegalArgumentException("Compatibility decoder belongs to a different connection");

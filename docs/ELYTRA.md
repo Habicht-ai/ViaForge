@@ -9,6 +9,9 @@ Kriechpose folgt in [ELYTRA-MOVEMENT.md](ELYTRA-MOVEMENT.md).
 Das später ergänzte [Schwimmen ab 1.13](SWIMMING.md) verwendet dieselben
 Modellübergänge mit eigener Wasserphysik und erhaltener fremder Schwimmpose.
 Seine Live-Nachweise sind von den historischen Elytra-Läufen unten getrennt.
+Die spätere Korrektur des Blicks senkrecht nach oben und des Raketen-Tickpunkts
+ist in [FLIGHT-SURFACES.md](FLIGHT-SURFACES.md) einschließlich Originalvergleich
+und frischen Grim-Läufen dokumentiert.
 
 Die bisherige Darstellung drehte den Körper, ließ aber die native 1.8-Laufpose
 weiterlaufen. Außerdem stieg die native Feuerwerksentität unabhängig vom
@@ -36,7 +39,9 @@ bereits korrekt bestätigten Boost auf. Der lokale Elytra-Flugton fehlte.
   Vor 1.18.2 liegt die Spur 0,3 Blöcke unter der Raketenposition; ab 1.18.2
   berücksichtigt `FIREWORK_HAND_TRAIL` die Handseite, Hauptarm und Blickrichtung.
   Leere moderne Attachment-Metadaten werden als „nicht angehängt“ behandelt.
-- Die Darstellung berechnet keinen weiteren Boost. Freie Raketen steigen
+- Jede angehängte Rakete beschleunigt den lokalen fliegenden Spieler einmal
+  in ihrem Entitätstick, nach dessen Bewegung. Der Renderer berechnet keinen
+  Boost. Freie Raketen steigen
   weiterhin auf. Bei neueren Servern kommt das Startgeräusch bereits über die
   gemeinsame Sound-Pipeline; der zusätzliche lokale 1.8-Startton entfällt.
   Raketenantrieb bleibt auf Versionen ab 1.11.1 begrenzt.
@@ -56,7 +61,8 @@ Raketenentitäten unter Forge. Spawn, Flugflag und Rocket-Attachment durchlaufen
 die vollständigen jeweiligen Via-Paketketten. Geprüft werden Kopf/Arme/Beine,
 Wiederherstellung der Laufpose, Flügel-Zeitbasis, Auflösung der Ogg-Datei,
 Sound-Einblendung, Position/Unsichtbarkeit der Rakete, Funkenposition,
-Nebenhandwechsel, Lösen der Rakete und das Ausbleiben eines zweiten Boosts.
+Nebenhandwechsel, Lösen der Rakete sowie genau eine Beschleunigung je
+angehängter Rakete ohne zusätzlichen Spieler-Bewegungsschritt.
 
 `live_flight_probe.py` prüft zusätzlich echte Verbindungen zu den lokalen
 Vanilla-Servern 1.9, 1.12.2 und 26.3 mit eigenen neuen Testspielern. Die Berichte

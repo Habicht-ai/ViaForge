@@ -66,9 +66,13 @@ final class ElytraMovementSmokeTest {
             p.movementInput.jump=false;p.movementInput.moveForward=1;
             p.setPosition(5.5,200,5.5);p.onGround=true;p.motionX=p.motionY=p.motionZ=0;
             wire.flag(1,false,handler);
-            require(p.height==.6F&&!ServerElytraFlight.crawling(p),"Landing flag alone never turns the previous flight pose into crawling");
+            require(p.height==.6F&&ServerElytraFlight.crawling(p)==ServerSession.rule(ClientRule.CRAWLING_POSE),"Cleared flight flag retains the original visually swimming pose until post-travel update");
+            ServerElytraFlight.beforeInput(p);
             ServerElytraFlight.slowInput(p);
-            require(p.movementInput.moveForward==1,"Landing confirmation must not apply a spurious crawl slowdown");
+            if(ServerSession.rule(ClientRule.SQUARE_SWIM_INPUT)) {
+                com.viaversion.viaforge.compatibility.ServerSwimming.applyMovementInput(p);
+                require(Math.abs(p.moveForward-.294)<1e-6,"Original landing transition has exactly one slow input tick");
+            }else require(Math.abs(p.movementInput.moveForward-(ServerSession.rule(ClientRule.CRAWLING_POSE)?.3:1))<1e-6,"Original versioned landing input slowdown");
             p.onLivingUpdate();
             require(p.isSprinting()&&p.height==1.8F,"Sprint survives confirmed landing in open space for the next jump");
             wire.flag(1,true,handler);ServerElytraFlight.updatePose(p);

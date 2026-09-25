@@ -53,16 +53,23 @@ public final class SwimmingPackets {
         int entity=Types.VAR_INT.readPrimitive(input);
         if(name.equals("ADD_PLAYER"))input.skipBytes(16+24+2);
         List<EntityData> entries=(poses?Types1_14.ENTITY_DATA_LIST:Types1_13.ENTITY_DATA_LIST).read(input);
+        return metadata(entity,entries,poses,source.alloc());
+    }
+    /** Observe already decoded values without serializing and parsing them again. */
+    public static ByteBuf metadata(int entity,List<EntityData> entries,boolean poses,io.netty.buffer.ByteBufAllocator allocator) throws Exception {
         int swim=-1,pose=-1;
         for(EntityData data:entries) {
             if(!poses&&data.id()==0&&data.getValue() instanceof Byte)swim=(((Byte)data.getValue())&16)!=0?1:0;
             if(poses&&data.id()==6&&data.getValue() instanceof Integer)pose=(Integer)data.getValue();
         }
         if(swim<0&&pose<0)return null;
-        ByteBuf result=event(source,34);Types.VAR_INT.writePrimitive(result,entity);result.writeByte(swim).writeByte(pose);return result;
+        ByteBuf result=event(allocator,34);Types.VAR_INT.writePrimitive(result,entity);result.writeByte(swim).writeByte(pose);return result;
     }
     private static ByteBuf event(ByteBuf source,int operation) throws Exception {
-        ByteBuf result=source.alloc().buffer();Types.VAR_INT.writePrimitive(result,0x3f);Types.STRING.write(result,"VF|entity");
+        return event(source.alloc(),operation);
+    }
+    private static ByteBuf event(io.netty.buffer.ByteBufAllocator allocator,int operation) throws Exception {
+        ByteBuf result=allocator.buffer();Types.VAR_INT.writePrimitive(result,0x3f);Types.STRING.write(result,"VF|entity");
         result.writeShort(340).writeByte(operation);return result;
     }
     private SwimmingPackets(){}

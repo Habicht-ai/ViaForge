@@ -209,10 +209,11 @@ Der native Welt-/Renderbereich bleibt Y=0…255. Neue Blockkollisionsformen,
 benutzerdefinierte Größen-/Schwerkraft-/Schleichattribute und vollständige moderne
 Unterwassernebel-/Lichtdarstellung sind nicht durch die Fluidregister allein
 implementiert. Zufällige seltene Unterwasser-Ambientzusätze fehlen bisher.
-Bei modernen Blasensäulen ist der Zeitpunkt nach der Bewegung berücksichtigt;
-die vollständige Auswertung aller während eines schnellen Ticks überstrichenen
-Blockeffekt-Volumen ist noch nicht portiert. Die nachgewiesenen Säulen-/Randfälle
-decken diese weitergehende moderne Kollisionslogik nicht vollständig ab.
+Der spätere [Lande-/Blasensäulenbericht](FLIGHT-EDGES.md) ergänzt ab Protokoll
+773 die achsenweise Auswertung der tatsächlichen Bewegungen und die präzise
+Kontaktregel des Originals. Die ältere Variante in 1.21.2–1.21.8 sowie alle
+beliebigen Blockeffekte und extremen Bewegungsfolgen sind damit noch nicht
+vollständig portiert oder als PASS nachgewiesen.
 Riptide und neue Mob-Schwimmanimationen gehören nicht zu dieser Spielerimplementierung.
 Die bekannten unabhängigen 26.2-Timer-, Kollisions- und Elytra-Grenzen bleiben
 offen. Boots- und Entity-Push-Nachweise werden nicht als Schwimmnachweis verwendet.

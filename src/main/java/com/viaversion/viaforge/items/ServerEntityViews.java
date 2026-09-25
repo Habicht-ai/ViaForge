@@ -70,6 +70,12 @@ public final class ServerEntityViews {
             for(int i=0;i<count;i++){int kind=input.readUnsignedByte();double value=input.readDouble();if(entity!=null)com.viaversion.viaforge.compatibility.ServerSwimming.attribute(entity,kind,value);}
             return;
         }
+        if (operation == 37) {
+            net.minecraft.entity.Entity entity=world.getEntityByID(Types.VAR_INT.readPrimitive(input));
+            double x=input.readDouble(),y=input.readDouble(),z=input.readDouble();
+            if(entity!=null)entity.setVelocity(x,y,z);
+            return;
+        }
         if (operation == 7) {
             int event = input.readInt();
             net.minecraft.util.BlockPos pos = net.minecraft.util.BlockPos.fromLong(input.readLong());

@@ -61,16 +61,19 @@ final class VillageBlockData {
         return originalFluids.applyAsInt(modern);
     }
 
+    boolean captures(int id) {
+        if (id < 0 || id >= packets.length) return false;
+        switch (packets[id].getName()) {
+            case "LEVEL_CHUNK": case "BLOCK_UPDATE": case "CHUNK_BLOCKS_UPDATE":
+            case "BLOCK_EVENT": case "ADD_ENTITY": case "SECTION_BLOCKS_UPDATE": case "LEVEL_CHUNK_WITH_LIGHT": return true;
+            default: return false;
+        }
+    }
     ByteBuf normalize(ByteBuf source) throws Exception {
         ByteBuf input = source.duplicate();
         int id = Types.VAR_INT.readPrimitive(input);
-        if (id < 0 || id >= packets.length) return null;
+        if (!captures(id)) return null;
         String name = packets[id].getName();
-        switch (name) {
-            case "LEVEL_CHUNK": case "BLOCK_UPDATE": case "CHUNK_BLOCKS_UPDATE":
-            case "BLOCK_EVENT": case "ADD_ENTITY": case "SECTION_BLOCKS_UPDATE": case "LEVEL_CHUNK_WITH_LIGHT": break;
-            default: return null;
-        }
         ByteBuf output = source.alloc().buffer();
         try {
             String oldName=name.equals("SECTION_BLOCKS_UPDATE")?"CHUNK_BLOCKS_UPDATE":name.equals("LEVEL_CHUNK_WITH_LIGHT")?"LEVEL_CHUNK":name;

@@ -49,6 +49,12 @@ def fixture(console, protocol):
 def exercise(row, folder, report, name, action, console):
     # Start both renderers while still Creative; frame stalls during another
     # client's initial resource load must not contaminate Survival transitions.
+    if report.get('interaction_surfaces')=='edges':
+        import edge_probe
+        return edge_probe.exercise(row,folder,report,name,action,console)
+    if report.get('interaction_surfaces'):
+        import surface_probe
+        return surface_probe.exercise(row,folder,report,name,action,console)
     if report.get('interaction_rightclick'):
         return rightclick_cases(row,folder,report,name,action,console)
     if report.get('interaction_player'):
@@ -172,6 +178,12 @@ def attack_player(row,folder,report,name,action,console):
 
 
 def summarize(case, poses, events, name, protocol):
+    if case['case'].startswith('Edge '):
+        import edge_probe
+        return edge_probe.summarize(case,poses,events,name,protocol)
+    if case['case'].startswith(('Surface ','Flight ')):
+        import surface_probe
+        return surface_probe.summarize(case,poses,events,name,protocol)
     ticks=[p for p in poses if p.get('phase')=='END' and case['start']*1000<=p['time_ms']<=case['end']*1000]
     selected=[e for e in events if case['start']<=e['time']<=case['end']]
     predictions=[e for e in selected if e['type']=='prediction']

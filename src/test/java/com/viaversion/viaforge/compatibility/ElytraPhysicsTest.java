@@ -3,6 +3,36 @@ import com.viaversion.viaforge.common.compatibility.*;
 import org.junit.Test;
 import static org.junit.Assert.*;
 public class ElytraPhysicsTest {
+    @Test public void originalFlightArithmeticBoundaries() {
+        for(int p:new int[]{47,107,340,393,404,754,755,756,757,758,767,768,772,773,774,775,776,777,778}) {
+            VersionRules r=CompatibilityRegistry.DEFAULT.resolve(p).rules();
+            assertEquals(p>=393&&p<=777,r.enabled(ClientRule.MODERN_LOOK_VECTOR));
+            assertEquals(p>=758&&p<=777,r.enabled(ClientRule.JAVA_ELYTRA_LIFT));
+            assertEquals(p>=774&&p<=777,r.enabled(ClientRule.DOUBLE_TRIG_LOOKUP));
+            assertEquals(p>=755&&p<=777,r.enabled(ClientRule.SHULKER_DELTA_PUSH));
+            assertEquals(p>=776&&p<=777,r.enabled(ClientRule.COLLISION_PORTION_BOUNCE));
+            assertEquals(p==777,r.enabled(ClientRule.SUPPRESS_GRAVITY_EQUAL_BOUNCE));
+            assertEquals(p>=393&&p<=777,r.enabled(ClientRule.EXPANDED_BLOCK_RAY));
+            assertEquals(p>=773&&p<=777,r.enabled(ClientRule.PRECISE_BLOCK_EFFECTS));
+        }
+    }
+    @Test public void straightUpHasNoHorizontalLookSinceOriginalVectorConvention() {
+        for(int p:new int[]{393,404,754,758,773,774,775,776}) {
+            VersionRules rules=CompatibilityRegistry.DEFAULT.resolve(p).rules();
+            double[] look=OriginalLookMath.look(0,-90,rules);
+            assertArrayEquals(new double[]{0,1,0},look,0);
+            double[] velocity=ElytraPhysics.step(rules,0,-.2,1,look[0],look[1],look[2],-90,.08);
+            assertEquals(-.2744000053405757,velocity[1],1e-14);
+            assertEquals((double).99F,velocity[2],0);
+            double[] near=OriginalLookMath.look(0,-89.9F,rules);
+            assertTrue(near[2]>.001);
+            assertTrue(ElytraPhysics.step(rules,0,-.2,1,near[0],near[1],near[2],-89.9F,.08)[1]>velocity[1]+.12);
+        }
+        for(int p:new int[]{107,340}) {
+            double[] look=OriginalLookMath.look(0,-90,CompatibilityRegistry.DEFAULT.resolve(p).rules());
+            assertTrue("Original float table retains a horizontal remainder: "+p,Math.hypot(look[0],look[2])>0);
+        }
+    }
     @Test public void flightStartAndCrawlingFollowOriginalBoundaries() {
         for(int protocol:new int[]{47,107,340,393,404,477,498,573,578,763,767,768,777,778}) {
             VersionRules rules=CompatibilityRegistry.DEFAULT.resolve(protocol).rules();

@@ -24,7 +24,7 @@ public final class ServerSwimming {
         double efficiency=Double.NaN,gravity=.08,sneakSpeed=.3;
         int pose=-1,sprintWindow;
     }
-    public static void clear(){STATES.clear();fluids.clear();SwimmingSound.clear();}
+    public static void clear(){STATES.clear();fluids.clear();SwimmingSound.clear();ServerBubbleColumns.clear();}
     public static boolean enabled(Entity entity){return entity instanceof EntityPlayer&&entity.worldObj.isRemote&&ServerSession.rule(ClientRule.SWIMMING);}
     private static State state(Entity entity){return STATES.computeIfAbsent(entity,e->new State());}
     public static boolean swimming(Entity entity){return enabled(entity)&&state(entity).swimming&&!((EntityPlayer)entity).capabilities.isFlying&&!entity.isRiding();}
@@ -33,6 +33,10 @@ public final class ServerSwimming {
             state(entity).pose==3||state(entity).pose<0&&swimming(entity));}
     public static double depth(Entity entity){return state(entity).depth;}
     public static void attribute(Entity entity,int kind,double value){if(kind==0)state(entity).efficiency=value;else if(kind==1)state(entity).gravity=value;else if(kind==2)state(entity).sneakSpeed=value;}
+    public static double effectiveGravity(net.minecraft.entity.EntityLivingBase entity) {
+        double gravity=enabled(entity)?state(entity).gravity:.08;
+        return enabled(entity)&&entity.motionY<=0&&entity.isPotionActive(28)?Math.min(gravity,.01):gravity;
+    }
     public static float sneakSpeed(EntityPlayer player) {
         if(ServerSession.rule(ClientRule.SNEAK_SPEED_ATTRIBUTE))return (float)state(player).sneakSpeed;
         if(!ServerSession.rule(ClientRule.SWIFT_SNEAK))return .3F;
@@ -235,15 +239,19 @@ public final class ServerSwimming {
     /** Bubble callbacks at the original pre-/post-travel stage of the target. */
     public static void bubbles(Entity entity) {
         if(!enabled(entity)||entity!=Minecraft.getMinecraft().thePlayer||entity.noClip)return;
+        if(ServerSession.rule(ClientRule.PRECISE_BLOCK_EFFECTS)){ServerBubbleColumns.apply(entity);return;}
         AxisAlignedBB box=entity.getEntityBoundingBox().contract(.001,.001,.001);
         for(int x=MathHelper.floor_double(box.minX);x<=MathHelper.floor_double(box.maxX);x++)
         for(int y=MathHelper.floor_double(box.minY);y<=MathHelper.floor_double(box.maxY);y++)
         for(int z=MathHelper.floor_double(box.minZ);z<=MathHelper.floor_double(box.maxZ);z++) {
-            int fluid=fluids.get(x,y,z);if(fluid<17)continue;
-            BlockPos above=new BlockPos(x,y+1,z);boolean surface=entity.worldObj.isAirBlock(above)&&waterLevel(entity.worldObj,above)<0;
-            entity.motionY=fluid==18?Math.max(surface?-.9:-.3,entity.motionY-.03):Math.min(surface?1.8:.7,entity.motionY+(surface?.1:.06));
-            entity.fallDistance=0;
+            bubbleAt(entity,new BlockPos(x,y,z));
         }
+    }
+    static void bubbleAt(Entity entity,BlockPos pos) {
+        int fluid=fluids.get(pos.getX(),pos.getY(),pos.getZ());if(fluid<17)return;
+        BlockPos above=pos.up();boolean surface=entity.worldObj.isAirBlock(above)&&waterLevel(entity.worldObj,above)<0;
+        entity.motionY=fluid==18?Math.max(surface?-.9:-.3,entity.motionY-.03):Math.min(surface?1.8:.7,entity.motionY+(surface?.1:.06));
+        if(!surface)entity.fallDistance=0;
     }
     private ServerSwimming(){}
 }

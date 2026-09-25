@@ -27,7 +27,8 @@ public final class LiveBoatProbe {
     private final int protocol, port;
     private final String name;
     private final long started=System.currentTimeMillis();
-    private int stage, tick, actionTick;
+    private int stage, actionTick;
+    private volatile int tick;
     private String action="idle";
     private boolean finished;
     private LiveBoatProbe(String path) {
@@ -57,9 +58,37 @@ public final class LiveBoatProbe {
         j.addProperty("x",event.sound.getXPosF());j.addProperty("y",event.sound.getYPosF());j.addProperty("z",event.sound.getZPosF());
         try{log(j);}catch(Exception failure){throw new IllegalStateException(failure);}
     }
-    private synchronized void log(JsonObject data) throws Exception {
+    private static final class PendingLog {
+        final JsonObject data;
+        final byte[] wire;
+        PendingLog(JsonObject data,byte[] wire){this.data=data;this.wire=wire;}
+        String format() {
+            if(wire!=null) {
+                char[] hex=new char[wire.length*2];String digits="0123456789abcdef";
+                for(int i=0;i<wire.length;i++){hex[i*2]=digits.charAt((wire[i]&255)>>>4);hex[i*2+1]=digits.charAt(wire[i]&15);}
+                data.addProperty("hex",new String(hex));
+            }
+            return data.toString();
+        }
+    }
+    private final java.util.Queue<PendingLog> pendingLogs=new java.util.concurrent.ConcurrentLinkedQueue<>();
+    private void log(JsonObject data) {
         data.addProperty("time_ms",System.currentTimeMillis());data.addProperty("tick",tick);
-        Files.write(folder.resolve("client.jsonl"),Collections.singletonList(data.toString()),StandardCharsets.UTF_8,StandardOpenOption.CREATE,StandardOpenOption.APPEND);
+        pendingLogs.add(new PendingLog(data,null));
+    }
+    private void wireLog(String phase,io.netty.buffer.ByteBuf buffer) {
+        JsonObject data=new JsonObject();data.addProperty("phase",phase);
+        data.addProperty("time_ms",System.currentTimeMillis());data.addProperty("tick",tick);
+        byte[] bytes=new byte[buffer.readableBytes()];buffer.getBytes(buffer.readerIndex(),bytes);
+        pendingLogs.add(new PendingLog(data,bytes));
+    }
+    private void flushLogs() throws Exception {
+        // Neither disk I/O nor JSON/hex formatting may hold up Netty before
+        // the original packet reaches the game-thread queue. Capture times
+        // belong to reception, not this later write at the end of a tick.
+        List<String> batch=new ArrayList<>();PendingLog entry;
+        while((entry=pendingLogs.poll())!=null)batch.add(entry.format());
+        if(!batch.isEmpty())Files.write(folder.resolve("client.jsonl"),batch,StandardCharsets.UTF_8,StandardOpenOption.CREATE,StandardOpenOption.APPEND);
     }
     private void state(String status,String detail)throws Exception {
         JsonObject j=new JsonObject();j.addProperty("state",status);j.addProperty("name",name);j.addProperty("protocol",protocol);j.addProperty("detail",detail);
@@ -73,7 +102,7 @@ public final class LiveBoatProbe {
             if(Files.exists(requested)&&new String(Files.readAllBytes(requested),StandardCharsets.UTF_8).trim().equals("stop")) {
                 state("DONE","Requested probe shutdown");finished=true;mc.shutdown();return;
             }
-            if(System.currentTimeMillis()-started>600000)throw new IllegalStateException("Probe timeout");
+            if(System.currentTimeMillis()-started>Long.parseLong(System.getenv().getOrDefault("VIAFORGE_PROBE_TIMEOUT_MS","600000")))throw new IllegalStateException("Probe timeout");
             if(mc.currentScreen instanceof GuiDisconnected) {
                 String reason="";
                 for(Field f:GuiDisconnected.class.getDeclaredFields()) {
@@ -145,6 +174,8 @@ public final class LiveBoatProbe {
                 String keys=sequenceInput(action,actionTick);
                 // Camera input only; the original tick emits movement/use packets.
                 if(keys.contains("turn"))mc.thePlayer.setAngles(10F,0F);
+                if(keys.contains("lookup"))mc.thePlayer.setAngles(0F,(mc.thePlayer.rotationPitch+(keys.contains("near")?89.9F:90F))/.15F);
+                if(keys.contains("close")&&mc.currentScreen!=null)mc.thePlayer.closeScreen();
                 key(mc.gameSettings.keyBindForward,keys.contains("forward"));key(mc.gameSettings.keyBindBack,keys.contains("back"));
                 key(mc.gameSettings.keyBindLeft,keys.contains("left"));key(mc.gameSettings.keyBindRight,keys.contains("right"));
                 key(mc.gameSettings.keyBindSneak,action.equals("dismount")||keys.contains("sneak"));
@@ -163,6 +194,15 @@ public final class LiveBoatProbe {
             j.addProperty("player_x",mc.thePlayer.posX);j.addProperty("player_y",mc.thePlayer.posY);j.addProperty("player_z",mc.thePlayer.posZ);
             if("1".equals(System.getenv("VIAFORGE_INTERACTION_PROBE"))) {
                 j.addProperty("using_item",mc.thePlayer.isUsingItem());j.addProperty("ladder",mc.thePlayer.isOnLadder());
+                j.addProperty("elytra",com.viaversion.viaforge.items.ServerElytraFlight.flying(mc.thePlayer));
+                j.addProperty("substrate",mc.theWorld.getBlockState(new net.minecraft.util.BlockPos(mc.thePlayer.posX,63,mc.thePlayer.posZ)).toString());
+                j.addProperty("loaded_column",mc.theWorld.isBlockLoaded(new net.minecraft.util.BlockPos(mc.thePlayer.posX,63,mc.thePlayer.posZ)));
+                net.minecraft.util.BlockPos feet=new net.minecraft.util.BlockPos(mc.thePlayer);
+                j.addProperty("bubble",com.viaversion.viaforge.compatibility.ServerSwimming.fluids.get(feet.getX(),feet.getY(),feet.getZ()));
+                j.addProperty("boosts",com.viaversion.viaforge.items.ServerEntityViews.boosts(mc.thePlayer.getEntityId()));
+                j.addProperty("screen",mc.currentScreen==null?"none":mc.currentScreen.getClass().getSimpleName());
+                net.minecraft.tileentity.TileEntity box=mc.theWorld.getTileEntity(new net.minecraft.util.BlockPos(1,64,0));
+                if(box instanceof com.viaversion.viaforge.blocks.ShulkerBlockEntity)j.addProperty("shulker_progress",((com.viaversion.viaforge.blocks.ShulkerBlockEntity)box).progress(1));
                 j.addProperty("use_ticks",mc.thePlayer.getItemInUseCount());
                 j.addProperty("hit",String.valueOf(mc.objectMouseOver));
                 j.addProperty("held",String.valueOf(mc.thePlayer.getHeldItem()));
@@ -242,6 +282,10 @@ public final class LiveBoatProbe {
             }
             if(tick<10000)log(j);
         }catch(Throwable t){try{state("FAIL",t.toString());}catch(Exception ignored){}t.printStackTrace();finished=true;mc.shutdown();}
+        finally {
+            if(event.phase==TickEvent.Phase.END||finished)try{flushLogs();}
+            catch(Exception error){try{state("FAIL",error.toString());}catch(Exception ignored){}error.printStackTrace();finished=true;mc.shutdown();}
+        }
     }
     private static String sequenceInput(String action,int tick) {
         if(!action.startsWith("sequence:"))return action;
@@ -258,7 +302,7 @@ public final class LiveBoatProbe {
             private int count;
             @Override public void channelRead(ChannelHandlerContext ctx,Object msg)throws Exception {
                 if(msg instanceof io.netty.buffer.ByteBuf&&count++<20000){io.netty.buffer.ByteBuf b=(io.netty.buffer.ByteBuf)msg;
-                    if(b.readableBytes()<512){JsonObject j=new JsonObject();j.addProperty("phase",phase);j.addProperty("hex",io.netty.buffer.ByteBufUtil.hexDump(b));log(j);}}
+                    if(b.readableBytes()<512)wireLog(phase,b);}
                 super.channelRead(ctx,msg);
             }
         };

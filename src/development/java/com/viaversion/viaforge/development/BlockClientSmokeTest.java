@@ -71,6 +71,10 @@ public final class BlockClientSmokeTest {
                     world.doPreChunk(0,0,true);
                     checks.add(FlattenedPipelineSmokeTest.verify(target(),world,report.toAbsolutePath().getParent()));
                 }
+                if (target().rules().enabled(com.viaversion.viaforge.common.compatibility.ClientRule.CONCURRENT_CLIENT_TASKS)) {
+                    PacketQueueSmokeTest.verify(target().serverProtocol());
+                    checks.add(target().resources().version()+": transformed packet queue: main-thread FIFO, exactly-once dispatch and disconnected payload release PASS");
+                }
                 ShulkerItemRenderSmokeTest.verify(target(), report.toAbsolutePath().getParent());
                 if (target().serverProtocol() >= 315) checks.add(target().resources().version()
                         + ": all 16 shulker item colors"+(target().serverProtocol()>=335?" and all 16 bed colors (baked geometry fits a 16px GUI slot)":"")+"; original target matrices for third person (both hands, slim/normal arms, sneaking), first person, GUI, fixed and dropped items PASS");
@@ -90,9 +94,10 @@ public final class BlockClientSmokeTest {
                     checks.add("Selected 1.13+ profiles: actual remote player swimming dimensions/eyes, full animation blend, original 26-phase arm stroke, sleeve following, phase advance and restoration after leaving water PASS (live physics is verified separately by swim_probe)");
                     checks.add("Selected 1.13+ profiles: real keyboard/living/travel sneak press and release ticks, target sprint retention, exactly one slowdown and restored movement; 1.19-1.20.6 original Swift Sneak snapshot through actual input PASS (live Grim evidence separately in SNEAK-TESTS.md)");
                     checks.add("Selected profiles: actual mouse rocket/shield use, both hands/main-hand preferences, Creative/Survival, target use/swing packets, no 26.3 use PUNCH, native/custom equip reset, cooldowns, grounded rejection, actual first-person shield render transitions, original third-person look clamps and sleeves PASS");
-                    checks.add("Selected profiles: neutral first-person arms during crouch/crawl, subsequent third-person pose retained, rocket target model/texture and .68 grip scale through actual first-person entry point with empty/occupied opposite hand PASS; landing confirmation does not become crawling or cancel sprint PASS");
+                    checks.add("Selected profiles: neutral first-person arms during crouch/crawl, subsequent third-person pose retained, rocket target model/texture and .68 grip scale through actual first-person entry point with empty/occupied opposite hand PASS; original retained flight-pose landing slowdown lasts one transition tick and preserves sprint PASS");
                     checks.add("Selected profiles: actual Survival/Creative inventory flight and standing previews, original versioned GL matrices, visible pixels and bounded-region isolation, restored player movement/angles/camera/flight state, nested clipping; 26.3 GUI scales 1/2/3 PASS");
                     checks.add("Drop regression: actual Q/Ctrl-Q in Survival and Creative, shield and stackable blocks, single/full/empty drops, selected/offhand/adjacent slot isolation, original target action packets and authoritative correction/empty packets; native drop behavior restored on disconnect PASS");
+                    checks.add("Surface regressions: native slime collision/rebound and sneak suppression, ticking shulker lid pushes and dynamic collision bounds, whole-ray lid intersection, axis-ordered bubble exit contacts/caps, each attached rocket boosts once in its own entity tick without extra player movement; overlapping rocket ticks PASS");
                     checks.add("Render regressions: original 1.13+ aquatic biomes and 1.16+ registry water colors, tall-source biome coordinates, 1.19.4+ biome update packets before Via cancellation, disconnect cleanup; first position packet waits for resources; 26.2 independently decoded RGBA hashes, actual atlas transparency and shield GPU texels, original bed faces/UVs in all 16 colors, 16 distinct rendered banner dyes; native water and texture caches restored PASS");
                     finish(null);
                 }

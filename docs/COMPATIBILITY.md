@@ -7,6 +7,9 @@ do not implement every later release's content. Unknown targets keep normal Via
 connectivity without borrowing an older parser. See [flattened families](FLATTENED.md)
 and [modern families, validation status and limits](MODERN.md).
 
+F5 component blocking, bubble-column visuals and resource-pack/session changes
+have separate [causes, real-client evidence and format limits](SESSION-RESOURCES.md).
+
 Player swimming from 1.13 has separate [version rules, original-client evidence,
 test cases and limits](SWIMMING.md). Its preserved fluid/pose events use the
 internal 340 format; behavior follows the actual negotiated server protocol.

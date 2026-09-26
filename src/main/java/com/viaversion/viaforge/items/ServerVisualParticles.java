@@ -13,6 +13,10 @@ public final class ServerVisualParticles {
         int setting = mc.gameSettings.particleSetting;
         if (setting == 1 && world.rand.nextInt(3) == 0) setting = 2;
         if (!ignoreRange && (setting > 1 || camera.getDistanceSq(x, y, z) > 1024)) return null;
+        if(id>=1045&&id<=1047&&com.viaversion.viaforge.compatibility.ServerSession.rule(com.viaversion.viaforge.common.compatibility.ClientRule.BUBBLE_PARTICLES)) {
+            EntityFX particle=id==1045?new ServerBubblePopParticle(world,x,y,z,vx,vy,vz):new ServerBubbleParticle(world,id==1046,x,y,z,vx,vy,vz);
+            mc.effectRenderer.addEffect(particle);return particle;
+        }
         if (id == 42 || id == 43 || id == 48) {
             EntityFX particle = new com.viaversion.viaforge.mobs.MobParticles(world,id,x,y,z,vx,vy,vz);
             mc.effectRenderer.addEffect(particle); return particle;

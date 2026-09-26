@@ -17,19 +17,32 @@ public final class NativePushProbe {
     private static String action="idle";
     private static final Gson GSON=new Gson();
     private static final java.util.Queue<String> packetEvents=new java.util.concurrent.ConcurrentLinkedQueue<>();
+    private static long visualCommand=-1;
     public static void premain(String path,Instrumentation instrumentation) {
         directory=Paths.get(path);started=System.currentTimeMillis();
         instrumentation.addTransformer(new ClassFileTransformer(){
             @Override public byte[] transform(ClassLoader loader,String name,Class<?> type,ProtectionDomain domain,byte[] bytes){
+                boolean visual="1".equals(System.getenv("VIAFORGE_VISUAL_SESSION"));
+                boolean particle=visual&&(name.equals("net/minecraft/client/particle/BubbleColumnUpParticle")||name.equals("net/minecraft/client/particle/WaterCurrentDownParticle")||name.equals("net/minecraft/client/particle/BubblePopParticle"));
+                boolean arms=visual&&name.equals("net/minecraft/client/model/HumanoidModel");
                 boolean player=name.equals("net/minecraft/client/player/LocalPlayer");
                 boolean packets=name.equals("net/minecraft/client/multiplayer/ClientPacketListener")||name.equals("net/minecraft/client/multiplayer/ClientCommonPacketListenerImpl");
-                if(!name.equals("net/minecraft/client/Minecraft")&&!player&&!packets)return null;
+                if(!name.equals("net/minecraft/client/Minecraft")&&!player&&!packets&&!particle&&!arms)return null;
                 ClassReader reader=new ClassReader(bytes);ClassWriter writer=new ClassWriter(reader,ClassWriter.COMPUTE_MAXS);
                 reader.accept(new ClassVisitor(Opcodes.ASM9,writer){
                     @Override public MethodVisitor visitMethod(int access,String name,String descriptor,String signature,String[] exceptions){
                         MethodVisitor method=super.visitMethod(access,name,descriptor,signature,exceptions);
+                        if(particle||arms) {
+                            if(!(particle&&(name.equals("<init>")||name.equals("tick")))&&!(arms&&name.equals("setupAnim")&&descriptor.contains("HumanoidRenderState")))return method;
+                            return new MethodVisitor(Opcodes.ASM9,method){
+                                @Override public void visitInsn(int opcode){
+                                    if(opcode==Opcodes.RETURN){super.visitVarInsn(Opcodes.ALOAD,0);super.visitLdcInsn(name);super.visitMethodInsn(Opcodes.INVOKESTATIC,"viaforge/lab/NativePushProbe","visual","(Ljava/lang/Object;Ljava/lang/String;)V",false);}
+                                    super.visitInsn(opcode);
+                                }
+                            };
+                        }
                         if(packets) {
-                            if(!name.equals("handlePing")&&!name.equals("handleSetEntityData")&&!(name.equals("send")&&descriptor.equals("(Lnet/minecraft/network/protocol/Packet;)V")))return method;
+                            if(!name.equals("handlePing")&&!name.equals("handleSetEntityData")&&!(visual&&(name.equals("handleResourcePackPush")||name.equals("handleResourcePackPop")))&&!(name.equals("send")&&descriptor.equals("(Lnet/minecraft/network/protocol/Packet;)V")))return method;
                             return new MethodVisitor(Opcodes.ASM9,method){
                                 private void log(String phase){super.visitVarInsn(Opcodes.ALOAD,1);super.visitLdcInsn(phase);super.visitMethodInsn(Opcodes.INVOKESTATIC,"viaforge/lab/NativePushProbe","packet","(Ljava/lang/Object;Ljava/lang/String;)V",false);}
                                 @Override public void visitCode(){super.visitCode();log(name+"_BEGIN");}
@@ -64,12 +77,29 @@ public final class NativePushProbe {
         throw new NoSuchFieldException(name);
     }
     private static Object call(Object o,String name)throws Exception{return o.getClass().getMethod(name).invoke(o);}
+    public static void visual(Object object,String phase) {
+        try {
+            Map<String,Object> row=new LinkedHashMap<>();row.put("time_ms",System.currentTimeMillis());row.put("tick",ticks);row.put("action",action);
+            row.put("visual",object.getClass().getSimpleName());row.put("phase",phase);row.put("id",System.identityHashCode(object));
+            if(phase.equals("setupAnim")) {
+                if(ticks%10!=0)return;
+                for(String side:new String[]{"rightArm","leftArm"})for(String axis:new String[]{"xRot","yRot","zRot"})row.put(side+"_"+axis,field(field(object,side),axis));
+            }else {
+                for(String name:new String[]{"x","y","z","xd","yd","zd","age","lifetime","removed"})row.put(name,field(object,name));
+                Method light=Class.forName("net.minecraft.client.particle.Particle").getDeclaredMethod("getLightCoords",float.class);
+                light.setAccessible(true);row.put("light",light.invoke(object,0F));
+            }
+            packetEvents.add(GSON.toJson(row));
+        }catch(Exception error){throw new IllegalStateException("Native visual observation",error);}
+    }
     public static void packet(Object packet,String phase) {
         String type=packet.getClass().getSimpleName();
-        if(!type.equals("ClientboundPingPacket")&&!type.equals("ServerboundPongPacket")&&!type.equals("ClientboundSetEntityDataPacket"))return;
+        boolean pack="1".equals(System.getenv("VIAFORGE_VISUAL_SESSION"))&&type.contains("ResourcePack");
+        if(!pack&&!type.equals("ClientboundPingPacket")&&!type.equals("ServerboundPongPacket")&&!type.equals("ClientboundSetEntityDataPacket"))return;
         try {
             Map<String,Object> j=new LinkedHashMap<>();j.put("time_ms",System.currentTimeMillis());j.put("phase",phase);j.put("thread",Thread.currentThread().getName());j.put("packet",type);
-            j.put("id",call(packet,type.equals("ClientboundSetEntityDataPacket")?"id":"getId"));
+            j.put("id",pack?String.valueOf(call(packet,"id")):call(packet,type.equals("ClientboundSetEntityDataPacket")?"id":"getId"));
+            if(pack)j.put("details",String.valueOf(packet));
             if(type.equals("ClientboundSetEntityDataPacket"))j.put("metadata",String.valueOf(call(packet,"packedItems")));
             packetEvents.add(GSON.toJson(j));
         }catch(Exception failure){throw new IllegalStateException("Native packet observation failed",failure);}
@@ -106,9 +136,49 @@ public final class NativePushProbe {
         m.put("name",System.getProperty("push.name"));m.put("protocol",776);
         Path tmp=directory.resolve("client-state.tmp");Files.writeString(tmp,GSON.toJson(m));Files.move(tmp,directory.resolve("client-state.json"),StandardCopyOption.REPLACE_EXISTING);
     }
+    private static void visualCommand(Object mc)throws Exception {
+        Object screen=call(field(mc,"gui"),"screen");
+        Path path=directory.resolve("command.json");
+        if(Files.exists(path)) {
+            com.google.gson.JsonObject r=GSON.fromJson(Files.readString(path),com.google.gson.JsonObject.class);
+            if(r.get("id").getAsLong()!=visualCommand) {
+                visualCommand=r.get("id").getAsLong();String op=r.get("op").getAsString();
+                if(op.equals("button")) {
+                    int i=0,index=r.get("button").getAsInt();Object chosen=null;
+                    for(Object child:(Iterable<?>)call(screen,"children"))if(Class.forName("net.minecraft.client.gui.components.Button").isInstance(child)) {if(i++==index){chosen=child;break;}}
+                    if(chosen==null)throw new IllegalStateException("Missing original button");
+                    double x=((Number)call(chosen,"getX")).doubleValue()+((Number)call(chosen,"getWidth")).doubleValue()/2;
+                    double y=((Number)call(chosen,"getY")).doubleValue()+((Number)call(chosen,"getHeight")).doubleValue()/2;
+                    Class<?> info=Class.forName("net.minecraft.client.input.MouseButtonInfo"),event=Class.forName("net.minecraft.client.input.MouseButtonEvent");
+                    Object click=event.getConstructor(double.class,double.class,info).newInstance(x,y,info.getConstructor(int.class,int.class).newInstance(0,0));
+                    screen.getClass().getMethod("mouseClicked",event,boolean.class).invoke(screen,click,false);
+                }else if(op.equals("chat")) {
+                    String text=r.get("text").getAsString();Object connection=field(field(mc,"player"),"connection");
+                    connection.getClass().getMethod(text.startsWith("/")?"sendCommand":"sendChat",String.class).invoke(connection,text.startsWith("/")?text.substring(1):text);
+                }
+                else if(op.equals("look")) {
+                    Object player=field(mc,"player");
+                    double yaw=r.get("yaw").getAsDouble()-((Number)call(player,"getYRot")).doubleValue();
+                    double pitch=r.get("pitch").getAsDouble()-((Number)call(player,"getXRot")).doubleValue();
+                    player.getClass().getMethod("turn",double.class,double.class).invoke(player,yaw/.15,pitch/.15);
+                }
+                else if(op.equals("resource")) {
+                    Class<?> id=Class.forName("net.minecraft.resources.Identifier");Object location=id.getMethod("parse",String.class).invoke(null,r.get("path").getAsString());
+                    Object resource=call(mc,"getResourceManager").getClass().getMethod("getResourceOrThrow",id).invoke(call(mc,"getResourceManager"),location);
+                    int pixel;try(java.io.InputStream stream=(java.io.InputStream)call(resource,"open")){pixel=javax.imageio.ImageIO.read(stream).getRGB(0,0);}
+                    packetEvents.add("{\"resource\":\""+r.get("path").getAsString()+"\",\"argb\":"+pixel+",\"command\":"+visualCommand+"}");
+                }else if(op.equals("stop"))call(mc,"stop");
+                else throw new IllegalArgumentException(op);
+            }
+        }
+        Map<String,Object> row=new LinkedHashMap<>();row.put("command",visualCommand);row.put("time_ms",System.currentTimeMillis());row.put("screen",screen==null?"none":screen.getClass().getSimpleName());
+        row.put("packs",String.valueOf(call(call(mc,"getResourcePackRepository"),"getSelectedIds")));
+        try {Files.writeString(directory.resolve("ui-state.json"),GSON.toJson(row));}catch(FileSystemException busySnapshot){}
+    }
     public static void tick(Object mc,boolean end) {
         if(done)return;
         try {
+            if(!end&&"1".equals(System.getenv("VIAFORGE_VISUAL_SESSION")))visualCommand(mc);
             if(end&&!packetEvents.isEmpty()) {
                 List<String> batch=new ArrayList<>();String entry;
                 while((entry=packetEvents.poll())!=null)batch.add(entry);
@@ -126,6 +196,15 @@ public final class NativePushProbe {
             if(!end){
                 ticks++;Object options=field(mc,"options");
                 String keys=sequenceInput(action,actionTick);
+                if("1".equals(System.getenv("VIAFORGE_VISUAL_SESSION"))) {
+                    Class camera=Class.forName("net.minecraft.client.CameraType");
+                    options.getClass().getMethod("setCameraType",camera).invoke(options,Enum.valueOf(camera,keys.contains("f5front")?"THIRD_PERSON_FRONT":keys.contains("f5back")?"THIRD_PERSON_BACK":"FIRST_PERSON"));
+                    Object particles=call(options,"particles");Class status=Class.forName("net.minecraft.server.level.ParticleStatus");
+                    particles.getClass().getMethod("set",Object.class).invoke(particles,Enum.valueOf(status,keys.contains("minimal")?"MINIMAL":keys.contains("decreased")?"DECREASED":"ALL"));
+                    if(actionTick==0)for(int i=0;i<9;i++)if(keys.contains("slot"+i)) {
+                        Object binding=((Object[])field(options,"keyHotbarSlots"))[i];Field click=Class.forName("net.minecraft.client.KeyMapping").getDeclaredField("clickCount");click.setAccessible(true);click.setInt(binding,click.getInt(binding)+1);
+                    }
+                }
                 if(keys.contains("turn"))player.getClass().getMethod("turn",double.class,double.class).invoke(player,10D,0D);
                 if(keys.contains("lookup"))player.getClass().getMethod("turn",double.class,double.class).invoke(player,0D,(-(keys.contains("near")?89.9:90)-(Float)call(player,"getXRot"))/.15);
                 if(keys.contains("close"))call(player,"closeContainer");
@@ -147,6 +226,16 @@ public final class NativePushProbe {
             Map<String,Object> j=new LinkedHashMap<>();j.put("time_ms",System.currentTimeMillis());j.put("tick",ticks);j.put("phase",end?"END":"START");j.put("action",action);j.put("action_tick",actionTick);
             double x=(Double)call(player,"getX"),y=(Double)call(player,"getY"),z=(Double)call(player,"getZ");
             j.put("player_x",x);j.put("player_y",y);j.put("player_z",z);
+            if("1".equals(System.getenv("VIAFORGE_VISUAL_SESSION"))) {
+                j.put("yaw",call(player,"getYRot"));j.put("pitch",call(player,"getXRot"));
+                if(ticks%10==0) {
+                    List<Map<String,Object>> remote=new ArrayList<>();
+                    for(Object other:(Iterable<?>)call(level,"entitiesForRendering"))if(other.getClass().getSimpleName().equals("RemotePlayer")) {
+                        Map<String,Object> p=new LinkedHashMap<>();p.put("name",String.valueOf(call(other,"getName")));p.put("x",call(other,"getX"));p.put("y",call(other,"getY"));p.put("z",call(other,"getZ"));p.put("invisible",call(other,"isInvisible"));p.put("using",call(other,"isUsingItem"));p.put("held",String.valueOf(call(other,"getMainHandItem")));remote.add(p);
+                    }
+                    j.put("remote_players",remote);
+                }
+            }
             if("1".equals(System.getenv("VIAFORGE_INTERACTION_PROBE"))) {
                 j.put("elytra",call(player,"isFallFlying"));
                 int boosts=0;
@@ -195,6 +284,12 @@ public final class NativePushProbe {
                 j.put("water_efficiency",player.getClass().getMethod("getAttributeValue",Class.forName("net.minecraft.core.Holder")).invoke(player,efficiency));
             }
             j.put("loaded",call(field(player,"connection"),"hasClientLoaded"));j.put("paused",call(mc,"isPaused"));
+            if("1".equals(System.getenv("VIAFORGE_VISUAL_SESSION"))) {
+                Object screen=call(field(mc,"gui"),"screen");j.put("screen",screen==null?"none":screen.getClass().getSimpleName());
+                j.put("using",call(player,"isUsingItem"));j.put("active_hand",String.valueOf(call(player,"getUsedItemHand")));
+                Object held=call(player,"getMainHandItem");j.put("use_action",String.valueOf(call(held,"getUseAnimation")));j.put("components",String.valueOf(call(held,"getComponents")));
+                if(end)try{Files.writeString(directory.resolve("visual-state.json"),GSON.toJson(j));}catch(FileSystemException busySnapshot){}
+            }
             Object playerBox=call(player,"getBoundingBox");j.put("player_box",playerBox.toString());
             List<Map<String,Object>> nearby=new ArrayList<>();
             for(Object e:(Iterable<?>)call(level,"entitiesForRendering")) {

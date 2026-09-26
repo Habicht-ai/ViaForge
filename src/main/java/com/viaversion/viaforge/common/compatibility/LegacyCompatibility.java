@@ -18,12 +18,12 @@ final class LegacyCompatibility {
             profiles.add(new CompatibilityProfile(wire.protocol(),rules,ResourceProfile.legacy(wire.resourceVersion()),new LegacyProtocolAdapter.Factory(wire)));
         }
         int[] flattened={393,401,404};String[] resources={"1.13","1.13.1","1.13.2"};
-        VersionRules v113=v112.derive().rule(CONCURRENT_CLIENT_TASKS,true).rule(EXPANDED_BLOCK_RAY,true).rule(MODERN_LOOK_VECTOR,true).rule(MODERN_BLOCK_USE_FAILURE,true).rule(SWIMMING,true).rule(BIOME_WATER_COLORS,true).build();
+        VersionRules v113=v112.derive().rule(BUBBLE_PARTICLES,true).rule(CONCURRENT_CLIENT_TASKS,true).rule(EXPANDED_BLOCK_RAY,true).rule(MODERN_LOOK_VECTOR,true).rule(MODERN_BLOCK_USE_FAILURE,true).rule(SWIMMING,true).rule(BIOME_WATER_COLORS,true).build();
         VersionRules v1131=v113.derive().rule(PREDICT_HOTBAR_DROPS,true).build();
         for(int i=0;i<flattened.length;i++)profiles.add(new CompatibilityProfile(flattened[i],i==0?v113:v1131,
                 new ResourceProfile(resources[i],com.viaversion.viaforge.blocks.resources.FlattenedResourceConverter::convert),new FlattenedProtocolAdapter.Factory(flattened[i])));
         int[] village={477,480,485,490,498};String[] villageResources={"1.14","1.14.1","1.14.2","1.14.3","1.14.4"};
-        VersionRules v114=v1131.derive().rule(JUMP_CLIMBING,true).rule(SHIFT_SWIM_INPUT,true).rule(DOUBLE_SWIM_INPUT,true).rule(SLEEPING_PUSH_IMMUNITY,true).rule(CRAWLING_POSE,true).build();
+        VersionRules v114=v1131.derive().rule(BUBBLE_EXPIRE_FIRST,true).rule(JUMP_CLIMBING,true).rule(SHIFT_SWIM_INPUT,true).rule(DOUBLE_SWIM_INPUT,true).rule(SLEEPING_PUSH_IMMUNITY,true).rule(CRAWLING_POSE,true).build();
         for(int i=0;i<village.length;i++)profiles.add(new CompatibilityProfile(village[i],v114,
                 new ResourceProfile(villageResources[i],com.viaversion.viaforge.blocks.resources.VillageResourceConverter::convert),new FlattenedProtocolAdapter.Factory(village[i])));
         int[] buzzy={573,575,578};String[] buzzyResources={"1.15","1.15.1","1.15.2"};
@@ -36,12 +36,12 @@ final class LegacyCompatibility {
         for(int i=0;i<nether.length;i++)profiles.add(new CompatibilityProfile(nether[i],nether[i]>=751?v1162:v116,
                 new ResourceProfile(netherResources[i],com.viaversion.viaforge.blocks.resources.NetherResourceConverter::convert),new FlattenedProtocolAdapter.Factory(nether[i])));
         int[] caves={755,756};String[] cavesResources={"1.17","1.17.1"};
-        VersionRules v117=v1162.derive().rule(SHULKER_DELTA_PUSH,true).rule(SWIM_FEET_IN_WATER,true).rule(PRECISE_ENTITY_PUSH,true).build();
+        VersionRules v117=v1162.derive().rule(BUBBLE_BASE_TICK,true).rule(SHULKER_DELTA_PUSH,true).rule(SWIM_FEET_IN_WATER,true).rule(PRECISE_ENTITY_PUSH,true).build();
         for(int i=0;i<caves.length;i++)profiles.add(new CompatibilityProfile(caves[i],v117,
                 new ResourceProfile(cavesResources[i],com.viaversion.viaforge.blocks.resources.CavesResourceConverter::convert),new FlattenedProtocolAdapter.Factory(caves[i])));
         int[] cliffs={757,758};String[] cliffsResources={"1.18.1","1.18.2"};
         VersionRules v118=v117.derive().build();
-        VersionRules v1182=v118.derive().rule(PRECISE_MOVEMENT_PACKETS,true).rule(JAVA_ELYTRA_LIFT,true).rule(FIREWORK_HAND_TRAIL,true).build();
+        VersionRules v1182=v118.derive().rule(BUBBLE_FLOAT_ANGLE,true).rule(PRECISE_MOVEMENT_PACKETS,true).rule(JAVA_ELYTRA_LIFT,true).rule(FIREWORK_HAND_TRAIL,true).build();
         for(int i=0;i<cliffs.length;i++)profiles.add(new CompatibilityProfile(cliffs[i],i==0?v118:v1182,
                 new ResourceProfile(cliffsResources[i],com.viaversion.viaforge.blocks.resources.CavesResourceConverter::convert),new FlattenedProtocolAdapter.Factory(cliffs[i])));
         int[] wild={759,760};String[] wildResources={"1.19","1.19.2"};
@@ -69,7 +69,7 @@ final class LegacyCompatibility {
         profiles.add(new CompatibilityProfile(772,v1215,new ResourceProfile("1.21.8",com.viaversion.viaforge.blocks.resources.SpringResourceConverter::convert),new FlattenedProtocolAdapter.Factory(772)));
         VersionRules v1219=v1215.derive().rule(DEDICATED_PACKET_QUEUE,true).rule(PRECISE_BLOCK_EFFECTS,true).build();
         profiles.add(new CompatibilityProfile(773,v1219,new ResourceProfile("1.21.10",com.viaversion.viaforge.blocks.resources.SpringResourceConverter::convert),new FlattenedProtocolAdapter.Factory(773)));
-        VersionRules v12111=v1219.derive().rule(DOUBLE_TRIG_LOOKUP,true).rule(CAPTURED_INVENTORY_FLIGHT,true).build();
+        VersionRules v12111=v1219.derive().rule(BUBBLE_FLOAT_RANDOM,true).rule(DOUBLE_TRIG_LOOKUP,true).rule(CAPTURED_INVENTORY_FLIGHT,true).build();
         profiles.add(new CompatibilityProfile(774,v12111,new ResourceProfile("1.21.11",com.viaversion.viaforge.blocks.resources.SpringResourceConverter::convert),new FlattenedProtocolAdapter.Factory(774)));
         VersionRules v261=v12111.derive().rule(ENTITY_FLUID_TRACKER,true).build();
         profiles.add(new CompatibilityProfile(775,v261,new ResourceProfile("26.1.2",com.viaversion.viaforge.blocks.resources.Year26ResourceConverter::convert),new FlattenedProtocolAdapter.Factory(775)));

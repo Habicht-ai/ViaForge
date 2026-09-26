@@ -48,7 +48,18 @@ public final class ItemDefinitionResourceConverter {
         if(type.equals("model"))return node.get("model").getAsString();
         if(type.equals("special"))return node.get("base").getAsString();
         if(type.equals("condition"))return defaultModel(node.getAsJsonObject("on_false"));
-        if(type.equals("range_dispatch")||type.equals("select"))return defaultModel(node.getAsJsonObject("fallback"));
+        if(type.equals("range_dispatch")) {
+            // At zero an entry with threshold <= 0 wins over fallback. Modern
+            // compass/clock definitions have no fallback: their first frame owns
+            // the original inherited display transforms (not 1.8's large grip).
+            JsonObject selected=node.getAsJsonObject("fallback");double threshold=Double.NEGATIVE_INFINITY;
+            if(node.has("entries"))for(JsonElement element:node.getAsJsonArray("entries")) {
+                JsonObject entry=element.getAsJsonObject();double value=entry.get("threshold").getAsDouble();
+                if(value<=0&&value>=threshold){threshold=value;selected=entry.getAsJsonObject("model");}
+            }
+            return defaultModel(selected);
+        }
+        if(type.equals("select"))return defaultModel(node.getAsJsonObject("fallback"));
         return null;
     }
     private ItemDefinitionResourceConverter() { }

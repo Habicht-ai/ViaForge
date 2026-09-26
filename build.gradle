@@ -74,7 +74,7 @@ unimined.minecraft {
     runs {
         config('client') {
             javaVersion = JavaVersion.VERSION_1_8
-            workingDir file('run')
+            workingDir file(providers.environmentVariable('VIAFORGE_GAME_DIR').getOrElse('run'))
             // Forge 1.8.9 cannot read the original Java 17+ classes.
             // Run the complete downgraded development JAR with only game libraries.
             classpath = classpath - sourceSets.main.output - configurations.library + configurations.minecraftLibraries
@@ -277,6 +277,7 @@ tasks.register('sourceArchive', Zip) {
         include 'src/**', 'gradle/**', 'docs/**'
         include 'tools/test-servers/*.py', 'tools/test-servers/*.json'
         include 'tools/test-servers/labac/**', 'tools/test-servers/native-probe/*.java'
+        include 'tools/test-servers/session-lab/*.java'
         include '*.gradle', '*.properties', '*.bat', 'gradlew', 'README.md', 'LICENSE'
         include '.editorconfig', '.gitignore', '.github/workflows/build.yml'
     }

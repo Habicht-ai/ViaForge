@@ -79,6 +79,21 @@ final class ShulkerItemRenderSmokeTest {
             ServerEntityViews.View view = ServerEntityViews.get(1710);
             require(view != null, "Shulker renderer equipment fixture");
             nativeGround(world, recorder);
+            // Animated native items retain their native texture animation but use
+            // the selected original frame's inherited hand display transforms.
+            for(Item item:new Item[]{net.minecraft.init.Items.compass,net.minecraft.init.Items.clock,net.minecraft.init.Items.paper}) {
+                String name=Item.itemRegistry.getNameForObject(item).getResourcePath();
+                String path="item/"+name;
+                if(zip.getEntry("assets/minecraft/models/"+path+".json")==null)path+=name.equals("compass")?"_16":"_00";
+                JsonObject display=originalDisplay(zip,path,0);ItemStack stack=new ItemStack(item);
+                for(boolean left:new boolean[]{false,true})for(TransformType type:new TransformType[]{TransformType.FIRST_PERSON,TransformType.THIRD_PERSON}) {
+                    HandModels.current=stack;HandModels.left=left;
+                    GlStateManager.loadIdentity();recorder.matrix=null;recorder.renderItemModelForEntity(stack,remote,type);
+                    HandModels.current=null;
+                    GlStateManager.loadIdentity();originalTransform(display,type==TransformType.THIRD_PERSON?"thirdperson":"firstperson",left);GlStateManager.scale(2,2,2);
+                    compare(recorder.matrix,target.resources().version()+" "+name+" "+type+" left="+left);
+                }
+            }
             String[] models = {"purpur_block", "beetroot_seeds", "shield", "diamond_sword"};
             int[] ids = {201, 435, 442};
             for (int i = 0; i < models.length; i++) {

@@ -18,6 +18,7 @@ public abstract class MixinCompatibilityBoundary {
     }
     @Inject(method = "transform", at = @At("HEAD"))
     private void preserve(Direction direction, State state, PacketWrapper packet, CallbackInfo ci) throws CancelException {
+        if(direction==Direction.CLIENTBOUND&&com.viaversion.viaforge.compatibility.ModernServerPacks.capture(this,state,packet))throw CancelException.generate();
         if (direction != Direction.CLIENTBOUND || state != State.PLAY) return;
         FlattenedProtocolAdapter adapter = packet.user().get(FlattenedProtocolAdapter.class);
         if (adapter != null && adapter.beforeProtocol(this, packet)) throw CancelException.generate();

@@ -62,6 +62,18 @@ public final class FlattenedProtocolAdapter implements PacketAdapter, StorableOb
             }catch(Exception error){event.release();throw new IllegalStateException("Invalid play ping",error);}
         }
         boolean original=protocol instanceof Protocol1_13To1_12_2;
+        if(original&&packet.getId()==ClientboundPackets1_13.LEVEL_PARTICLES.getId()) {
+            ByteBuf copy=null;
+            try {
+                copy=snapshot(packet);Types.VAR_INT.readPrimitive(copy);int particle=copy.readInt();
+                if(particle>=45&&particle<=47) {
+                    ByteBuf event=Unpooled.buffer();Types.VAR_INT.writePrimitive(event,0x3f);Types.STRING.write(event,"VF|entity");
+                    event.writeShort(340).writeByte(9).writeInt(1000+particle).writeBytes(copy);
+                    pending.add(event);packet.cancel();return true;
+                }
+            }catch(Exception failure){throw new IllegalStateException("Invalid original bubble particle",failure);}
+            finally{if(copy!=null)copy.release();}
+        }
         boolean modern=protocol instanceof com.viaversion.viabackwards.protocol.v1_14to1_13_2.Protocol1_14To1_13_2;
         boolean legacy=protocol instanceof Protocol1_12_2To1_12_1;
         if(flattened==null)flattened=new FlattenedBlockData(waterColors);

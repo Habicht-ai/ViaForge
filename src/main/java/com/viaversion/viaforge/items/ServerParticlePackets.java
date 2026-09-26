@@ -11,7 +11,7 @@ public final class ServerParticlePackets {
     private static final Random RANDOM = new Random();
     public static void accept(WorldClient world, ByteBuf input) {
         int type = input.readInt();
-        if (type != 45 && type != 47 && type != 42 && type != 43 && type != 48) return;
+        if (type != 45 && type != 47 && type != 42 && type != 43 && type != 48 && (type<1045||type>1047)) return;
         boolean longDistance = input.readBoolean();
         double x = input.readFloat(), y = input.readFloat(), z = input.readFloat();
         double dx = input.readFloat(), dy = input.readFloat(), dz = input.readFloat(), speed = input.readFloat();

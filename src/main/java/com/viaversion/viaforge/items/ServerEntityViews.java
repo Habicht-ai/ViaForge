@@ -31,7 +31,10 @@ public final class ServerEntityViews {
     public static void clear() { com.viaversion.viaforge.compatibility.ServerSwimming.clear(); com.viaversion.viaforge.compatibility.ClientEntityMotion.clear(); ServerElytraFlight.clear(); VIEWS.clear(); world = null; com.viaversion.viaforge.blocks.ServerEditorPermissions.clear(); ServerTotemAnimation.clear(); ServerCombatState.clear(); ServerItemCooldowns.clear(); com.viaversion.viaforge.hands.Offhand.clear(); com.viaversion.viaforge.mobs.ServerMobs.clear(); com.viaversion.viaforge.boats.ServerBoats.clear(); }
     public static View get(int id) { return world == Minecraft.getMinecraft().theWorld ? VIEWS.get(id) : null; }
     public static boolean blocking(EntityLivingBase entity, boolean offhand, ItemStack stack) {
-        if (!ClientItems.is(stack, com.viaversion.viaforge.common.blocks.LegacyItemCatalog.Kind.SHIELD)) return false;
+        // Use the retained item's action, just like the original player renderer.
+        // Modern swords without blocks_attacks still return NONE; first-person
+        // use, the local F5 model and remote hand metadata now share this decision.
+        if (stack == null || stack.getItemUseAction() != net.minecraft.item.EnumAction.BLOCK) return false;
         if (entity == Minecraft.getMinecraft().thePlayer) return (offhand==(com.viaversion.viaforge.hands.Offhand.useHand==1)) && ((EntityPlayer)entity).getItemInUse() == stack;
         View view = get(entity.getEntityId());
         return view != null && (view.handState & 1) != 0 && ((view.handState & 2) != 0) == offhand;

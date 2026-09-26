@@ -6,6 +6,9 @@ item, entity or gameplay mechanic introduced by those later releases.
 
 Current upgrade details and limitations: [26.3 and Elytra](UPGRADE-26.3.md). Historical verification entries below describe their dated runs.
 
+The later [F5, bubble, proxy-switch and server-resource work](SESSION-RESOURCES.md)
+records its own original-client comparisons and incomplete modern pack-format support.
+
 ## Protocol support and profiles
 
 The bundled ViaVersion/ViaBackwards 5.12.0 and ViaRewind 4.2.0 provide a path from

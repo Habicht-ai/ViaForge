@@ -1,5 +1,8 @@
 # Two hands on supported server profiles
 
+The September26 compass/clock hand-size correction and original-client captures
+are described in [REJOIN-ITEMS.md](REJOIN-ITEMS.md).
+
 The latest first-person crouching/crawling and rocket-model corrections and their
 validation are described in [the September 20 regression report](REGRESSIONS-2026-09-20.md).
 

@@ -16,6 +16,8 @@ public final class ParticleAtlasConverter {
             // 1.13 doubled the atlas grid to 32 columns; the existing 16 columns
             // of each of the first 16 rows retain their old semantic positions.
             for(int y=0;y<16*cell;y++)for(int x=0;x<16*cell;x++)result.setRGB(x,y,source.getRGB(x,y));
+            // Five 2x2-cell bubble-pop frames live beyond the copied 1.13 rows.
+            for(int frame=0;frame<5;frame++)copy(source,result,frame*2*cell,16*cell,frame*2*cell,12*cell,2*cell,2*cell);
             ByteArrayOutputStream output=new ByteArrayOutputStream();ImageIO.write(result,"png",output);return output.toByteArray();
         }catch(IOException error){throw new IllegalArgumentException("Cannot convert particle atlas",error);}
     }
@@ -31,6 +33,7 @@ public final class ParticleAtlasConverter {
         int[] slots={16,19,20,21,22,32,48,49,64,65,66,67,80,81,82,112,113,114};
         String[] names={"splash_0","splash_0","splash_1","splash_2","splash_3","bubble","flame","lava","note","critical_hit","enchanted_hit","damage","heart","angry","glint","drip_hang","drip_fall","drip_land"};
         for(int i=0;i<slots.length;i++)sprite(source,atlas,slots[i],names[i]);
+        for(int i=0;i<5;i++)copy(read(source,"textures/particle/bubble_pop_"+i+".png"),atlas,0,0,i*16,96,16,16);
         for(int i=0;i<26;i++)sprite(source,atlas,225+i,"sga_"+(char)('a'+i));
         result.put("textures/particle/particles.png",encode(atlas));
         result.put("textures/entity/explosion.png",frames(source,"explosion_",16,32,32,0));

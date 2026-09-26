@@ -646,7 +646,7 @@ final class FlattenedPipelineSmokeTest {
         }
         ByteBuf totem=packet(ClientboundPackets1_13.ENTITY_EVENT);totem.writeInt(1).writeByte(35);receive(totem);data=event(8);data.release();require(client.readInbound()==null,"No duplicate Totem fallback");
         ByteBuf swing=wilderness?BlockPipelineSmokeTest.packet(ClientboundPackets26_3.SWING_ANIMATION.getId()):packet(ClientboundPackets1_13.ANIMATE);Types.VAR_INT.writePrimitive(swing,1);if(wilderness){Types.VAR_INT.writePrimitive(swing,1);Types.VAR_INT.writePrimitive(swing,1);Types.VAR_INT.writePrimitive(swing,6);}else swing.writeByte(3);receive(swing);data=event(27);data.release();require(client.readInbound()==null,"No duplicate offhand swing");
-        for(int[] ids:new int[][]{{8,42},{16,43},{40,45},{41,47},{38,48}}) {
+        for(int[] ids:new int[][]{{8,42},{16,43},{40,45},{41,47},{38,48},{45,1045},{46,1046},{47,1047}}) {
             ByteBuf particles=packet(ClientboundPackets1_13.LEVEL_PARTICLES);
             if(wilderness){
                 VersionedTypes.V26_3.particle().write(particles,targetParticle(ids[0]));
@@ -815,8 +815,12 @@ final class FlattenedPipelineSmokeTest {
         if(!village) {
             java.awt.image.BufferedImage sourceAtlas=javax.imageio.ImageIO.read(new java.io.ByteArrayInputStream(original.get("textures/particle/particles.png")));
             require(sourceAtlas.getWidth()==256,"Original 1.13 particle atlas");
-            for(int y=0;y<128;y++)for(int x=0;x<128;x++)require(atlas.getRGB(x,y)==sourceAtlas.getRGB(x,y),"Original particle texel "+x+","+y);
+            for(int y=0;y<128;y++)for(int x=0;x<128;x++)require(atlas.getRGB(x,y)==sourceAtlas.getRGB(x,y>=96&&y<112&&x<80?y+32:y),"Original particle texel / relocated pop frame "+x+","+y);
         }else {
+            for(int i=0;i<5;i++) {
+                java.awt.image.BufferedImage sprite=javax.imageio.ImageIO.read(new java.io.ByteArrayInputStream(original.get("textures/particle/bubble_pop_"+i+".png")));
+                for(int y=0;y<16;y++)for(int x=0;x<16;x++)require(atlas.getRGB(i*16+x,96+y)==sprite.getRGB(x,y),"Original bubble-pop frame "+i);
+            }
             for(int i=0;i<8;i++) {
                 java.awt.image.BufferedImage sprite=javax.imageio.ImageIO.read(new java.io.ByteArrayInputStream(original.get("textures/particle/glitter_"+i+".png")));
                 for(int y=0;y<8;y++)for(int x=0;x<8;x++)require(atlas.getRGB(i*8+x,88+y)==sprite.getRGB(x,y),"Original Totem/end-rod sprite "+i);

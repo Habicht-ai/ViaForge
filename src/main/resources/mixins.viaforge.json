@@ -5,6 +5,9 @@
   "package": "com.viaversion.viaforge.mixin.impl",
   "refmap": "mixins.viaforge.refmap.json",
   "client": [
+    "connect.MixinServerResourcePacks",
+    "connect.ServerPackRepositoryAccess",
+    "items.MixinBubbleDisplay",
     "connect.MixinPacketTasks",
     "connect.MixinPacketTaskStage",
     "connect.MixinConcurrentClientTasks",

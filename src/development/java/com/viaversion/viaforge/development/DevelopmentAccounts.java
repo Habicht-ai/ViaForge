@@ -21,6 +21,7 @@ public final class DevelopmentAccounts {
     @Mod.EventHandler
     public void onInit(FMLInitializationEvent event) {
         HotbarTrace.install();
+        if (SessionVisualProbe.installIfRequested()) return;
         if (LiveBoatProbe.installIfRequested()) return;
         if (ProtocolConnectionSmokeTest.installIfRequested()) return;
         if (LiveFlightSmokeTest.installIfRequested()) return;

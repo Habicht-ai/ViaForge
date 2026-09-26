@@ -17,6 +17,7 @@ public final class HandModels {
     public static boolean left;
     private static final Map<String,JsonObject> CACHE=new HashMap<>();
     private static String version;
+    public static void clear(){CACHE.clear();version=null;}
     public static void apply(IBakedModel model,ItemCameraTransforms.TransformType type) {
         Minecraft mc=Minecraft.getMinecraft();String now=ServerSession.getLoadedResourceVersion();
         if(!Objects.equals(now,version)){CACHE.clear();version=now;}

@@ -7,6 +7,21 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class SwimmingTest {
+    @Test public void bubbleVisualBoundariesDoNotEnableColumnsOnLegacyTargets() {
+        for(int protocol:new int[]{47,107,340,393,498,754,755,757,758,773,774,776}) {
+            VersionRules rules=CompatibilityRegistry.DEFAULT.resolve(protocol).rules();
+            assertEquals(protocol>=393,rules.enabled(ClientRule.BUBBLE_PARTICLES));
+            assertEquals(protocol>=477,rules.enabled(ClientRule.BUBBLE_EXPIRE_FIRST));
+            assertEquals(protocol>=755,rules.enabled(ClientRule.BUBBLE_BASE_TICK));
+            assertEquals(protocol>=758,rules.enabled(ClientRule.BUBBLE_FLOAT_ANGLE));
+            assertEquals(protocol>=774,rules.enabled(ClientRule.BUBBLE_FLOAT_RANDOM));
+        }
+        assertEquals(0,SwimmingFluids.descriptor("minecraft:soul_sand"));
+        assertEquals(0,SwimmingFluids.descriptor("minecraft:magma_block"));
+        assertEquals(1,SwimmingFluids.descriptor("minecraft:water[level=0]"));
+        assertEquals(1,SwimmingFluids.descriptor("minecraft:oak_slab[waterlogged=true]"));
+        assertEquals(17,SwimmingFluids.descriptor("minecraft:bubble_column[drag=false]"));
+    }
     @Test public void zeroSneakingSpeedProducesFiniteStationaryInput() {
         assertArrayEquals(new float[]{0,0},SwimmingPhysics.squareInput(0,1,1,0),0);
         assertArrayEquals(new float[]{0,0},SwimmingPhysics.squareInput(1,1,1,0),0);

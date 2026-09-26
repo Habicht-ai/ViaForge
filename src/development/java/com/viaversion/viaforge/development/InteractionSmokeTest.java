@@ -37,6 +37,16 @@ final class InteractionSmokeTest {
                 require(sword.getItemUseAction()==EnumAction.BLOCK&&sword.getMaxItemUseDuration()==72000,"Original component blocking action and duration");
                 sword.useItemRightClick(world,player);
                 require(player.isUsingItem()&&player.getItemInUse()==sword,"Block component starts actual native item use");
+                ItemStack previousHeld=player.getHeldItem();int previousHand=com.viaversion.viaforge.hands.Offhand.useHand;
+                try {
+                    player.inventory.mainInventory[player.inventory.currentItem]=sword;com.viaversion.viaforge.hands.Offhand.useHand=0;
+                    net.minecraft.client.model.ModelPlayer model=new net.minecraft.client.model.ModelPlayer(0,false);
+                    model.setRotationAngles(0,0,0,0,0,.0625F,player);
+                    require(com.viaversion.viaforge.items.ServerEntityViews.blocking(player,false,sword),"Active component sword reaches F5 arm selection");
+                    require(model.heldItemLeft==3||model.heldItemRight==3,"F5 component sword uses original BLOCK arm pose");
+                    player.clearItemInUse();model.setRotationAngles(0,0,0,0,0,.0625F,player);
+                    require(model.heldItemLeft!=3&&model.heldItemRight!=3,"F5 returns to idle after actual use release");
+                }finally{player.inventory.mainInventory[player.inventory.currentItem]=previousHeld;com.viaversion.viaforge.hands.Offhand.useHand=previousHand;}
                 player.clearItemInUse();
                 BlockingRenderSmokeTest.verify(sword);
                 ItemStack plain=new ItemStack(Items.diamond_sword);plain.useItemRightClick(world,player);
